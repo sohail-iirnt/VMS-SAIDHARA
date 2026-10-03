@@ -149,7 +149,6 @@ function InternalTransfers({profile,locations,duty,refresh}:{profile:Profile;loc
   const un2=onSnapshot(query(collection(db,"internalTransfers"),where("destinationLocationId","==",profile.locationId)),s=>setRows(old=>[...old.filter(x=>x.destinationLocationId!==profile.locationId||!x.__incoming),...s.docs.map(d=>({id:d.id,...d.data(),__incoming:true}))]));
   return()=>{un1();un2();clean()};
  },[profile,refresh]);
- const outgoing=rows.filter(r=>r.sourceLocationId===(profile.role==="admin"?r=>r.sourceLocationId:r.sourceLocationId));
  const shownBase=profile.role==="admin"
    ? rows
    : subTab==="incoming"?rows.filter(r=>r.destinationLocationId===profile.locationId):rows.filter(r=>r.sourceLocationId===profile.locationId);
