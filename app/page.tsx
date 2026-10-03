@@ -8,12 +8,13 @@ import {LayoutDashboard,Users,PackageCheck,Ticket,BarChart3,Settings,LogOut,Plus
 import JsBarcode from "jsbarcode";
 
 type Profile={uid:string;name:string;email:string;role:"admin"|"security";locationId:string;active:boolean};
-type Location={id:string;name:string};
+type Location={id:string;name:string;active?:boolean};
+type DutyDesk={id:string;locationId:string;securityPersonId:string;securityPersonName:string;securityPersonEmail?:string;status:"ACTIVE"|"ENDED";startedAt?:any;endedAt?:any;startedBy?:string;startedByName?:string};
 const LOCATIONS:Location[]=[
 {id:"ADMIN",name:"Main Admin Office"},{id:"I",name:"Warehouse I"},{id:"J",name:"Warehouse J"},{id:"K",name:"Warehouse K"},{id:"L",name:"Warehouse L"},{id:"O",name:"Warehouse O"},{id:"P",name:"Warehouse P"},{id:"Q",name:"Warehouse Q"},{id:"R",name:"Warehouse R"},{id:"S",name:"Warehouse S"},{id:"T",name:"Warehouse T"},{id:"H14-MHE",name:"H14 (MHE)"}];
 const purposes=["Meeting","Visitor","Official","Others"];
 const today=()=>new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
-const locName=(id:string)=>LOCATIONS.find(x=>x.id===id)?.name||id;
+const locName=(id:string,locations:Location[]=LOCATIONS)=>locations.find(x=>x.id===id)?.name||LOCATIONS.find(x=>x.id===id)?.name||id;
 const fmt=(v:any)=>v?.toDate?v.toDate().toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}):v?new Date(v).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}):"—";
 
 export default function Home(){
@@ -30,21 +31,30 @@ function Login(p:any){
 }
 
 function Portal({profile}:{profile:Profile}){
- const [tab,setTab]=useState("dashboard"),[mobile,setMobile]=useState(false),[refresh,setRefresh]=useState(0);
- const allowed=profile.role==="admin"?LOCATIONS:LOCATIONS.filter(x=>x.id===profile.locationId);
+ const [tab,setTab]=useState("dashboard"),[mobile,setMobile]=useState(false),[refresh,setRefresh]=useState(0),[locations,setLocations]=useState<Location[]>(LOCATIONS),[duty,setDuty]=useState<DutyDesk|null>(null);
+ useEffect(()=>onSnapshot(collection(db,"locations"),s=>{const docs=s.docs.map(d=>({id:d.id,...d.data()} as Location)).filter(x=>x.active!==false);if(docs.length)setLocations(docs)},[]),[]);
+ const allowed=profile.role==="admin"?locations:locations.filter(x=>x.id===profile.locationId);
  const items:any[]=[["dashboard","Dashboard",LayoutDashboard],["visitors","Visitors",Users],["assets","Assets",PackageCheck],["gatepasses","Gate Passes",Ticket],["analytics","Analytics",BarChart3],...(profile.role==="admin"?[["settings","Settings",Settings]]:[])];
- return <div className="app"><aside className={mobile?"side open":"side"}><div className="sideBrand"><div className="logoCircle small">S</div><div><b>SAIDHARA</b><span>NDC OPERATIONS</span></div></div><div className="locationPill"><MapPin size={15}/>{profile.role==="admin"?"All locations":locName(profile.locationId)}</div><nav>{items.map(([id,label,Icon])=><button className={tab===id?"nav active":"nav"} onClick={()=>{setTab(id);setMobile(false)}} key={id}><Icon size={19}/><span>{label}</span></button>)}</nav><div className="sideBottom"><div className="profileMini"><div className="avatar">{profile.name?.slice(0,1)||"S"}</div><div><b>{profile.name}</b><span>{profile.role==="admin"?"Administrator":"Desk Security"}</span></div></div><button className="nav logout" onClick={()=>import("firebase/auth").then(x=>x.signOut(auth))}><LogOut size={18}/> Sign out</button></div></aside><section className="main"><header><div className="headLeft"><button className="mobileMenu" onClick={()=>setMobile(!mobile)}><Menu/></button><div><span className="crumb">NDC / {profile.role==="admin"?"CONTROL CENTER":locName(profile.locationId).toUpperCase()}</span><h2>{tab==="dashboard"?"Operations Dashboard":tab[0].toUpperCase()+tab.slice(1)}</h2></div></div><button className="iconBtn" title="Refresh" onClick={()=>setRefresh(x=>x+1)}><RefreshCw size={18}/></button></header><div className="content"><Page tab={tab} profile={profile} allowed={allowed} refresh={refresh}/></div></section></div>;
+ return <div className="app"><aside className={mobile?"side open":"side"}><div className="sideBrand"><div className="logoCircle small">S</div><div><b>SAIDHARA</b><span>NDC OPERATIONS</span></div></div><div className="locationPill"><MapPin size={15}/>{profile.role==="admin"?"All locations":locName(profile.locationId,locations)}</div><nav>{items.map(([id,label,Icon])=><button className={tab===id?"nav active":"nav"} onClick={()=>{setTab(id);setMobile(false)}} key={id}><Icon size={19}/><span>{label}</span></button>)}</nav><div className="sideBottom"><div className="profileMini"><div className="avatar">{profile.name?.slice(0,1)||"S"}</div><div><b>{profile.name}</b><span>{profile.role==="admin"?"Administrator":"Desk Security"}</span></div></div><button className="nav logout" onClick={()=>import("firebase/auth").then(x=>x.signOut(auth))}><LogOut size={18}/> Sign out</button></div></aside><section className="main"><header><div className="headLeft"><button className="mobileMenu" onClick={()=>setMobile(!mobile)}><Menu/></button><div><span className="crumb">NDC / {profile.role==="admin"?"CONTROL CENTER":locName(profile.locationId,locations).toUpperCase()}</span><h2>{tab==="dashboard"?"Operations Dashboard":tab[0].toUpperCase()+tab.slice(1)}</h2></div></div><div className="headerRight"><DutyDeskBar profile={profile} locations={locations} duty={duty} onChange={setDuty}/><button className="iconBtn" title="Refresh" onClick={()=>setRefresh(x=>x+1)}><RefreshCw size={18}/></button></div></header><div className="content"><Page tab={tab} profile={profile} allowed={allowed} locations={locations} duty={duty} refresh={refresh}/></div></section></div>;
+}
+function Page({tab,profile,allowed,locations,duty,refresh}:{tab:string;profile:Profile;allowed:Location[];locations:Location[];duty:DutyDesk|null;refresh:number}){
+ if(tab==="dashboard")return <Dashboard profile={profile} locations={locations}/>;
+ if(tab==="visitors")return <Visitors profile={profile} allowed={allowed} locations={locations} duty={duty} refresh={refresh}/>;
+ if(tab==="assets")return <Assets profile={profile} locations={locations} duty={duty} refresh={refresh}/>;
+ if(tab==="gatepasses")return <GatePasses profile={profile} locations={locations} duty={duty} refresh={refresh}/>;
+ if(tab==="analytics")return <Analytics profile={profile} allowed={allowed} locations={locations}/>;
+ return <SettingsPage locations={locations}/>;
 }
 
-function Page({tab,profile,allowed,refresh}:{tab:string;profile:Profile;allowed:Location[];refresh:number}){
- if(tab==="dashboard")return <Dashboard profile={profile}/>;
- if(tab==="visitors")return <Visitors profile={profile} allowed={allowed} refresh={refresh}/>;
- if(tab==="assets")return <Assets profile={profile} refresh={refresh}/>;
- if(tab==="gatepasses")return <GatePasses profile={profile} refresh={refresh}/>;
- if(tab==="analytics")return <Analytics profile={profile} allowed={allowed}/>;
- return <SettingsPage/>;
+function DutyDeskBar({profile,locations,duty,onChange}:{profile:Profile;locations:Location[];duty:DutyDesk|null;onChange:(d:DutyDesk|null)=>void}){
+ const [users,setUsers]=useState<any[]>([]),[locationId,setLocationId]=useState(profile.role==="admin"?(duty?.locationId||"ADMIN"):profile.locationId),[securityId,setSecurityId]=useState(""),[busy,setBusy]=useState(false);
+ useEffect(()=>{const ids=profile.role==="admin"?locations.map(x=>x.id):[profile.locationId];const us=ids.map(id=>onSnapshot(query(collection(db,"users"),where("role","==","security"),where("locationId","==",id)),snap=>setUsers(old=>[...old.filter(x=>x.locationId!==id),...snap.docs.map(d=>({id:d.id,...d.data()}))])));return()=>us.forEach(x=>x())},[profile,locations]);
+ useEffect(()=>{if(duty){setLocationId(duty.locationId);setSecurityId(duty.securityPersonId)}},[duty]);
+ const locationUsers=users.filter(u=>u.locationId===locationId&&u.active!==false);
+ const start=async()=>{if(!locationId)return alert("Select a location.");if(!securityId)return alert("Select the security desk person first.");const person=locationUsers.find(x=>x.id===securityId);if(!person)return;setBusy(true);try{const ref=doc(db,"deskSessions",locationId);const existing=await getDoc(ref);if(existing.exists()&&existing.data().status==="ACTIVE"&&existing.data().securityPersonId!==securityId)throw new Error(existing.data().securityPersonName+" is already on duty at "+locName(locationId,locations)+".");const data={locationId,securityPersonId:person.id,securityPersonName:person.name,securityPersonEmail:person.email,status:"ACTIVE",startedAt:serverTimestamp(),startedBy:profile.uid,startedByName:profile.name};await setDoc(ref,data);onChange({id:ref.id,...data} as DutyDesk)}catch(e:any){alert(e.message)}finally{setBusy(false)}};
+ const end=async()=>{if(!duty||duty.securityPersonId!==profile.uid)return alert("Only the selected security desk officer can end their own duty. Sign in as "+duty.securityPersonName+" to end this desk session.");setBusy(true);try{await updateDoc(doc(db,"deskSessions",duty.locationId),{status:"ENDED",endedAt:serverTimestamp(),endedBy:profile.uid,endedByName:profile.name});onChange(null)}catch(e:any){alert(e.message)}finally{setBusy(false)}};
+ return <div className="dutyDesk"><div className="dutyStatus"><span className={duty?"dutyDot active":"dutyDot"}/><div><small>ON-DUTY SECURITY</small><b>{duty?.securityPersonName||"No desk selected"}</b></div></div>{profile.role==="admin"&&<select value={locationId} onChange={e=>{setLocationId(e.target.value);setSecurityId("")}}>{locations.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select>}<select value={profile.role==="security"?profile.uid:securityId} disabled={profile.role==="security"||busy} onChange={e=>setSecurityId(e.target.value)}><option value="">Select desk officer</option>{locationUsers.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select>{duty?.securityPersonId===profile.uid?<button className="dutyLogout" onClick={end} disabled={busy}>End duty</button>:<button className="dutyStart" onClick={start} disabled={busy||!securityId}>{busy?"…":"Start duty"}</button>}</div>;
 }
-
 function Stat({label,value,icon}:any){return <div className="stat"><div className="statIcon">{icon}</div><div><span>{label}</span><strong>{value}</strong></div></div>}
 
 function Dashboard({profile}:{profile:Profile}){
