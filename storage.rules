@@ -1,0 +1,8 @@
+rules_version = '2';
+service firebase.storage {
+ match /b/{bucket}/o {
+  function signedIn(){return request.auth != null;}
+  function admin(){return signedIn() && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';}
+  match /visitorPhotos/{locationId}/{fileName} { allow read: if signedIn(); allow write: if signedIn() && (admin() || firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.locationId == locationId); }
+ }
+}
