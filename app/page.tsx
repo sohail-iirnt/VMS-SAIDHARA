@@ -49,7 +49,7 @@ function Stat({label,value,icon}:any){return <div className="stat"><div classNam
 function Dashboard({profile}:{profile:Profile}){
  const [stats,setStats]=useState({today:0,inside:0,assets:0,passes:0});
  useEffect(()=>{const ids=profile.role==="admin"?LOCATIONS.map(x=>x.id):[profile.locationId];const visitorToday:any={},visitorInside:any={},assets:any={},passes:any={};
- const apply=()=>setStats({today:Object.values(visitorToday).reduce((a:any,b:any)=>a+b,0),inside:Object.values(visitorInside).reduce((a:any,b:any)=>a+b,0),assets:Object.values(assets).reduce((a:any,b:any)=>a+b,0),passes:Object.values(passes).reduce((a:any,b:any)=>a+b,0)});
+ const apply=()=>setStats({today:Object.values(visitorToday).reduce<number>((a,b)=>a+Number(b),0),inside:Object.values(visitorInside).reduce<number>((a,b)=>a+Number(b),0),assets:Object.values(assets).reduce<number>((a,b)=>a+Number(b),0),passes:Object.values(passes).reduce<number>((a,b)=>a+Number(b),0)});
  const us=ids.map(id=>onSnapshot(query(collection(db,"visitors"),where("locationId","==",id)),s=>{visitorToday[id]=s.docs.filter(d=>d.data().entryDate===today()).length;visitorInside[id]=s.docs.filter(d=>!d.data().checkOutAt).length;apply()}));
  const as=ids.map(id=>onSnapshot(query(collection(db,"assets"),where("locationId","==",id)),s=>{assets[id]=s.size;apply()}));
  const gs=ids.map(id=>onSnapshot(query(collection(db,"gatePasses"),where("locationId","==",id)),s=>{passes[id]=s.size;apply()}));
