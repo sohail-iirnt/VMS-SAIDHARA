@@ -22,6 +22,12 @@ service cloud.firestore {
   match /visitors/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
   match /assets/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
   match /gatePasses/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
+  match /internalTransfers/{id} {
+    allow read: if admin() || (security() && (resource.data.sourceLocationId == me().locationId || resource.data.destinationLocationId == me().locationId));
+    allow create: if admin() || (security() && request.resource.data.sourceLocationId == me().locationId);
+    allow update: if admin() || (security() && resource.data.destinationLocationId == me().locationId && request.resource.data.sourceLocationId == resource.data.sourceLocationId && request.resource.data.destinationLocationId == resource.data.destinationLocationId && resource.data.status == 'SENT' && request.resource.data.status == 'RECEIVED_CLOSED');
+    allow delete: if admin();
+  }
   match /auditLogs/{id} { allow read: if admin(); allow create: if signedIn(); allow update,delete: if false; }
  }
 }
