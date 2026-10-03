@@ -9,10 +9,14 @@ service cloud.firestore {
   match /users/{uid} { allow read: if signedIn() && (request.auth.uid==uid || admin()); allow create,update,delete: if admin(); }
   match /locations/{id} { allow read: if signedIn(); allow write: if admin(); }
   match /settings/{id} { allow read: if signedIn(); allow write: if admin(); }
+  match /securityPersons/{id} {
+    allow read: if admin() || (security() && resource.data.locationId == me().locationId);
+    allow create,update,delete: if admin();
+  }
   match /deskSessions/{locationId} {
     allow read: if admin() || (security() && resource.data.locationId == me().locationId);
-    allow create: if admin() || (security() && request.resource.data.locationId == me().locationId && request.resource.data.securityPersonId == request.auth.uid);
-    allow update: if admin() || (security() && resource.data.locationId == me().locationId && resource.data.securityPersonId == request.auth.uid && request.resource.data.locationId == me().locationId && request.resource.data.securityPersonId == request.auth.uid);
+    allow create: if admin() || (security() && request.resource.data.locationId == me().locationId && request.resource.data.startedBy == request.auth.uid);
+    allow update: if admin() || (security() && resource.data.locationId == me().locationId && resource.data.startedBy == request.auth.uid && request.resource.data.locationId == me().locationId && request.resource.data.startedBy == request.auth.uid);
     allow delete: if admin();
   }
   match /visitors/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
