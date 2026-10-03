@@ -48,7 +48,7 @@ function Page({tab,profile,allowed,locations,duty,refresh}:{tab:string;profile:P
 
 function DutyDeskBar({profile,locations,duty,onChange}:{profile:Profile;locations:Location[];duty:DutyDesk|null;onChange:(d:DutyDesk|null)=>void}){
  const [people,setPeople]=useState<any[]>([]),[locationId,setLocationId]=useState(profile.role==="admin"?(duty?.locationId||"ADMIN"):profile.locationId),[personId,setPersonId]=useState(""),[busy,setBusy]=useState(false);
- useEffect(()=>{if(!locationId)return;return onSnapshot(query(collection(db,"securityPersons"),where("locationId","==",locationId)),snap=>setPeople(snap.docs.map(d=>({id:d.id,...d.data()})).filter((p:any)=>p.active!==false))},[locationId]);
+ useEffect(()=>{if(!locationId)return;return onSnapshot(query(collection(db,"securityPersons"),where("locationId","==",locationId)),snap=>setPeople(snap.docs.map(d=>({id:d.id,...d.data()})).filter((p:any)=>p.active!==false)))},[locationId]);
  useEffect(()=>{if(duty){setLocationId(duty.locationId);setPersonId(duty.securityPersonId)}else setPersonId("")},[duty]);
  useEffect(()=>{if(!locationId)return;return onSnapshot(doc(db,"deskSessions",locationId),snap=>{const d=snap.exists()?({id:snap.id,...snap.data()} as DutyDesk):null;if(d?.status==="ACTIVE")onChange(d);else if(duty?.locationId===locationId)onChange(null)})},[locationId]);
  const selected=people.find(x=>x.id===personId);
