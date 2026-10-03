@@ -98,6 +98,19 @@
  .transferTabs{grid-column:1/-1}
 }
 
+
+.transferIdentity{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:17px 18px;border:1px solid #dce4ee;border-radius:15px;background:linear-gradient(135deg,#f9fbfd,#f1f5fa);box-shadow:inset 0 1px 0 #fff}
+.transferIdentityCode span{display:block;font-size:8px;letter-spacing:.15em;font-weight:900;color:#8994a6}
+.transferIdentityCode b{display:block;font-size:24px;line-height:1.1;margin-top:6px;letter-spacing:.015em;color:#18263d}
+.transferIdentityCode small{display:block;font-size:9px;color:#8a95a6;margin-top:5px}
+.transferIdentityMeta{display:flex;align-items:center;gap:15px}
+.transferIdentityMeta>div{padding-left:15px;border-left:1px solid #dbe2eb}
+.transferIdentityMeta>div small{display:block;font-size:7px;letter-spacing:.12em;font-weight:900;color:#8b96a7}
+.transferIdentityMeta>div b{display:block;margin-top:4px;font-size:9px;color:#244b79}
+.transferIdentity .transferPill{white-space:nowrap}
+@media(max-width:760px){.transferIdentity{align-items:flex-start;flex-direction:column}.transferIdentityMeta{width:100%;justify-content:space-between}.transferIdentityMeta>div{margin-left:auto}}
+@media(max-width:560px){.transferIdentityCode b{font-size:20px}.transferIdentityMeta{gap:9px}.transferIdentityMeta>div{padding-left:9px}}
+
 /* Premium on-screen document previews — intentionally separate from print styling */
 .previewToolbarIdentity{min-width:0}
 .previewToolbarIdentity small{display:block;margin-top:5px;color:#9aa5b6;font-size:9px;line-height:1.35}
