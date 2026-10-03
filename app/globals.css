@@ -97,3 +97,41 @@
  .transferPreview .transferFoot{display:grid;grid-template-columns:1fr;gap:5px}
  .transferTabs{grid-column:1/-1}
 }
+
+/* Premium on-screen document previews — intentionally separate from print styling */
+.previewToolbarIdentity{min-width:0}
+.previewToolbarIdentity small{display:block;margin-top:5px;color:#9aa5b6;font-size:9px;line-height:1.35}
+.previewMeta{display:flex!important;align-items:center;gap:6px!important;text-transform:uppercase;letter-spacing:.08em}
+.previewMetaDot{width:6px;height:6px;border-radius:50%;background:#35b978;box-shadow:0 0 0 4px #35b97818}
+.modal:has(.passPreview),.modal:has(.transferPreview){width:min(900px,100%);padding:17px;border-radius:22px}
+.modal:has(.passPreview) .modalHead,.modal:has(.transferPreview) .modalHead{margin:2px 3px 14px}
+.modal:has(.passPreview) .modalHead h2,.modal:has(.transferPreview) .modalHead h2{font-size:18px;letter-spacing:-.02em}
+.passPreview,.transferPreview{background:linear-gradient(180deg,#f4f6fa 0%,#edf1f6 100%);border:1px solid #dfe5ee;border-radius:18px;padding:14px;box-shadow:inset 0 1px 0 #fff;overflow:auto}
+.passPreview .passPrintCard,.transferPreview .transferPassCard{box-shadow:0 20px 50px #15233b1f,0 2px 6px #15233b0d}
+.passPreview .passBrand,.transferPreview .transferPassBrand{position:relative;min-height:116px;overflow:hidden}
+.passPreview .passBrand:after,.transferPreview .transferPassBrand:after{content:"";position:absolute;width:190px;height:190px;border:1px solid #ffffff18;border-radius:50%;right:-70px;top:-85px;box-shadow:0 0 0 26px #ffffff08,0 0 0 52px #ffffff04}
+.passPreview .brandTitle,.transferPreview .transferPassBrand h1{letter-spacing:.055em}
+.passPreview .passStatus,.transferPreview .transferPassStatus{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;text-transform:uppercase}
+.passPreview .passStatus:before,.transferPreview .transferPassStatus:before{content:"";width:6px;height:6px;border-radius:50%;background:#5ee39b}
+.passPreview .passStatus.returned:before{background:#aeb8c7}
+.passPreview .passBody,.transferPreview .transferPassBody{background:#fff}
+.passPreview .passNumberRow,.transferPreview .transferPassNo{align-items:center}
+.passPreview .passNumberLabel,.transferPreview .transferPassNo span{color:#8b96a7}
+.passPreview .passNumber,.transferPreview .transferPassNo b{letter-spacing:.015em}
+.passPreview .typePill,.transferPreview .transferPill{border:1px solid #dbe2ff;box-shadow:0 2px 7px #3448a70c}
+.passPreview .assetTypePill{background:#eef8f3;color:#176b48;border-color:#cfe8da}
+.passPreview .infoItem,.transferPreview .transferInfo{transition:box-shadow .15s ease,border-color .15s ease}
+.passPreview .infoItem:hover,.transferPreview .transferInfo:hover{border-color:#cfd8e5;box-shadow:0 5px 16px #15233b0a}
+.passPreview .securityInfo{position:relative;overflow:hidden}
+.passPreview .securityInfo:before{content:"SECURITY";position:absolute;right:-16px;bottom:-12px;font-size:42px;font-weight:900;letter-spacing:.06em;color:#536ddd08;pointer-events:none}
+.passPreview .barcodePanel,.transferPreview .transferBarcode{background:linear-gradient(180deg,#fbfcfe,#f7f9fb);box-shadow:inset 0 1px 0 #fff}
+.passPreview .barcodePanel svg,.transferPreview .transferBarcode svg{background:#fff;border-radius:7px;padding:5px}
+.passPreview .barcodeCaption,.transferPreview .transferBarcode small{color:#7b8799}
+.previewHint{margin-top:2px;padding:10px 2px 1px;font-weight:650}
+@media(max-width:560px){
+ .modal:has(.passPreview),.modal:has(.transferPreview){padding:12px;border-radius:18px}
+ .passPreview,.transferPreview{padding:8px;border-radius:14px}
+ .previewToolbarIdentity small{font-size:8px}
+ .previewMeta{font-size:7px!important;padding:6px 8px!important}
+ .passPreview .passBrand,.transferPreview .transferPassBrand{min-height:105px}
+}
