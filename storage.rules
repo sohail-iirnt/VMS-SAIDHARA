@@ -2,7 +2,17 @@ rules_version = '2';
 service firebase.storage {
  match /b/{bucket}/o {
   function signedIn(){return request.auth != null;}
-  function admin(){return signedIn() && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';}
-  match /visitorPhotos/{locationId}/{fileName} { allow read: if signedIn(); allow write: if signedIn() && (admin() || firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.locationId == locationId); }
+  function activeUser(){
+    return signedIn() &&
+      firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.active == true;
+  }
+
+  // Visitor photographs are operational records. Any active authenticated
+  // VMS login may read/upload them; the application still writes them under
+  // the visitorPhotos/<locationId>/ path for location traceability.
+  match /visitorPhotos/{locationId}/{fileName} {
+    allow read: if activeUser();
+    allow write: if activeUser();
+  }
  }
 }
