@@ -51,3 +51,49 @@
  .passPreview .passFooter{display:grid;grid-template-columns:1fr;gap:5px}
  .passPreview .barcodePanel{padding:11px}
 }
+
+
+/* Internal asset transfer */
+.transferTabs{display:flex;align-items:center;gap:5px;background:#f4f6fa;border:1px solid #e1e6ee;border-radius:11px;padding:4px}
+.transferTab{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#6f7b8e;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:800}
+.transferTab.active{background:#fff;color:#273b78;box-shadow:0 2px 8px #182b5514}
+.transferNotice{display:flex;align-items:flex-start;gap:10px;background:#f3f6ff;border:1px solid #e0e6f5;color:#44527a;border-radius:13px;padding:12px 14px;margin-bottom:15px}
+.transferNotice>svg{color:#536ddd;flex:0 0 auto;margin-top:1px}
+.transferNotice b{display:block;font-size:11px;color:#2b3a60}
+.transferNotice span{display:block;font-size:10px;color:#78849a;margin-top:3px;line-height:1.45}
+.transferPreview{background:#eef2f7;border:1px solid #dfe5ee;border-radius:20px;padding:16px;overflow:auto}
+.transferPreview .transferPassCard{width:min(100%,690px);margin:0 auto;background:#fff;border:1px solid #d7dee8;border-radius:16px;overflow:hidden;box-shadow:0 16px 42px rgba(20,32,55,.14)}
+.transferPreview .transferPassBrand{padding:25px 28px}
+.transferPreview .transferPassBrand small{font-size:9px;letter-spacing:.18em}
+.transferPreview .transferPassBrand h1{font-size:26px;line-height:1;margin:7px 0 0}
+.transferPreview .transferPassBrand p{font-size:10px;line-height:1.45}
+.transferPreview .transferPassStatus{white-space:nowrap}
+.transferPreview .transferPassBody{padding:25px 28px 22px}
+.transferPreview .transferPassNo{padding-bottom:18px}
+.transferPreview .transferPassNo span{font-size:8px;letter-spacing:.16em}
+.transferPreview .transferPassNo b{font-size:24px;line-height:1.15}
+.transferPreview .transferPill{font-size:9px;letter-spacing:.03em}
+.transferPreview .transferGrid{grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.transferPreview .transferInfo{min-width:0;padding:13px 14px;border:1px solid #e3e8ef;border-radius:11px;background:#fbfcfe}
+.transferPreview .transferInfo label{font-size:7px;line-height:1.25;letter-spacing:.14em}
+.transferPreview .transferInfo strong{display:block;font-size:12px;line-height:1.5;color:#17243a;overflow-wrap:anywhere;word-break:break-word}
+.transferPreview .transferRoute{grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.transferPreview .transferRoute .transferInfo{background:#f5f8ff;border-color:#dfe6f3}
+.transferPreview .transferBarcode{margin-top:16px;padding:14px 16px 12px;border:1px dashed #c8d2df;border-radius:13px;background:#fafbfd}
+.transferPreview .transferBarcode svg{display:block;width:min(100%,430px);margin:0 auto}
+.transferPreview .transferBarcode small{font-size:8px;line-height:1.4;overflow-wrap:anywhere}
+.transferPreview .transferFoot{margin-top:16px;padding-top:13px;font-size:8px;line-height:1.4}
+.transferPreview .transferNote{font-size:8px;line-height:1.4;margin-top:9px}
+@media(max-width:900px){.transferTabs{width:100%}.transferTab{flex:1;justify-content:center}}
+@media(max-width:560px){
+ .transferPreview{padding:9px;border-radius:15px}
+ .transferPreview .transferPassBrand{padding:20px 17px}
+ .transferPreview .transferPassBrand h1{font-size:21px}
+ .transferPreview .transferPassBody{padding:18px 15px}
+ .transferPreview .transferPassNo{align-items:flex-start;flex-direction:column}
+ .transferPreview .transferPassNo b{font-size:20px}
+ .transferPreview .transferGrid,.transferPreview .transferRoute{grid-template-columns:1fr;gap:9px}
+ .transferPreview .transferInfo{padding:12px}
+ .transferPreview .transferFoot{display:grid;grid-template-columns:1fr;gap:5px}
+ .transferTabs{grid-column:1/-1}
+}
