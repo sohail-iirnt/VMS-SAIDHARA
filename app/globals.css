@@ -157,3 +157,66 @@
 
 /* Pass document header alignment */
 .passPreview .passBrand,.transferPreview .transferPassBrand{gap:18px;align-items:flex-start}.passPreview .passBrand>div,.transferPreview .transferPassBrand>div{min-width:0}.passPreview .brandKicker,.transferPreview .transferPassBrand small{line-height:1.35;overflow-wrap:anywhere}.passPreview .brandTitle,.transferPreview .transferPassBrand h1{line-height:1.08}.passPreview .brandSub,.transferPreview .transferPassBrand p{line-height:1.45;max-width:520px}.passPreview .passStatus,.transferPreview .transferPassStatus{flex:0 0 auto;margin-top:1px}.passPreview .passIdentity{margin-top:0}.passPreview .passIdentityMeta{min-width:0}.passPreview .passIdentityCode{min-width:0}.passPreview .passIdentityCode b{overflow-wrap:anywhere;word-break:break-word}.transferPreview .transferIdentityCode b{overflow-wrap:anywhere;word-break:break-word}@media(max-width:560px){.passPreview .passBrand,.transferPreview .transferPassBrand{flex-direction:column;gap:12px}.passPreview .passStatus,.transferPreview .transferPassStatus{align-self:flex-start}.passPreview .passIdentity,.transferPreview .transferIdentity{align-items:flex-start;flex-direction:column;gap:12px}.passPreview .passIdentityMeta,.transferPreview .transferIdentityMeta{width:100%;justify-content:space-between}.passPreview .passIdentityMeta>div,.transferPreview .transferIdentityMeta>div{margin-left:auto}.passPreview .brandTitle,.transferPreview .transferPassBrand h1{font-size:21px}}
+
+
+/* Gate pass headline — fixed, isolated layout */
+.gatePassPreview .passBrand{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:24px;
+  min-height:126px;
+  padding:24px 28px;
+}
+.gatePassPreview .passBrand>div{
+  min-width:0;
+  width:auto;
+}
+.gatePassPreview .brandKicker{
+  display:block;
+  font-size:9px;
+  line-height:1.35;
+  letter-spacing:.16em;
+  font-weight:800;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.gatePassPreview .brandTitle{
+  display:block;
+  margin-top:7px;
+  font-size:28px;
+  line-height:1.05;
+  letter-spacing:.055em;
+  font-weight:900;
+}
+.gatePassPreview .brandSub{
+  display:block;
+  margin-top:6px;
+  max-width:520px;
+  font-size:10px;
+  line-height:1.45;
+}
+.gatePassPreview .passStatus{
+  align-self:center;
+  justify-self:end;
+  margin:0;
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+@media(max-width:560px){
+  .gatePassPreview .passBrand{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:13px;
+    min-height:0;
+    padding:20px;
+  }
+  .gatePassPreview .passStatus{
+    align-self:flex-start;
+    justify-self:auto;
+  }
+  .gatePassPreview .brandTitle{font-size:23px}
+  .gatePassPreview .brandKicker{font-size:8px}
+}
+
