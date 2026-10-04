@@ -29,6 +29,6 @@ service cloud.firestore {
     allow update: if admin() || (security() && resource.data.destinationLocationId == me().locationId && request.resource.data.sourceLocationId == resource.data.sourceLocationId && request.resource.data.destinationLocationId == resource.data.destinationLocationId && resource.data.status == 'SENT' && request.resource.data.status == 'RECEIVED_CLOSED');
     allow delete: if admin();
   }
-  match /auditLogs/{id} { allow read: if admin(); allow create: if signedIn(); allow update,delete: if false; }
+  match /assetMovementEvents/{id} { allow read: if admin() || (security() && resource.data.locationIds is list && resource.data.locationIds.hasAny([me().locationId])); allow create: if admin() || (security() && request.resource.data.locationIds is list && request.resource.data.locationIds.hasAny([me().locationId])); allow update,delete: if false; }\n  match /auditLogs/{id} { allow read: if admin(); allow create: if signedIn(); allow update,delete: if false; }
  }
 }
