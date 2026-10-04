@@ -223,7 +223,7 @@ function AssetTimeline({profile,allowed,locations}:{profile:Profile;allowed:Loca
   const unsubs:any[]=[];
   const maps:any={};
   ids.forEach(id=>unsubs.push(onSnapshot(query(collection(db,"assets"),where("locationId","==",id)),s=>{maps["a"+id]=s.docs.map(d=>({id:d.id,...d.data()}));setAssets(Object.values(maps).flat());setLoading(false)})));
-  ids.forEach(id=>unsubs.push(onSnapshot(query(collection(db,"gatePasses"),where("locationId","==",id)),s=>{maps["p"+id]=s.docs.map(d=>({id:d.id,...d.data()}));setPasses(Object.values(maps).flat().filter((x:any)=>x.passNo);setLoading(false)})));
+  ids.forEach(id=>unsubs.push(onSnapshot(query(collection(db,"gatePasses"),where("locationId","==",id)),s=>{maps["p"+id]=s.docs.map(d=>({id:d.id,...d.data()}));setPasses(Object.values(maps).flat().filter((x:any)=>x.passNo));setLoading(false)})));
   if(profile.role==="admin")unsubs.push(onSnapshot(collection(db,"internalTransfers"),s=>setTransfers(s.docs.map(d=>({id:d.id,...d.data()})))));
   else{
    unsubs.push(onSnapshot(query(collection(db,"internalTransfers"),where("sourceLocationId","==",profile.locationId)),s=>setTransfers(old=>[...old.filter(x=>x.sourceLocationId!==profile.locationId),...s.docs.map(d=>({id:d.id,...d.data()}))])));
