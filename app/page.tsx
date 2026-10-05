@@ -235,21 +235,23 @@ function AssetTimeline({profile,allowed,locations}:{profile:Profile;allowed:Loca
  },[profile,locations]);
  const candidates=assets.filter(a=>[a.assetNumber,a.assetDetails,a.issuedTo,a.issuedBy].join(" ").toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>String(a.assetNumber||"").localeCompare(String(b.assetNumber||"")));
  const active=selected||candidates[0]||null;
+ const movementTime=(value:any)=>{if(!value)return 0;if(typeof value?.toMillis==="function")return value.toMillis();const parsed=new Date(value).getTime();return Number.isFinite(parsed)?parsed:0};
  const timeline=active?[
   {id:"created",eventType:"REGISTERED",time:active.createdAt||active.issueDate,locationId:active.locationId,details:(active.type==="RETURNABLE"?"Returnable":"Non-returnable")+" asset registered · "+(active.assetDetails||"Asset record created"),actorName:active.issuedBy||"System"},
   ...passes.filter(p=>p.assetId===active.id).flatMap(p=>[
-   {id:p.id+"-created",eventType:"GATE_PASS_CREATED",time:p.createdAt,locationId:p.locationId,details:p.passNo+" · "+(p.purpose||"Asset movement"),actorName:p.createdByName||"—",passId:p.id},
-   ...(p.status==="RETURNED"?[{id:p.id+"-returned",eventType:"RETURNED",time:p.returnedAt,locationId:p.locationId,details:"Gate pass "+p.passNo+" returned",actorName:p.returnedByName||"—"}]:[])
+   {id:p.id+"-created",eventType:"GATE_PASS_CREATED",time:p.createdAt,locationId:p.locationId,details:(p.passNo||"Gate pass")+" · "+(p.purpose||"Asset movement"),actorName:p.createdByName||"—",passId:p.id},
+   ...(p.status==="RETURNED"?[{id:p.id+"-returned",eventType:"RETURNED",time:p.returnedAt,locationId:p.locationId,details:"Gate pass "+(p.passNo||"")+" returned",actorName:p.returnedByName||"—"}]:[])
   ]),
-  ...transfers.filter(t=>t.assetNumber&&t.assetNumber===active.assetNumber).flatMap(t=>[
-   {id:t.id+"-sent",eventType:"TRANSFER_SENT",time:t.createdAt,fromLocationId:t.sourceLocationId,toLocationId:t.destinationLocationId,details:t.transferNo+" · "+t.itemName+" · Qty "+t.quantity,actorName:t.createdByName||t.sendingViaPerson||"—",transferId:t.id},
-   ...(t.status==="RECEIVED_CLOSED"?[{id:t.id+"-received",eventType:"TRANSFER_RECEIVED",time:t.receivedAt,fromLocationId:t.sourceLocationId,toLocationId:t.destinationLocationId,details:t.transferNo+" received and closed",actorName:t.receivedByName||"—"}]:[])
+  ...transfers.filter(t=>t.assetNumber&&active.assetNumber&&t.assetNumber===active.assetNumber).flatMap(t=>[
+   {id:t.id+"-sent",eventType:"TRANSFER_SENT",time:t.createdAt,fromLocationId:t.sourceLocationId,toLocationId:t.destinationLocationId,details:(t.transferNo||"Internal transfer")+" · "+(t.itemName||"Asset movement")+" · Qty "+(t.quantity||1),actorName:t.createdByName||t.sendingViaPerson||"—",transferId:t.id},
+   ...(t.status==="RECEIVED_CLOSED"?[{id:t.id+"-received",eventType:"TRANSFER_RECEIVED",time:t.receivedAt,fromLocationId:t.sourceLocationId,toLocationId:t.destinationLocationId,details:(t.transferNo||"Transfer")+" received and closed",actorName:t.receivedByName||"—",transferId:t.id}]:[])
   ]),
-  ...events.filter(e=>(e.assetId===active.id)||(e.assetNumber&&e.assetNumber===active.assetNumber))
- ].sort((a,b)=>(b.time?.toMillis?a.time.toMillis():a.time?new Date(a.time).getTime():0)-(a.time?.toMillis?b.time.toMillis():b.time?new Date(b.time).getTime():0))
+  ...events.filter(e=>(e.assetId===active.id)||(e.assetNumber&&active.assetNumber&&e.assetNumber===active.assetNumber))
+   .map((e:any)=>({...e,eventType:String(e.eventType||"MOVEMENT"),id:String(e.id||("event-"+movementTime(e.createdAt))),time:e.time||e.createdAt}))
+ ].sort((a,b)=>movementTime(b.time)-movementTime(a.time))
  :[];
  const unique=timeline.filter((x:any,i:number,a:any[])=>a.findIndex(y=>y.id===x.id)===i);
- const eventLabel=(t:string)=>({REGISTERED:"Asset registered",GATE_PASS_CREATED:"Gate pass issued",TRANSFER_SENT:"Internal transfer sent",TRANSFER_RECEIVED:"Transfer received",RETURNED:"Asset / pass returned"} as any)[t]||t;
+ const eventLabel=(t:string)=>({REGISTERED:"Asset registered",GATE_PASS_CREATED:"Gate pass issued",TRANSFER_SENT:"Internal transfer sent",TRANSFER_RECEIVED:"Transfer received",RETURNED:"Asset / pass returned",MOVEMENT:"Asset movement recorded"} as any)[t]||String(t||"Movement");
  const eventIcon=(t:string)=>t==="TRANSFER_SENT"?<Send size={16}/>:t==="TRANSFER_RECEIVED"?<Inbox size={16}/>:t==="RETURNED"?<RotateCcw size={16}/>:t==="GATE_PASS_CREATED"?<Ticket size={16}/>:<PackageCheck size={16}/>;
  return <><div className="assetTimelineHero"><div><span className="eyebrow">MOVEMENT INTELLIGENCE</span><h1>Asset Movement Timeline</h1><p>One traceable history for assets moving through the SAIDHARA network.</p></div><div className="assetTimelineScope"><Activity size={18}/><div><b>{profile.role==="admin"?"System-wide visibility":"Location-scoped visibility"}</b><span>{profile.role==="admin"?"All NDC locations":"Only movements involving "+locName(profile.locationId,locations)}</span></div></div></div>
  <div className="assetTimelineStats"><div><PackageSearch size={18}/><span>Assets visible</span><b>{assets.length}</b></div><div><Activity size={18}/><span>Movement events</span><b>{events.length}</b></div><div><ArrowRightLeft size={18}/><span>Transfers tracked</span><b>{transfers.length}</b></div><div><Ticket size={18}/><span>Pass records</span><b>{passes.length}</b></div></div>
