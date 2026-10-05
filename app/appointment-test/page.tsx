@@ -287,7 +287,7 @@ export default function AppointmentBookingV2() {
         <aside className={styles.intro}>
           <div className={styles.brandRow}>
             <div className={styles.logoMark}>V</div>
-            <div><strong>VMS NDC</strong><span>Godrej &amp; Boyce · Visitor Access</span></div>
+            <div><strong>Godrej &amp; Boyce</strong><span>Saidhara NDC · Visitor Appointment</span></div>
           </div>
           <div className={styles.introContent}>
             <span className={styles.kicker}>WELCOME TO SAIDHARA NDC</span>
@@ -299,7 +299,7 @@ export default function AppointmentBookingV2() {
               <div><span><Sparkles size={17} /></span><div><b>Easy arrival</b><small>Keep your appointment reference with you.</small></div></div>
             </div>
           </div>
-          <div className={styles.sideFoot}>VMS NDC · Visitor &amp; Asset Management</div>
+          <div className={styles.sideFoot}>Godrej &amp; Boyce · Saidhara NDC</div>
         </aside>
 
         <section className={styles.formShell}>
