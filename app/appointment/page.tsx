@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useRef,useState} from "react";
-import {addDoc,collection,Timestamp} from "firebase/firestore";
+import {addDoc,collection,Timestamp,doc,getDoc} from "firebase/firestore";
+import AppointmentBookingV2 from "../appointment-v2/page";
 import {db} from "../../lib/firebase";
 import {CalendarCheck,Clock3,MapPin,ShieldCheck,CheckCircle2,ArrowLeft} from "lucide-react";
 
@@ -12,7 +13,9 @@ const today=()=>new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"})
 const refNo=()=>{const d=today().replaceAll("-","");return "APT-"+d+"-"+String(Date.now()).slice(-6)};
 
 export default function AppointmentBooking(){
- const [f,setF]=useState<any>({locationId:"",appointmentDate:today(),appointmentTime:"10:00",visitorName:"",company:"",mobile:"",email:"",hostName:"",purpose:"Meeting",remarks:"",photoUrl:""}),[saving,setSaving]=useState(false),[done,setDone]=useState<any>(null),[error,setError]=useState(""),[cameraOpen,setCameraOpen]=useState(false),[cameraError,setCameraError]=useState(""),[cameraReady,setCameraReady]=useState(false);
+ const [f,setF]=useState<any>({locationId:"",appointmentDate:today(),appointmentTime:"10:00",visitorName:"",company:"",mobile:"",email:"",hostName:"",purpose:"Meeting",remarks:"",photoUrl:""}),[saving,setSaving]=useState(false),[done,setDone]=useState<any>(null),[error,setError]=useState(""),[cameraOpen,setCameraOpen]=useState(false),[cameraError,setCameraError]=useState(""),[cameraReady,setCameraReady]=useState(false),[publicDesign,setPublicDesign]=useState("classic");
+ useEffect(()=>{let active=true;getDoc(doc(db,"publicSettings","appointment")).then(s=>{if(active&&s.exists()&&s.data().activeDesign==="visitor-v2")setPublicDesign("visitor-v2")}).catch(()=>{});return()=>{active=false}},[]);
+ if(publicDesign==="visitor-v2") return <AppointmentBookingV2/>;
  const cameraVideo=useRef<HTMLVideoElement|null>(null); const cameraStream=useRef<MediaStream|null>(null);
  const u=(k:string,v:any)=>setF((x:any)=>({...x,[k]:v}));
  const stopCamera=()=>{cameraStream.current?.getTracks().forEach(t=>t.stop());cameraStream.current=null;if(cameraVideo.current)cameraVideo.current.srcObject=null;setCameraReady(false);setCameraOpen(false)}; useEffect(()=>{if(!cameraOpen)return;const video=cameraVideo.current,stream=cameraStream.current;if(!video||!stream)return;video.srcObject=stream;video.play().then(()=>setCameraReady(video.readyState>=2&&video.videoWidth>0)).catch(()=>setCameraError("The webcam stream could not start. Check browser camera permission and try again."));return()=>{if(video.srcObject===stream)video.srcObject=null}},[cameraOpen]);
