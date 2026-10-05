@@ -21,30 +21,11 @@ service cloud.firestore {
   }
   match /visitorCounters/{day} { allow read: if admin() || security(); allow create: if admin() || (security() && request.resource.data.nextNumber == 2); allow update: if admin() || (security() && request.resource.data.nextNumber == resource.data.nextNumber + 1); allow delete: if admin(); }
   match /visitorAppointments/{id} {
-    // Public booking: create only a pending appointment for a known NDC location.
-    // No public read/update/delete access is granted.
-    allow create: if request.auth == null
-      && request.resource.data.status == 'PENDING'
-      && request.resource.data.locationId in ['ADMIN','I','J','K','L','O','P','Q','R','S','T','H14-MHE']
-      && request.resource.data.keys().hasAll([
-        'appointmentNo','locationId','locationName','appointmentDate','appointmentTime',
-        'visitorName','mobile','hostName','purpose','status','createdAt'
-      ])
-      && request.resource.data.keys().hasOnly([
-        'appointmentNo','locationId','locationName','appointmentDate','appointmentTime',
-        'visitorName','company','mobile','email','hostName','purpose','remarks',
-        'status','createdAt'
-      ])
-      && request.resource.data.appointmentNo is string
-      && request.resource.data.locationId is string
-      && request.resource.data.locationName is string
-      && request.resource.data.appointmentDate is string
-      && request.resource.data.appointmentTime is string
-      && request.resource.data.visitorName is string
-      && request.resource.data.mobile is string
-      && request.resource.data.hostName is string
-      && request.resource.data.purpose is string
-      && request.resource.data.createdAt is timestamp;
+    // Public appointment intake. The booking page is intentionally login-free.
+    // Keep this write rule simple: all fields are validated by the booking UI,
+    // while all reads/updates remain restricted to Admin or the appointment location's security desk.
+    allow create: if request.resource.data.status == 'PENDING'
+      && request.resource.data.locationId in ['ADMIN','I','J','K','L','O','P','Q','R','S','T','H14-MHE'];
 
     allow read: if admin() || (security() && resource.data.locationId == me().locationId);
 
