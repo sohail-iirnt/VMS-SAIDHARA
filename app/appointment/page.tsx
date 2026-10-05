@@ -1,6 +1,6 @@
 "use client";
 import {useState} from "react";
-import {addDoc,collection,serverTimestamp} from "firebase/firestore";
+import {addDoc,collection,Timestamp} from "firebase/firestore";
 import {db} from "../../lib/firebase";
 import {CalendarCheck,Clock3,MapPin,ShieldCheck,CheckCircle2,ArrowLeft} from "lucide-react";
 
@@ -19,7 +19,7 @@ export default function AppointmentBooking(){
    const selected=LOCATIONS.find(x=>x.id===f.locationId); if(!selected)throw new Error("Invalid location.");
    if(f.appointmentDate<today())throw new Error("Appointment date cannot be in the past.");
    const appointmentNo=refNo();
-   const ref=await addDoc(collection(db,"visitorAppointments"),{appointmentNo,locationId:f.locationId,locationName:selected.name,appointmentDate:f.appointmentDate,appointmentTime:f.appointmentTime,visitorName:f.visitorName.trim(),company:f.company.trim(),mobile:f.mobile.trim(),email:f.email.trim(),hostName:f.hostName.trim(),purpose:f.purpose,remarks:f.remarks.trim(),status:"PENDING",createdAt:serverTimestamp()});
+   const ref=await addDoc(collection(db,"visitorAppointments"),{appointmentNo,locationId:f.locationId,locationName:selected.name,appointmentDate:f.appointmentDate,appointmentTime:f.appointmentTime,visitorName:f.visitorName.trim(),company:f.company.trim(),mobile:f.mobile.trim(),email:f.email.trim(),hostName:f.hostName.trim(),purpose:f.purpose,remarks:f.remarks.trim(),status:"PENDING",createdAt:Timestamp.now()});
    setDone({id:ref.id,appointmentNo,locationName:selected.name,date:f.appointmentDate,time:f.appointmentTime,visitorName:f.visitorName}); 
  }catch(err:any){setError(err.message||"Unable to submit appointment. Please try again.");}finally{setSaving(false)}};
  if(done){
