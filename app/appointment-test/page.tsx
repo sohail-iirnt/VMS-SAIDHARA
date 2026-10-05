@@ -310,7 +310,7 @@ export default function AppointmentBookingV2() {
 
           <div className={styles.formHeader}>
             <div>
-              <span className={styles.stepLabel}>STEP {step} OF 2</span>
+              <span className={styles.stepLabel}>{step === 1 ? "START YOUR VISIT" : "YOUR DETAILS"}</span>
               <h2>{step === 1 ? "Where are you visiting?" : "A little about you"}</h2>
               <p>{step === 1 ? "First, tell us where and when you plan to visit." : "These details help your host and security team prepare."}</p>
             </div>
