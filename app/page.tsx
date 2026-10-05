@@ -20,7 +20,7 @@ const fmt=(v:any)=>v?.toDate?v.toDate().toLocaleString("en-IN",{dateStyle:"mediu
 export default function Home(){
  const [profile,setProfile]=useState<Profile|null>(null),[loading,setLoading]=useState(true),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[error,setError]=useState("");
  useEffect(()=>{let active=true;const unsub=onAuthStateChanged(auth,async u=>{if(!active)return;if(!u){setProfile(null);setLoading(false);return}try{const s=await getDoc(doc(db,"users",u.uid));if(!active)return;if(s.exists())setProfile({uid:u.uid,...s.data()} as Profile);else setError("Account profile is not configured. Ask the administrator.");}catch{if(active)setError("Unable to load your profile. Please refresh and try again.");}finally{if(active)setLoading(false)}});return()=>{active=false;unsub()}},[]);
- if(loading)return <div className="splash"><div className="brandMark">S</div><h2>SAIDHARA NDC</h2><p>Visitor & Asset Management</p></div>;
+ if(loading)return <div className="splash"><div className="brandMark">V</div><h2>VMS NDC</h2><p>Godrej & Boyce · Visitor & Asset Management</p><div className="splashLine"><span/></div></div>;
  if(!profile)return <Login email={email} password={password} setEmail={setEmail} setPassword={setPassword} error={error} setError={setError}/>;
  return <Portal profile={profile}/>;
 }
