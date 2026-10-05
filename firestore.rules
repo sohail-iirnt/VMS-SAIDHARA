@@ -21,28 +21,26 @@ service cloud.firestore {
   }
   match /visitorCounters/{day} { allow read: if admin() || security(); allow create: if admin() || (security() && request.resource.data.nextNumber == 2); allow update: if admin() || (security() && request.resource.data.nextNumber == resource.data.nextNumber + 1); allow delete: if admin(); }
   match /visitorAppointments/{id} {
-    function validPublicAppointment(){
-      return request.auth == null &&
-        request.resource.data.keys().hasAll(['appointmentNo','locationId','locationName','appointmentDate','appointmentTime','visitorName','mobile','hostName','purpose','status','createdAt']) &&
-        request.resource.data.keys().hasOnly(['appointmentNo','locationId','locationName','appointmentDate','appointmentTime','visitorName','company','mobile','email','hostName','purpose','remarks','status','createdAt']) &&
-        request.resource.data.status == 'PENDING' &&
-        ['ADMIN','I','J','K','L','O','P','Q','R','S','T','H14-MHE'].hasAny([request.resource.data.locationId]) &&
-        request.resource.data.appointmentNo is string && request.resource.data.appointmentNo.size() <= 40 &&
-        request.resource.data.locationId is string && request.resource.data.locationId.size() <= 30 &&
-        request.resource.data.locationName is string && request.resource.data.locationName.size() <= 80 &&
-        request.resource.data.appointmentDate is string && request.resource.data.appointmentDate.size() == 10 &&
-        request.resource.data.appointmentTime is string && request.resource.data.appointmentTime.size() == 5 &&
-        request.resource.data.visitorName is string && request.resource.data.visitorName.size() > 1 && request.resource.data.visitorName.size() <= 100 &&
-        request.resource.data.mobile is string && request.resource.data.mobile.size() >= 8 && request.resource.data.mobile.size() <= 20 &&
-        request.resource.data.hostName is string && request.resource.data.hostName.size() > 1 && request.resource.data.hostName.size() <= 100 &&
-        request.resource.data.purpose is string && request.resource.data.purpose.size() <= 40 &&
-        request.resource.data.get('company','') is string && request.resource.data.get('company','').size() <= 120 &&
-        request.resource.data.get('email','') is string && request.resource.data.get('email','').size() <= 160 &&
-        request.resource.data.get('remarks','') is string && request.resource.data.get('remarks','').size() <= 500 &&
-        request.resource.data.createdAt is timestamp;
-    }
-    allow create: if validPublicAppointment();
+    allow create: if request.auth == null
+      && request.resource.data.status == 'PENDING'
+      && request.resource.data.locationId in ['ADMIN','I','J','K','L','O','P','Q','R','S','T','H14-MHE']
+      && request.resource.data.appointmentNo is string
+      && request.resource.data.locationName is string
+      && request.resource.data.appointmentDate is string
+      && request.resource.data.appointmentTime is string
+      && request.resource.data.visitorName is string
+      && request.resource.data.mobile is string
+      && request.resource.data.hostName is string
+      && request.resource.data.purpose is string
+      && request.resource.data.createdAt is timestamp
+      && request.resource.data.keys().hasOnly([
+        'appointmentNo','locationId','locationName','appointmentDate','appointmentTime',
+        'visitorName','company','mobile','email','hostName','purpose','remarks',
+        'status','createdAt'
+      ]);
+
     allow read: if admin() || (security() && resource.data.locationId == me().locationId);
+
     allow update: if admin() ||
       (security() &&
        resource.data.locationId == me().locationId &&
@@ -52,6 +50,7 @@ service cloud.firestore {
          'noShowAt','visitorId','checkedInAt','checkedInBy','checkedInByName',
          'checkedOutAt','checkedOutBy','checkedOutByName','updatedAt'
        ]));
+
     allow delete: if admin();
   }
   match /visitors/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
