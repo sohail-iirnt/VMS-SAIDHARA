@@ -312,3 +312,10 @@
 .bookingPhotoButton.secondaryPhoto{background:#eef2f8;color:#43526a}
 .bookingPhotoButton input{position:absolute;inset:0;width:100%!important;height:100%!important;margin:0!important;padding:0!important;opacity:0;cursor:pointer}
 @media(max-width:560px){.bookingPhotoBody{align-items:flex-start;flex-direction:column}.bookingPhotoBody img,.bookingPhotoPlaceholder{width:110px;height:110px}.bookingPhotoActions{width:100%}.bookingPhotoButton{flex:1;text-align:center}}
+
+/* Desktop webcam capture */
+.cameraModal{position:fixed;inset:0;z-index:1000;background:rgba(8,16,31,.72);backdrop-filter:blur(8px);display:grid;place-items:center;padding:20px}
+.cameraCard{width:min(620px,100%);background:#fff;border-radius:20px;box-shadow:0 25px 80px rgba(0,0,0,.28);padding:18px}
+.cameraHead{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:14px}.cameraHead b{display:block;font-size:13px;color:#17233b}.cameraHead span{display:block;font-size:9px;color:#8792a3;margin-top:4px}.cameraHead button{border:0;background:#eef2f7;border-radius:9px;width:32px;height:32px;font-size:20px;color:#516078;cursor:pointer}
+.cameraPreview{width:100%;aspect-ratio:4/3;background:#101722;border-radius:14px;overflow:hidden}.cameraPreview video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
+.cameraActions{display:flex;justify-content:flex-end;gap:9px;margin-top:14px}.cameraError{padding:20px;border-radius:12px;background:#fff3f3;color:#a33b3b;font-size:10px;line-height:1.5}
