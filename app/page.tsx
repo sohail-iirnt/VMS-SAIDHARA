@@ -272,20 +272,38 @@ function AssetTimeline({profile,allowed,locations}:{profile:Profile;allowed:Loca
   unsubs.push(onSnapshot(evQ,s=>setEvents(s.docs.map(d=>({id:d.id,...d.data()})))));
   return()=>unsubs.forEach(u=>u());
  },[profile,locations]);
- const candidates=assets.filter(a=>[a.assetNumber,a.assetDetails,a.issuedTo,a.issuedBy].join(" ").toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>String(a.assetNumber||"").localeCompare(String(b.assetNumber||"")));
- const active=selected||candidates[0]||null;
+ const assetKey=(value:any)=>String(value||"").trim().toUpperCase();
+ const transferCandidates=transfers.filter(t=>assetKey(t.assetNumber)).reduce((acc:any[],t:any)=>{
+   const key=assetKey(t.assetNumber);
+   if(acc.some(x=>assetKey(x.assetNumber)===key))return acc;
+   acc.push({
+     id:"transfer-asset-"+key,
+     assetNumber:String(t.assetNumber).trim(),
+     assetDetails:t.itemName||"Internal asset transfer",
+     issuedTo:t.sendingViaPerson||"Transfer in transit",
+     issuedBy:t.issuedByPerson||t.createdByName||"—",
+     type:"TRANSFERRED ASSET",
+     status:t.status==="RECEIVED_CLOSED"?"TRANSFERRED":"IN TRANSIT",
+     locationId:t.destinationLocationId||t.sourceLocationId,
+     __virtualTransfer:true
+   });
+   return acc;
+ },[]);
+ const mergedCandidates=[...assets,...transferCandidates.filter(v=>!assets.some(a=>assetKey(a.assetNumber)===assetKey(v.assetNumber)))];
+ const candidates=mergedCandidates.filter(a=>[a.assetNumber,a.assetDetails,a.issuedTo,a.issuedBy].join(" ").toLowerCase().includes(filter.toLowerCase())).sort((a,b)=>String(a.assetNumber||"").localeCompare(String(b.assetNumber||"")));
+ const active=(selected&&candidates.some(x=>x.id===selected.id)?selected:null)||candidates[0]||null;
  const movementTime=(value:any)=>{if(!value)return 0;if(typeof value?.toMillis==="function")return value.toMillis();const parsed=new Date(value).getTime();return Number.isFinite(parsed)?parsed:0};
  const timeline=active?[
-  {id:"created",eventType:"REGISTERED",time:active.createdAt||active.issueDate,locationId:active.locationId,details:(active.type==="RETURNABLE"?"Returnable":"Non-returnable")+" asset registered · "+(active.assetDetails||"Asset record created"),actorName:active.issuedBy||"System"},
+  ...(!active.__virtualTransfer?[{id:"created",eventType:"REGISTERED",time:active.createdAt||active.issueDate,locationId:active.locationId,details:(active.type==="RETURNABLE"?"Returnable":"Non-returnable")+" asset registered · "+(active.assetDetails||"Asset record created"),actorName:active.issuedBy||"System"}]:[]),
   ...passes.filter(p=>p.assetId===active.id).flatMap(p=>[
    {id:p.id+"-created",eventType:"GATE_PASS_CREATED",time:p.createdAt,locationId:p.locationId,details:(p.passNo||"Gate pass")+" · "+(p.purpose||"Asset movement"),actorName:p.createdByName||"—",passId:p.id},
    ...(p.status==="RETURNED"?[{id:p.id+"-returned",eventType:"RETURNED",time:p.returnedAt,locationId:p.locationId,details:"Gate pass "+(p.passNo||"")+" returned",actorName:p.returnedByName||"—"}]:[])
   ]),
-  ...transfers.filter(t=>t.assetNumber&&active.assetNumber&&t.assetNumber===active.assetNumber).flatMap(t=>[
-   {id:t.id+"-sent",eventType:"TRANSFER_SENT",time:t.createdAt,fromLocationId:t.sourceLocationId,toLocationId:t.destinationLocationId,details:(t.transferNo||"Internal transfer")+" · "+(t.itemName||"Asset movement")+" · Qty "+(t.quantity||1),actorName:t.createdByName||t.sendingViaPerson||"—",transferId:t.id},
-   ...(t.status==="RECEIVED_CLOSED"?[{id:t.id+"-received",eventType:"TRANSFER_RECEIVED",time:t.receivedAt,fromLocationId:t.sourceLocationId,toLocationId:t.destinationLocationId,details:(t.transferNo||"Transfer")+" received and closed",actorName:t.receivedByName||"—",transferId:t.id}]:[])
+  ...transfers.filter(t=>assetKey(t.assetNumber)&&assetKey(t.assetNumber)===assetKey(active.assetNumber)).flatMap(t=>[
+   {id:t.id+"-sent",eventType:"TRANSFER_SENT",time:t.createdAt,fromLocationId:t.sourceLocationId,toLocationId:t.destinationLocationId,details:(t.transferNo||"Internal transfer")+" · "+(t.itemName||"Asset movement")+" · Qty "+(t.quantity||1)+" · Issued by "+(t.issuedByPerson||"—")+" · Via "+(t.sendingViaPerson||"—"),actorName:t.createdByName||t.sendingViaPerson||"—",transferId:t.id,transferNo:t.transferNo},
+   ...(t.status==="RECEIVED_CLOSED"?[{id:t.id+"-received",eventType:"TRANSFER_RECEIVED",time:t.receivedAt,fromLocationId:t.sourceLocationId,toLocationId:t.destinationLocationId,details:(t.transferNo||"Transfer")+" received at "+locName(t.destinationLocationId,locations)+" and closed",actorName:t.receivedByName||"—",transferId:t.id,transferNo:t.transferNo}]:[])
   ]),
-  ...events.filter(e=>(e.assetId===active.id)||(e.assetNumber&&active.assetNumber&&e.assetNumber===active.assetNumber))
+  ...events.filter(e=>(e.assetId===active.id)||(assetKey(e.assetNumber)&&assetKey(active.assetNumber)&&assetKey(e.assetNumber)===assetKey(active.assetNumber)))
    .map((e:any)=>({...e,eventType:String(e.eventType||"MOVEMENT"),id:String(e.id||("event-"+movementTime(e.createdAt))),time:e.time||e.createdAt}))
  ].sort((a,b)=>movementTime(b.time)-movementTime(a.time))
  :[];
@@ -293,7 +311,7 @@ function AssetTimeline({profile,allowed,locations}:{profile:Profile;allowed:Loca
  const eventLabel=(t:string)=>({REGISTERED:"Asset registered",GATE_PASS_CREATED:"Gate pass issued",TRANSFER_SENT:"Internal transfer sent",TRANSFER_RECEIVED:"Transfer received",RETURNED:"Asset / pass returned",MOVEMENT:"Asset movement recorded"} as any)[t]||String(t||"Movement");
  const eventIcon=(t:string)=>t==="TRANSFER_SENT"?<Send size={16}/>:t==="TRANSFER_RECEIVED"?<Inbox size={16}/>:t==="RETURNED"?<RotateCcw size={16}/>:t==="GATE_PASS_CREATED"?<Ticket size={16}/>:<PackageCheck size={16}/>;
  return <><div className="assetTimelineHero"><div><span className="eyebrow">MOVEMENT INTELLIGENCE</span><h1>Asset Movement Timeline</h1><p>One traceable history for assets moving through the SAIDHARA network.</p></div><div className="assetTimelineScope"><Activity size={18}/><div><b>{profile.role==="admin"?"System-wide visibility":"Location-scoped visibility"}</b><span>{profile.role==="admin"?"All NDC locations":"Only movements involving "+locName(profile.locationId,locations)}</span></div></div></div>
- <div className="assetTimelineStats"><div><PackageSearch size={18}/><span>Assets visible</span><b>{assets.length}</b></div><div><Activity size={18}/><span>Movement events</span><b>{events.length}</b></div><div><ArrowRightLeft size={18}/><span>Transfers tracked</span><b>{transfers.length}</b></div><div><Ticket size={18}/><span>Pass records</span><b>{passes.length}</b></div></div>
+ <div className="assetTimelineStats"><div><PackageSearch size={18}/><span>Assets visible</span><b>{candidates.length}</b></div><div><Activity size={18}/><span>Movement events</span><b>{events.length}</b></div><div><ArrowRightLeft size={18}/><span>Transfers tracked</span><b>{transfers.length}</b></div><div><Ticket size={18}/><span>Pass records</span><b>{passes.length}</b></div></div>
  <div className="assetTimelineLayout"><section className="assetPicker panel"><div className="assetPickerHead"><div><b>Find an asset</b><span>Search by asset number, serial, description or holder.</span></div><span className="recordCount">{candidates.length} result{candidates.length===1?"":"s"}</span></div><div className="search assetTimelineSearch"><Search size={17}/><input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="e.g. LAP-00124"/></div><div className="assetList">{candidates.slice(0,40).map(a=><button className={"assetListItem "+(active?.id===a.id?"active":"")} key={a.id} onClick={()=>setSelected(a)}><div className="assetListIcon"><PackageCheck size={17}/></div><div><b>{a.assetNumber||"Unnumbered asset"}</b><span>{a.assetDetails||"No details"} · {locName(a.locationId,locations)}</span><small>{a.issuedTo||"No holder"} · {a.status||a.type}</small></div><ArrowRight size={15}/></button>)}{!candidates.length&&<Empty text={loading?"Loading assets…":"No matching assets found."}/>}</div></section>
  <section className="assetTimelinePanel panel">{active?<><div className="assetTimelineHead"><div><span className="eyebrow">ASSET RECORD</span><h2>{active.assetNumber||"Unnumbered asset"}</h2><p>{active.assetDetails||"Company asset / material"} · Current location: <b>{locName(active.locationId,locations)}</b></p></div><span className={"badge "+(active.status==="RETURNED"?"neutral":"green")}>{active.status||active.type}</span></div><div className="assetRouteStrip"><div><span>ISSUED TO</span><b>{active.issuedTo||"—"}</b></div><ArrowRight size={15}/><div><span>ISSUED BY</span><b>{active.issuedBy||"—"}</b></div><ArrowRight size={15}/><div><span>ORIGIN</span><b>{locName(active.locationId,locations)}</b></div></div><div className="movementTimeline">{unique.map((e:any,i:number)=><div className="movementItem" key={e.id}><div className="movementRail"><span>{eventIcon(e.eventType)}</span>{i<unique.length-1&&<i/>}</div><div className="movementCard"><div className="movementCardTop"><div><b>{eventLabel(e.eventType)}</b><small>{fmt(e.time)}</small></div><span className="movementType">{e.eventType.replaceAll("_"," ")}</span></div><p>{e.details||"Movement recorded."}</p><div className="movementMeta">{e.fromLocationId&&<span><Send size={12}/>{locName(e.fromLocationId,locations)}</span>}{e.toLocationId&&<><ArrowRight size={12}/><span>{locName(e.toLocationId,locations)}</span></>}{e.locationId&&<span><MapPin size={12}/>{locName(e.locationId,locations)}</span>}{e.actorName&&<span><Users size={12}/>{e.actorName}</span>}{e.passId&&<span><Ticket size={12}/>Pass linked</span>}{e.transferId&&<span><ArrowRightLeft size={12}/>Transfer linked</span>}</div></div></div>)}{!unique.length&&<Empty text="No movement history available for this asset yet."/>}</div></>:<div className="timelineEmpty"><div className="timelineEmptyIcon"><History size={30}/></div><b>Select an asset to view its complete movement history</b><span>Admin can trace assets across all NDC locations. Security desks see only movements connected to their location.</span></div>}</section></div></>;
 }
