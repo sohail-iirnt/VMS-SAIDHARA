@@ -257,12 +257,12 @@ export default function AppointmentBookingV2() {
         <section className={styles.successShell}>
           <div className={styles.brandRow}>
             <div className={styles.logoMark}>V</div>
-            <div><strong>VMS NDC</strong><span>Godrej &amp; Boyce · Visitor Access</span></div>
+            <div><strong>Godrej &amp; Boyce</strong><span>Saidhara NDC · Visitor Appointment</span></div>
           </div>
           <div className={styles.successIcon}><CheckCircle2 size={34} strokeWidth={2.4} /></div>
           <span className={styles.kicker}>REQUEST RECEIVED</span>
-          <h1>Your visit request is on its way.</h1>
-          <p className={styles.successLead}>The destination security desk will review your appointment. Save the reference below for your visit.</p>
+          <h1>Your appointment request is submitted.</h1>
+          <p className={styles.successLead}>Your visit is now awaiting approval. Save your appointment reference and show it when you arrive.</p>
           <div className={styles.ticket}>
             <div className={styles.ticketTop}><span>Appointment reference</span><strong>{done.appointmentNo}</strong></div>
             <div className={styles.ticketGrid}>
@@ -271,10 +271,10 @@ export default function AppointmentBookingV2() {
               <div><span>Date</span><b>{done.date}</b></div>
               <div><span>Time</span><b>{done.time} IST</b></div>
             </div>
-            <div className={styles.pending}><span className={styles.dot} /> Pending security approval</div>
+            <div className={styles.pending}><span className={styles.dot} /> Awaiting approval</div>
           </div>
-          <button className={styles.primaryButton} type="button" onClick={startAgain}>Book another visit <ArrowRight size={17} /></button>
-          <p className={styles.smallNote}>Please carry a valid photo ID when you arrive.</p>
+          <button className={styles.primaryButton} type="button" onClick={startAgain}>Book another appointment <ArrowRight size={17} /></button>
+          <p className={styles.smallNote}>Please carry a valid photo ID when you arrive. We look forward to welcoming you.</p>
         </section>
       </main>
     );
@@ -290,13 +290,13 @@ export default function AppointmentBookingV2() {
             <div><strong>VMS NDC</strong><span>Godrej &amp; Boyce · Visitor Access</span></div>
           </div>
           <div className={styles.introContent}>
-            <span className={styles.kicker}>VISITOR APPOINTMENT</span>
-            <h1>Plan your visit.<br /><em>Arrive prepared.</em></h1>
-            <p>Request a visit in under two minutes. Designed for a quick, comfortable experience on your phone or desktop.</p>
+            <span className={styles.kicker}>WELCOME TO SAIDHARA NDC</span>
+            <h1>Book your visit.<br /><em>We'll be ready.</em></h1>
+            <p>Make your appointment before you arrive. It only takes a couple of minutes, and you can complete it comfortably from your phone.</p>
             <div className={styles.promiseList}>
-              <div><span><ShieldCheck size={17} /></span><div><b>Secure request</b><small>No account or login required.</small></div></div>
-              <div><span><Clock3 size={17} /></span><div><b>Clear schedule</b><small>Choose your location, date and time.</small></div></div>
-              <div><span><Sparkles size={17} /></span><div><b>Simple arrival</b><small>Keep your reference ready at the gate.</small></div></div>
+              <div><span><ShieldCheck size={17} /></span><div><b>Quick &amp; easy</b><small>No account or login needed.</small></div></div>
+              <div><span><Clock3 size={17} /></span><div><b>Choose your visit</b><small>Pick your destination, date and time.</small></div></div>
+              <div><span><Sparkles size={17} /></span><div><b>Easy arrival</b><small>Keep your appointment reference with you.</small></div></div>
             </div>
           </div>
           <div className={styles.sideFoot}>VMS NDC · Visitor &amp; Asset Management</div>
@@ -304,15 +304,15 @@ export default function AppointmentBookingV2() {
 
         <section className={styles.formShell}>
           <div className={styles.mobileBrand}>
-            <div className={styles.brandRow}><div className={styles.logoMark}>V</div><div><strong>VMS NDC</strong><span>Godrej &amp; Boyce</span></div></div>
+            <div className={styles.brandRow}><div className={styles.logoMark}>V</div><div><strong>Godrej &amp; Boyce</strong><span>Saidhara NDC</span></div></div>
             <span className={styles.secure}><ShieldCheck size={14} /> Secure</span>
           </div>
 
           <div className={styles.formHeader}>
             <div>
               <span className={styles.stepLabel}>STEP {step} OF 2</span>
-              <h2>{step === 1 ? "When are you visiting?" : "Tell us about you"}</h2>
-              <p>{step === 1 ? "Choose where and when you need access." : "A few details help the security desk prepare for your arrival."}</p>
+              <h2>{step === 1 ? "Where are you visiting?" : "A little about you"}</h2>
+              <p>{step === 1 ? "First, tell us where and when you plan to visit." : "These details help your host and security team prepare."}</p>
             </div>
             <div className={styles.progress}><span className={step === 1 ? styles.active : styles.complete}>{step === 1 ? "1" : <Check size={15} />}</span><i className={step === 2 ? styles.lineActive : ""} /><span className={step === 2 ? styles.active : ""}>2</span></div>
           </div>
@@ -320,7 +320,7 @@ export default function AppointmentBookingV2() {
           <form onSubmit={submit} className={styles.form}>
             {step === 1 ? (
               <div className={styles.stepBody}>
-                <div className={styles.sectionLabel}><MapPin size={18} /><div><b>Destination</b><small>Select the exact office or warehouse.</small></div></div>
+                <div className={styles.sectionLabel}><MapPin size={18} /><div><b>Where are you going?</b><small>Select the office or warehouse you are visiting.</small></div></div>
                 <div className={styles.locationGrid}>
                   {LOCATIONS.map((location) => (
                     <button type="button" key={location.id} className={form.locationId === location.id ? styles.locationSelected : styles.locationCard} onClick={() => update("locationId", location.id)}>
@@ -333,27 +333,27 @@ export default function AppointmentBookingV2() {
                   <label className={styles.field}><span>Appointment date <b>*</b></span><div className={styles.inputWrap}><CalendarDays size={17} /><input type="date" min={today()} value={form.appointmentDate} onChange={(e) => update("appointmentDate", e.target.value)} required /></div></label>
                   <label className={styles.field}><span>Preferred time <b>*</b></span><div className={styles.inputWrap}><Clock3 size={17} /><input type="time" value={form.appointmentTime} onChange={(e) => update("appointmentTime", e.target.value)} required /></div></label>
                 </div>
-                <div className={styles.tip}><Clock3 size={16} /><span>Appointments are reviewed by the destination security desk before your visit.</span></div>
+                <div className={styles.tip}><Clock3 size={16} /><span>Your request will be reviewed by the security team at your selected location.</span></div>
               </div>
             ) : (
               <div className={styles.stepBody}>
                 <div className={styles.selectedSummary}><div className={styles.summaryIcon}><MapPin size={18} /></div><div><span>VISITING</span><b>{selectedLocation?.name}</b><small>{form.appointmentDate} · {form.appointmentTime} IST</small></div><button type="button" onClick={back}>Change</button></div>
-                <div className={styles.sectionLabel}><UserRound size={18} /><div><b>Visitor details</b><small>Required fields are marked with *</small></div></div>
+                <div className={styles.sectionLabel}><UserRound size={18} /><div><b>About you</b><small>Just the details we need for your visit.</small></div></div>
                 <div className={styles.fieldGrid}>
                   <label className={styles.field}><span>Full name <b>*</b></span><div className={styles.inputWrap}><UserRound size={17} /><input autoFocus value={form.visitorName} onChange={(e) => update("visitorName", e.target.value)} placeholder="Your full name" required /></div></label>
                   <label className={styles.field}><span>Mobile number <b>*</b></span><div className={styles.inputWrap}><Phone size={17} /><input inputMode="tel" autoComplete="tel" value={form.mobile} onChange={(e) => update("mobile", e.target.value)} placeholder="10-digit mobile" required /></div></label>
                   <label className={styles.field}><span>Company / organisation</span><div className={styles.inputWrap}><UsersRound size={17} /><input value={form.company} onChange={(e) => update("company", e.target.value)} placeholder="Company name" /></div></label>
                   <label className={styles.field}><span>Email address</span><div className={styles.inputWrap}><Mail size={17} /><input type="email" autoComplete="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="Optional" /></div></label>
-                  <label className={styles.field}><span>Person to meet <b>*</b></span><div className={styles.inputWrap}><UserRound size={17} /><input value={form.hostName} onChange={(e) => update("hostName", e.target.value)} placeholder="Host / employee name" required /></div></label>
+                  <label className={styles.field}><span>Who are you meeting? <b>*</b></span><div className={styles.inputWrap}><UserRound size={17} /><input value={form.hostName} onChange={(e) => update("hostName", e.target.value)} placeholder="Name of host or employee" required /></div></label>
                   <label className={styles.field}><span>Purpose</span><div className={styles.inputWrap}><Sparkles size={17} /><select value={form.purpose} onChange={(e) => update("purpose", e.target.value)}>{PURPOSES.map((purpose) => <option key={purpose}>{purpose}</option>)}</select></div></label>
                 </div>
 
                 <div className={styles.photoCard}>
-                  <div><span className={styles.photoIcon}><Camera size={18} /></span><div><b>Visitor photo <small>Optional</small></b><p>A photo can help the security desk identify you on arrival.</p></div></div>
+                  <div><span className={styles.photoIcon}><Camera size={18} /></span><div><b>Photo <small>Optional</small></b><p>Optional — this can help us identify you when you arrive.</p></div></div>
                   {form.photoUrl ? <div className={styles.photoPreview}><img src={form.photoUrl} alt="Visitor preview" /><button type="button" onClick={() => update("photoUrl", "")}><X size={15} /></button></div> : <div className={styles.photoActions}><button type="button" onClick={openCamera}><Camera size={16} /> Take photo</button><label><span>Choose photo</span><input type="file" accept="image/*" capture="user" onChange={(e) => attachPhoto(e.target.files?.[0])} /></label></div>}
                 </div>
 
-                <label className={styles.field}><span>Anything else we should know?</span><textarea rows={3} value={form.remarks} onChange={(e) => update("remarks", e.target.value)} placeholder="Optional note for the security desk" /></label>
+                <label className={styles.field}><span>Anything else to share?</span><textarea rows={3} value={form.remarks} onChange={(e) => update("remarks", e.target.value)} placeholder="Optional message for your host or security team" /></label>
               </div>
             )}
 
@@ -362,13 +362,13 @@ export default function AppointmentBookingV2() {
             <div className={styles.actions}>
               {step === 2 && <button type="button" className={styles.backButton} onClick={back}><ChevronLeft size={18} /> Back</button>}
               <button type="submit" className={styles.primaryButton} disabled={saving}>
-                {saving ? "Submitting request…" : step === 1 ? "Continue" : "Request appointment"}
+                {saving ? "Booking your visit…" : step === 1 ? "Continue" : "Book my appointment"}
                 {!saving && (step === 1 ? <ArrowRight size={17} /> : <Check size={17} />)}
               </button>
             </div>
           </form>
 
-          <div className={styles.formFoot}><ShieldCheck size={15} /> Your information is used for visitor appointment processing. No account is required.</div>
+          <div className={styles.formFoot}><ShieldCheck size={15} /> Your details are used only to process your visitor appointment. No account is required.</div>
         </section>
       </div>
 
