@@ -154,16 +154,15 @@ function NonRoutinePassView({entry,locations,onClose}:{entry:any;locations:Locat
  const print=()=>{
   const sheet=document.querySelector(".nonRoutinePassSheet") as HTMLElement|null;
   if(!sheet)return;
-  const printWindow=window.open("","_blank","width=1000,height=800");
+  const printWindow=window.open("about:blank","_blank","width=1000,height=800");
   if(!printWindow){alert("Please allow pop-ups to print the pass.");return}
-  const head=document.head.innerHTML;
   const printStyles=`<style>
    @page{size:A4 portrait;margin:10mm}
    *{box-sizing:border-box}
-   html,body{margin:0;padding:0;background:#fff;color:#172033;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+   html,body{margin:0;padding:0;background:#fff!important;color:#172033;-webkit-print-color-adjust:exact;print-color-adjust:exact}
    body{font-family:Arial,Helvetica,sans-serif}
    .printPass{width:100%;max-width:190mm;margin:0 auto}
-   .nonRoutinePassSheet{background:#fff;color:#1c283b;width:100%;border:1px solid #d9dee6;border-radius:3px;padding:10mm;box-shadow:none}
+   .nonRoutinePassSheet{display:block!important;visibility:visible!important;background:#fff;color:#1c283b;width:100%;border:1px solid #d9dee6;border-radius:3px;padding:10mm;box-shadow:none}
    .nonRoutinePassHeader{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #17284b;padding-bottom:5mm}
    .passBrand{font-size:16px;font-weight:900;letter-spacing:.08em;color:#17284b}
    .passSite{font-size:9px;color:#667085;letter-spacing:.18em;margin-top:3px}
@@ -194,11 +193,17 @@ function NonRoutinePassView({entry,locations,onClose}:{entry:any;locations:Locat
    .nonRoutineRemarks p{margin:5px 0 0;font-size:9px;line-height:1.5;color:#4d5a6d}
    .nonRoutinePassFooter{display:flex;justify-content:space-between;gap:15px;margin-top:6mm;padding-top:3mm;border-top:1px solid #e2e6ec;font-size:7px;color:#8a94a2}
   </style>`;
-  printWindow.document.open();
-  printWindow.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Non-Routine Visitor Pass</title>"+head+printStyles+"</head><body><main class='printPass'>"+sheet.outerHTML+"</main></body></html>");
+  printWindow.document.documentElement.innerHTML=`<head><meta charset="utf-8"><title>Non-Routine Visitor Pass</title>${printStyles}</head><body><main class="printPass"></main></body>`;
+  const target=printWindow.document.querySelector(".printPass");
+  if(!target){printWindow.close();alert("Unable to prepare the print pass.");return}
+  target.appendChild(sheet.cloneNode(true));
   printWindow.document.close();
-  printWindow.focus();
-  setTimeout(()=>{printWindow.print();printWindow.onafterprint=()=>printWindow.close()},350);
+  const startPrint=()=>{
+    printWindow.focus();
+    printWindow.print();
+    printWindow.onafterprint=()=>printWindow.close();
+  };
+  setTimeout(startPrint,300);
  };
  return <div className="overlay nonRoutinePassOverlay"><div className="nonRoutinePassModal"><div className="nonRoutinePassToolbar"><div><span className="eyebrow">SAIDHARA NDC · TEMPORARY WORK ENTRY</span><h2>Non-Routine Visitor Pass</h2></div><div className="passToolbarActions"><button className="secondary" onClick={onClose}>Close</button><button className="primary" onClick={print}><Printer size={15}/> Print pass</button></div></div><article className="nonRoutinePassSheet">
   <div className="nonRoutinePassHeader"><div><div className="passBrand">GODREJ & BOYCE</div><div className="passSite">NDC · SAIDHARA</div></div><div className="nonRoutinePassNumber"><small>PASS NO.</small><b>{entry.passNo}</b><span>{entry.entryDate}</span></div></div>
