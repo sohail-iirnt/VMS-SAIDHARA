@@ -42,6 +42,12 @@ service cloud.firestore {
 
     allow delete: if admin();
   }
+  match /nonRoutineVisitors/{id} {
+    allow read: if sameLocation(resource.data);
+    allow create: if sameLocation(request.resource.data);
+    allow update: if sameLocation(resource.data) && sameLocation(request.resource.data);
+    allow delete: if admin();
+  }
   match /visitors/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
   match /assets/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
   match /gatePasses/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
