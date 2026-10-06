@@ -151,7 +151,55 @@ function NonRoutineModal({profile,locations,duty,onClose}:{profile:Profile;locat
  </form></Modal>;
 }
 function NonRoutinePassView({entry,locations,onClose}:{entry:any;locations:Location[];onClose:()=>void}){
- const print=()=>window.print();
+ const print=()=>{
+  const sheet=document.querySelector(".nonRoutinePassSheet") as HTMLElement|null;
+  if(!sheet)return;
+  const printWindow=window.open("","_blank","width=1000,height=800");
+  if(!printWindow){alert("Please allow pop-ups to print the pass.");return}
+  const head=document.head.innerHTML;
+  const printStyles=`<style>
+   @page{size:A4 portrait;margin:10mm}
+   *{box-sizing:border-box}
+   html,body{margin:0;padding:0;background:#fff;color:#172033;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+   body{font-family:Arial,Helvetica,sans-serif}
+   .printPass{width:100%;max-width:190mm;margin:0 auto}
+   .nonRoutinePassSheet{background:#fff;color:#1c283b;width:100%;border:1px solid #d9dee6;border-radius:3px;padding:10mm;box-shadow:none}
+   .nonRoutinePassHeader{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #17284b;padding-bottom:5mm}
+   .passBrand{font-size:16px;font-weight:900;letter-spacing:.08em;color:#17284b}
+   .passSite{font-size:9px;color:#667085;letter-spacing:.18em;margin-top:3px}
+   .nonRoutinePassNumber{text-align:right;display:grid;gap:2px}
+   .nonRoutinePassNumber small,.nonRoutinePassGrid small,.nonRoutinePassTimes small,.nonRoutineRemarks small{font-size:7px;font-weight:900;letter-spacing:.12em;color:#7b8798}
+   .nonRoutinePassNumber b{font-size:17px;color:#24796f}
+   .nonRoutinePassNumber span{font-size:8px;color:#667085}
+   .nonRoutinePassTitle{padding:6mm 0 4mm;display:grid;gap:4px}
+   .nonRoutinePassTitle span{font-size:7px;letter-spacing:.14em;font-weight:900;color:#a26b20}
+   .nonRoutinePassTitle b{font-size:19px;color:#17284b}
+   .nonRoutinePassGrid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #dfe4eb;border-bottom:0}
+   .nonRoutinePassGrid>div{padding:3.2mm;border-right:1px solid #dfe4eb;border-bottom:1px solid #dfe4eb;display:grid;gap:4px;min-width:0}
+   .nonRoutinePassGrid>div:nth-child(4n){border-right:0}
+   .nonRoutinePassGrid b{font-size:10px;color:#29374c;word-break:break-word}
+   .nonRoutinePeople{margin-top:5mm;border:1px solid #dfe4eb;break-inside:avoid}
+   .passSectionLabel{padding:3mm;background:#f3f5f8;font-size:7px;font-weight:900;letter-spacing:.13em;color:#536176;border-bottom:1px solid #dfe4eb}
+   .nonRoutinePeople ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr}
+   .nonRoutinePeople li{display:flex;align-items:center;gap:9px;padding:3mm;border-bottom:1px solid #edf0f4}
+   .nonRoutinePeople li:nth-child(odd){border-right:1px solid #edf0f4}
+   .nonRoutinePeople li:nth-last-child(-n+2){border-bottom:0}
+   .nonRoutinePeople li span{width:22px;height:22px;border-radius:7px;background:#eef2f7;color:#657287;display:grid;place-items:center;font-size:8px;font-weight:900;flex:0 0 auto}
+   .nonRoutinePeople li b{font-size:9px;color:#27364b}
+   .nonRoutinePassTimes{display:grid;grid-template-columns:repeat(3,1fr);margin-top:5mm;border:1px solid #dfe4eb;break-inside:avoid}
+   .nonRoutinePassTimes>div{padding:3mm;display:grid;gap:4px;border-right:1px solid #dfe4eb}
+   .nonRoutinePassTimes>div:last-child{border-right:0}
+   .nonRoutinePassTimes b{font-size:9px;color:#29374c}
+   .nonRoutineRemarks{margin-top:4mm;padding:3mm;background:#fafbfc;border:1px solid #e2e6ec;break-inside:avoid}
+   .nonRoutineRemarks p{margin:5px 0 0;font-size:9px;line-height:1.5;color:#4d5a6d}
+   .nonRoutinePassFooter{display:flex;justify-content:space-between;gap:15px;margin-top:6mm;padding-top:3mm;border-top:1px solid #e2e6ec;font-size:7px;color:#8a94a2}
+  </style>`;
+  printWindow.document.open();
+  printWindow.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Non-Routine Visitor Pass</title>"+head+printStyles+"</head><body><main class='printPass'>"+sheet.outerHTML+"</main></body></html>");
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(()=>{printWindow.print();printWindow.onafterprint=()=>printWindow.close()},350);
+ };
  return <div className="overlay nonRoutinePassOverlay"><div className="nonRoutinePassModal"><div className="nonRoutinePassToolbar"><div><span className="eyebrow">SAIDHARA NDC · TEMPORARY WORK ENTRY</span><h2>Non-Routine Visitor Pass</h2></div><div className="passToolbarActions"><button className="secondary" onClick={onClose}>Close</button><button className="primary" onClick={print}><Printer size={15}/> Print pass</button></div></div><article className="nonRoutinePassSheet">
   <div className="nonRoutinePassHeader"><div><div className="passBrand">GODREJ & BOYCE</div><div className="passSite">NDC · SAIDHARA</div></div><div className="nonRoutinePassNumber"><small>PASS NO.</small><b>{entry.passNo}</b><span>{entry.entryDate}</span></div></div>
   <div className="nonRoutinePassTitle"><span>NON-ROUTINE VISITOR / TEMPORARY WORK</span><b>{entry.activity}</b></div>
@@ -164,6 +212,7 @@ function NonRoutinePassView({entry,locations,onClose}:{entry:any;locations:Locat
   <div className="nonRoutinePassFooter"><span>Temporary work entry · Keep this pass available while inside the premises.</span><span>VMS NDC · {entry.passNo}</span></div>
  </article></div></div>;
 }
+
 function VisitorModal({profile,locations,duty,onClose}:{profile:Profile;locations:Location[];duty:DutyDesk|null;onClose:()=>void}){
  const [f,setF]=useState<any>({serialNo:"",name:"",company:"",mobile:"",whomToMeet:"",purpose:"Meeting",remarks:"",locationId:profile.role==="admin"?(duty?.locationId||"ADMIN"):profile.locationId,photo:"",securityPersonId:duty?.securityPersonId||"",securityPersonName:duty?.securityPersonName||""}),[saving,setSaving]=useState(false),[camera,setCamera]=useState(false);
  const video=useRef<HTMLVideoElement>(null);const cameraStream=useRef<MediaStream|null>(null);const update=(k:string,v:any)=>setF((x:any)=>({...x,[k]:v}));
