@@ -162,7 +162,7 @@ function NonRoutinePassView({entry,locations,onClose}:{entry:any;locations:Locat
   <div className="nonRoutinePassTimes"><div><small>IN TIME</small><b>{fmt(entry.inTime)}</b></div><div><small>OUT TIME</small><b>{fmt(entry.outTime)}</b></div><div><small>SECURITY OFFICER</small><b>{entry.securityPersonName||"—"}</b></div></div>
   <div className="nonRoutineRemarks"><small>REMARKS</small><p>{entry.remarks||"—"}</p></div>
   <div className="nonRoutinePassFooter"><span>Temporary work entry · Keep this pass available while inside the premises.</span><span>VMS NDC · {entry.passNo}</span></div>
- </article></div>;
+ </article></div></div>;
 }
 function VisitorModal({profile,locations,duty,onClose}:{profile:Profile;locations:Location[];duty:DutyDesk|null;onClose:()=>void}){
  const [f,setF]=useState<any>({serialNo:"",name:"",company:"",mobile:"",whomToMeet:"",purpose:"Meeting",remarks:"",locationId:profile.role==="admin"?(duty?.locationId||"ADMIN"):profile.locationId,photo:"",securityPersonId:duty?.securityPersonId||"",securityPersonName:duty?.securityPersonName||""}),[saving,setSaving]=useState(false),[camera,setCamera]=useState(false);
