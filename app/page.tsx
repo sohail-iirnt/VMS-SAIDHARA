@@ -29,7 +29,7 @@ export default function Home(){
 function Login(p:any){
  const submit=async(e:any)=>{e.preventDefault();p.setError("");try{await signInWithEmailAndPassword(auth,p.email,p.password)}catch(e:any){p.setError(e.code==="auth/invalid-credential"?"Invalid email or password.":"Unable to sign in. Check Firebase Authentication.")}};
  return <main className="login loginClassicBrand"><div className="loginCard loginCardBranded">
-  <div className="loginBrandSide"><img src="/GODREJ%20NDC.png" alt="Godrej & Boyce NDC Saidhara" className="loginBrandLogo"/><span>VISITOR MANAGEMENT SYSTEM</span><b>SAIDHARA NDC</b></div>
+  <div className="loginBrandSide"><img src="/GODREJ%20UPDATED%20LOGO.png" alt="Godrej & Boyce NDC Saidhara" className="loginBrandLogo"/><span>VISITOR MANAGEMENT SYSTEM</span><b>SAIDHARA NDC</b></div>
   <div className="loginFormSide"><div className="logoCircle">S</div><div className="eyebrow">SAIDHARA NDC</div><h1>Secure operations portal</h1><p className="muted">Manage visitors, assets and gate passes for your assigned location.</p><form onSubmit={submit}><label>Email<input type="email" value={p.email} onChange={e=>p.setEmail(e.target.value)} placeholder="security@vms.com" required/></label><label>Password<input type="password" value={p.password} onChange={e=>p.setPassword(e.target.value)} placeholder="••••••••" required/></label>{p.error&&<div className="error">{p.error}</div>}<button className="primary wide">Sign in securely</button></form><div className="loginFoot"><ShieldCheck size={16}/> Location-based access control enabled</div></div>
  </div></main>;}
 
