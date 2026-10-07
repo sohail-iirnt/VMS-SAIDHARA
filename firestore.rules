@@ -9,7 +9,10 @@ service cloud.firestore {
   match /users/{uid} { allow read: if signedIn() && (request.auth.uid==uid || admin()); allow create,update,delete: if admin(); }
   match /locations/{id} { allow read: if signedIn(); allow write: if admin(); }
   match /settings/{id} { allow read: if signedIn(); allow write: if admin(); }
-  match /publicSettings/{id} { allow read: if id == "appointment"; allow write: if admin(); }
+  match /publicSettings/{id} {
+    allow read: if id in ["appointment","loginBranding"];
+    allow write: if admin();
+  }
   match /securityPersons/{id} {
     allow read: if admin() || (security() && resource.data.locationId == me().locationId);
     allow create,update,delete: if admin();
