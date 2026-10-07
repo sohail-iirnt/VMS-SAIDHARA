@@ -27,8 +27,28 @@ export default function Home(){
 }
 
 function Login(p:any){
- const submit=async(e:any)=>{e.preventDefault();p.setError("");try{await signInWithEmailAndPassword(auth,p.email,p.password)}catch(e:any){p.setError(e.code==="auth/invalid-credential"?"Invalid email or password.":"Unable to sign in. Check Firebase Authentication.")}};
- return <main className="login"><div className="loginCard"><div className="logoCircle">S</div><div className="eyebrow">SAIDHARA NDC</div><h1>Secure operations portal</h1><p className="muted">Manage visitors, assets and gate passes for your assigned location.</p><form onSubmit={submit}><label>Email<input type="email" value={p.email} onChange={e=>p.setEmail(e.target.value)} placeholder="security@vms.com" required/></label><label>Password<input type="password" value={p.password} onChange={e=>p.setPassword(e.target.value)} placeholder="••••••••" required/></label>{p.error&&<div className="error">{p.error}</div>}<button className="primary wide">Sign in securely</button></form><div className="loginFoot"><ShieldCheck size={16}/> Location-based access control enabled</div></div></main>;
+ const [showPassword,setShowPassword]=useState(false);
+ const submit=async(e:any)=>{e.preventDefault();p.setError("");try{await signInWithEmailAndPassword(auth,p.email.trim(),p.password)}catch(e:any){p.setError(e.code==="auth/invalid-credential"?"Invalid email or password.":"Unable to sign in. Check Firebase Authentication.")}};
+ return <main className="login loginV2">
+  <section className="loginShowcase">
+   <div className="loginGlow glowOne"/><div className="loginGlow glowTwo"/>
+   <div className="loginShowcaseTop"><img src="/GODREJ%20NDC.png" alt="Godrej & Boyce NDC Saidhara" className="godrejLoginLogo"/><span className="secureBadge"><span/>SECURE VMS</span></div>
+   <div className="loginShowcaseCopy"><span className="eyebrow loginEyebrow">GODREJ & BOYCE · SAIDHARA NDC</span><h1>One secure desk.<br/><em>Every movement accounted for.</em></h1><p>Visitor, asset, gate-pass and appointment operations — managed securely from one location-aware command center.</p><div className="loginFeatureRow"><div><ShieldCheck size={17}/><span>Role-based access</span></div><div><MapPin size={17}/><span>Location secured</span></div><div><Activity size={17}/><span>Live operations</span></div></div></div>
+   <div className="loginShowcaseFoot"><span>VISITOR MANAGEMENT SYSTEM</span><b>SAIDHARA NDC</b></div>
+  </section>
+  <section className="loginPanel"><div className="loginPanelInner">
+   <div className="mobileLoginBrand"><img src="/GODREJ%20NDC.png" alt="Godrej & Boyce NDC Saidhara"/></div>
+   <div className="loginPanelIntro"><span className="loginKicker">WELCOME BACK</span><h2>Sign in to VMS</h2><p>Use your authorized desk credentials to continue.</p></div>
+   <form onSubmit={submit} className="loginFormV2">
+    <label className="loginFieldV2"><span>Email address</span><div className="loginInputWrap"><Mail size={17}/><input type="email" value={p.email} onChange={e=>p.setEmail(e.target.value)} placeholder="name@company.com" autoComplete="username" required/></div></label>
+    <label className="loginFieldV2"><span>Password</span><div className="loginInputWrap"><ShieldCheck size={17}/><input type={showPassword?"text":"password"} value={p.password} onChange={e=>p.setPassword(e.target.value)} placeholder="Enter your password" autoComplete="current-password" required/><button type="button" className="passwordToggle" onClick={()=>setShowPassword(x=>!x)} aria-label={showPassword?"Hide password":"Show password"}>{showPassword?<Eye size={17}/>:<Eye size={17}/>}</button></div></label>
+    {p.error&&<div className="error loginErrorV2"><X size={16}/><span>{p.error}</span></div>}
+    <button className="primary loginSubmitV2" disabled={!p.email||!p.password}><span>Continue to secure portal</span><ArrowRight size={17}/></button>
+   </form>
+   <div className="loginTrust"><div className="loginTrustIcon"><ShieldCheck size={18}/></div><div><b>Protected access</b><span>Your account only opens the locations and operations assigned to it.</span></div></div>
+   <div className="loginPanelFooter"><span>© Godrej & Boyce · Saidhara NDC</span><span>Authorized users only</span></div>
+  </div></section>
+ </main>;
 }
 
 function Portal({profile}:{profile:Profile}){
