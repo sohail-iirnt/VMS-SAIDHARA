@@ -15,4 +15,13 @@ service firebase.storage {
     allow write: if activeUser();
   }
  }
+  // The login logo is intentionally public because the login screen is shown before authentication.
+  // Only an active administrator may replace it.
+  match /loginBranding/{fileName} {
+    allow read: if true;
+    allow write: if signedIn() &&
+      firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin' &&
+      firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.active == true;
+  }
+
 }
