@@ -453,20 +453,22 @@ function SettingsPage({locations}:{locations:Location[]}){
 function LoginBrandingSettings(){
  const [branding,setBranding]=useState<LoginBranding>({logoUrl:DEFAULT_LOGIN_LOGO,width:310});
  const [draftWidth,setDraftWidth]=useState(310),[file,setFile]=useState<File|null>(null),[preview,setPreview]=useState(DEFAULT_LOGIN_LOGO),[saving,setSaving]=useState(false);
- useEffect(()=>onSnapshot(doc(db,"publicSettings","loginBranding"),snap=>{
-   const d=snap.exists()?snap.data() as any:{};
-   const width=Math.min(520,Math.max(140,Number(d.width)||310));
-   setBranding({logoUrl:d.logoUrl||DEFAULT_LOGIN_LOGO,width});
-   setDraftWidth(width); setPreview(d.logoUrl||DEFAULT_LOGIN_LOGO);
- }),[]);
+ useEffect(()=>{
+   const unsub=onSnapshot(doc(db,"publicSettings","appointment"),snap=>{
+     const d=snap.exists()?((snap.data() as any).loginBranding||{}):{};
+     const width=Math.min(520,Math.max(140,Number(d.width)||310));
+     setBranding({logoUrl:d.logoUrl||DEFAULT_LOGIN_LOGO,width});setDraftWidth(width);setPreview(d.logoUrl||DEFAULT_LOGIN_LOGO);
+   },()=>{});
+   return ()=>unsub();
+ },[]);
  const choose=(f:File|null)=>{if(!f)return;if(!f.type.startsWith("image/"))return alert("Please select an image file.");setFile(f);const reader=new FileReader();reader.onload=()=>setPreview(String(reader.result));reader.readAsDataURL(f)};
  const save=async()=>{setSaving(true);try{
    let logoUrl=branding.logoUrl;
-   if(file){const reader=new FileReader();const dataUrl=await new Promise<string>((resolve,reject)=>{reader.onload=()=>resolve(String(reader.result));reader.onerror=reject;reader.readAsDataURL(file)});const r=ref(storage,`visitorPhotos/ADMIN/login-branding-${Date.now()}.${file.type.split("/")[1]||"png"}`);await uploadString(r,dataUrl,"data_url",{contentType:file.type,cacheControl:"no-cache,max-age=0"});logoUrl=await getDownloadURL(r);}
-   await setDoc(doc(db,"publicSettings","loginBranding"),{logoUrl,width:draftWidth,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||null},{merge:true});
+   if(file){const reader=new FileReader();const dataUrl=await new Promise<string>((resolve,reject)=>{reader.onload=()=>resolve(String(reader.result));reader.onerror=reject;reader.readAsDataURL(file)});const r=ref(storage,"visitorPhotos/ADMIN/login-branding-"+Date.now()+"."+(file.type.split("/")[1]||"png"));await uploadString(r,dataUrl,"data_url",{contentType:file.type,cacheControl:"no-cache,max-age=0"});logoUrl=await getDownloadURL(r);}
+   await setDoc(doc(db,"publicSettings","appointment"),{loginBranding:{logoUrl,width:draftWidth,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||null}},{merge:true});
    setBranding({logoUrl,width:draftWidth});setPreview(logoUrl);setFile(null);alert("Login logo updated successfully.");
  }catch(e:any){alert("Could not update login logo: "+e.message)}finally{setSaving(false)}};
- const reset=async()=>{setSaving(true);try{await setDoc(doc(db,"publicSettings","loginBranding"),{logoUrl:DEFAULT_LOGIN_LOGO,width:310,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||null},{merge:true});setFile(null);alert("Login logo reset to the latest published Godrej logo.");}catch(e:any){alert(e.message)}finally{setSaving(false)}};
+ const reset=async()=>{setSaving(true);try{await setDoc(doc(db,"publicSettings","appointment"),{loginBranding:{logoUrl:DEFAULT_LOGIN_LOGO,width:310,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||null}},{merge:true});setFile(null);alert("Login logo reset to the latest published Godrej logo.");}catch(e:any){alert(e.message)}finally{setSaving(false)}};
  return <section className="loginBrandingAdmin panel"><div className="loginBrandingHeader"><div><span className="eyebrow">LOGIN PAGE BRANDING</span><h2>Godrej login logo</h2><p>Replace the public login logo and control its display size without touching code.</p></div><span className="badge green">Admin controlled</span></div>
   <div className="loginBrandingGrid"><div className="loginBrandingPreview"><div className="loginBrandingPreviewInner"><img src={preview} alt="Login logo preview" style={{width:Math.min(420,draftWidth),maxWidth:"100%"}}/></div><small>Live preview · transparent PNG supported</small></div>
   <div className="loginBrandingControls"><label className="field"><span>Replace logo</span><input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={e=>choose(e.target.files?.[0]||null)}/></label>
