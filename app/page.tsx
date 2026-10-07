@@ -30,17 +30,19 @@ export default function Home(){
 
 function Login(p:any){
  const [branding,setBranding]=useState<LoginBranding>({logoUrl:DEFAULT_LOGIN_LOGO,width:310});
- useEffect(()=>onSnapshot(doc(db,"publicSettings","loginBranding"),snap=>{
-   if(!snap.exists())return;
-   const d=snap.data() as any;
-   setBranding({logoUrl:d.logoUrl||DEFAULT_LOGIN_LOGO,width:Math.min(520,Math.max(140,Number(d.width)||310))});
- },()=>{}),[]);
+ useEffect(()=>{
+   const unsub=onSnapshot(doc(db,"publicSettings","loginBranding"),snap=>{
+     if(!snap.exists())return;
+     const d=snap.data() as any;
+     setBranding({logoUrl:d.logoUrl||DEFAULT_LOGIN_LOGO,width:Math.min(520,Math.max(140,Number(d.width)||310))});
+   },()=>{});
+   return ()=>unsub();
+ },[]);
  const submit=async(e:any)=>{e.preventDefault();p.setError("");try{await signInWithEmailAndPassword(auth,p.email,p.password)}catch(e:any){p.setError(e.code==="auth/invalid-credential"?"Invalid email or password.":"Unable to sign in. Check Firebase Authentication.")}};
  return <main className="login loginClassicBrand"><div className="loginCard loginCardBranded">
   <div className="loginBrandSide"><img src={branding.logoUrl} alt="Godrej & Boyce NDC Saidhara" className="loginBrandLogo" style={{width:branding.width,maxWidth:"100%"}}/><span>VISITOR MANAGEMENT SYSTEM</span><b>SAIDHARA NDC</b></div>
   <div className="loginFormSide"><div className="logoCircle">S</div><div className="eyebrow">SAIDHARA NDC</div><h1>Secure operations portal</h1><p className="muted">Manage visitors, assets and gate passes for your assigned location.</p><form onSubmit={submit}><label>Email<input type="email" value={p.email} onChange={e=>p.setEmail(e.target.value)} placeholder="security@vms.com" required/></label><label>Password<input type="password" value={p.password} onChange={e=>p.setPassword(e.target.value)} placeholder="••••••••" required/></label>{p.error&&<div className="error">{p.error}</div>}<button className="primary wide">Sign in securely</button></form><div className="loginFoot"><ShieldCheck size={16}/> Location-based access control enabled</div></div>
  </div></main>;}
-
 function Portal({profile}:{profile:Profile}){
  const [tab,setTab]=useState("dashboard"),[mobile,setMobile]=useState(false),[refresh,setRefresh]=useState(0),[locations,setLocations]=useState<Location[]>(LOCATIONS),[duty,setDuty]=useState<DutyDesk|null>(null);
  useEffect(()=>onSnapshot(collection(db,"locations"),s=>{const custom=s.docs.map(d=>({id:d.id,...d.data()} as Location)).filter(x=>x.active!==false);const merged=LOCATIONS.map(base=>custom.find(x=>x.id===base.id)||base);custom.filter(x=>!LOCATIONS.some(base=>base.id===x.id)).forEach(x=>merged.push(x));setLocations(merged)}),[]);
