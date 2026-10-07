@@ -373,3 +373,23 @@
 .loginFormSide .logoCircle{margin:0 0 15px}
 @media(max-width:700px){.loginCardBranded{grid-template-columns:1fr}.loginBrandSide{min-height:165px;padding:24px 20px}.loginBrandLogo{width:245px;max-height:115px;margin-bottom:12px}.loginBrandSide span{font-size:6px}.loginBrandSide b{font-size:10px}.loginFormSide{padding:28px 24px}.loginFormSide .logoCircle{margin-bottom:12px}}
 @media(max-width:420px){.loginClassicBrand{padding:13px}.loginFormSide{padding:25px 20px}.loginCardBranded{border-radius:22px}}
+
+/* Admin-managed login branding */
+.loginBrandLogo{max-height:none}
+.loginBrandingAdmin{margin:0 0 24px;padding:22px}
+.loginBrandingHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.loginBrandingHeader h2{margin:5px 0 4px;font-size:19px}
+.loginBrandingHeader p{margin:0;color:#7f8b9e;font-size:10px;line-height:1.5}
+.loginBrandingGrid{display:grid;grid-template-columns:minmax(250px,.9fr) minmax(320px,1.1fr);gap:18px}
+.loginBrandingPreview{border:1px dashed #d8dfeb;border-radius:15px;padding:18px;background:linear-gradient(145deg,#fbfcfe,#f2f5f9);display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:190px}
+.loginBrandingPreviewInner{width:100%;min-height:130px;display:grid;place-items:center;padding:12px;background:#fff;border:1px solid #e5e9f0;border-radius:12px;overflow:hidden}
+.loginBrandingPreviewInner img{height:auto;max-height:120px;object-fit:contain;display:block}
+.loginBrandingPreview small{font-size:8px;color:#8b96a7;margin-top:9px}
+.loginBrandingControls{display:grid;gap:14px;align-content:center}
+.brandingRange{display:grid;gap:8px;font-size:10px;color:#46536a}
+.brandingRange>span{display:flex;justify-content:space-between;align-items:center}
+.brandingRange strong{font-size:11px;color:#29364c}
+.brandingRange input[type=range]{width:100%;accent-color:#4059d0}
+.brandingRange small{font-size:8px;color:#8994a5}
+.brandingActions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+@media(max-width:760px){.loginBrandingGrid{grid-template-columns:1fr}.loginBrandingHeader{flex-direction:column}.brandingActions{justify-content:stretch}.brandingActions button{flex:1}.loginBrandingPreview{min-height:165px}}
