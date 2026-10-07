@@ -31,9 +31,9 @@ export default function Home(){
 function Login(p:any){
  const [branding,setBranding]=useState<LoginBranding>({logoUrl:DEFAULT_LOGIN_LOGO,width:310});
  useEffect(()=>{
-   const unsub=onSnapshot(doc(db,"publicSettings","loginBranding"),snap=>{
+   const unsub=onSnapshot(doc(db,"publicSettings","appointment"),snap=>{
      if(!snap.exists())return;
-     const d=snap.data() as any;
+     const d=(snap.data() as any).loginBranding||{};
      setBranding({logoUrl:d.logoUrl||DEFAULT_LOGIN_LOGO,width:Math.min(520,Math.max(140,Number(d.width)||310))});
    },()=>{});
    return ()=>unsub();
@@ -462,7 +462,7 @@ function LoginBrandingSettings(){
  const choose=(f:File|null)=>{if(!f)return;if(!f.type.startsWith("image/"))return alert("Please select an image file.");setFile(f);const reader=new FileReader();reader.onload=()=>setPreview(String(reader.result));reader.readAsDataURL(f)};
  const save=async()=>{setSaving(true);try{
    let logoUrl=branding.logoUrl;
-   if(file){const reader=new FileReader();const dataUrl=await new Promise<string>((resolve,reject)=>{reader.onload=()=>resolve(String(reader.result));reader.onerror=reject;reader.readAsDataURL(file)});const r=ref(storage,"loginBranding/logo");await uploadString(r,dataUrl,"data_url",{contentType:file.type,cacheControl:"no-cache,max-age=0"});logoUrl=await getDownloadURL(r);}
+   if(file){const reader=new FileReader();const dataUrl=await new Promise<string>((resolve,reject)=>{reader.onload=()=>resolve(String(reader.result));reader.onerror=reject;reader.readAsDataURL(file)});const r=ref(storage,`visitorPhotos/ADMIN/login-branding-${Date.now()}.${file.type.split("/")[1]||"png"}`);await uploadString(r,dataUrl,"data_url",{contentType:file.type,cacheControl:"no-cache,max-age=0"});logoUrl=await getDownloadURL(r);}
    await setDoc(doc(db,"publicSettings","loginBranding"),{logoUrl,width:draftWidth,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||null},{merge:true});
    setBranding({logoUrl,width:draftWidth});setPreview(logoUrl);setFile(null);alert("Login logo updated successfully.");
  }catch(e:any){alert("Could not update login logo: "+e.message)}finally{setSaving(false)}};
