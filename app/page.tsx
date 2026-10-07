@@ -34,7 +34,7 @@ function Login(p:any){
    if(!snap.exists())return;
    const d=snap.data() as any;
    setBranding({logoUrl:d.logoUrl||DEFAULT_LOGIN_LOGO,width:Math.min(520,Math.max(140,Number(d.width)||310))});
- },()=>{});},[]);
+ },()=>{}),[]);
  const submit=async(e:any)=>{e.preventDefault();p.setError("");try{await signInWithEmailAndPassword(auth,p.email,p.password)}catch(e:any){p.setError(e.code==="auth/invalid-credential"?"Invalid email or password.":"Unable to sign in. Check Firebase Authentication.")}};
  return <main className="login loginClassicBrand"><div className="loginCard loginCardBranded">
   <div className="loginBrandSide"><img src={branding.logoUrl} alt="Godrej & Boyce NDC Saidhara" className="loginBrandLogo" style={{width:branding.width,maxWidth:"100%"}}/><span>VISITOR MANAGEMENT SYSTEM</span><b>SAIDHARA NDC</b></div>
