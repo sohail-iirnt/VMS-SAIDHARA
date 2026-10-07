@@ -366,10 +366,10 @@
 .loginBrandSide{min-height:500px;padding:34px 27px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:linear-gradient(145deg,#ffffff,#f1f4f8);border-right:1px solid #dfe5ec;position:relative;overflow:hidden;color:#182333}
 .loginBrandSide:before{content:"";position:absolute;width:320px;height:320px;border:1px solid #d9e1ea;border-radius:50%;right:-205px;bottom:-170px;box-shadow:0 0 0 55px #eef2f6}
 .loginBrandSide:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#dce6f2;left:-105px;top:-75px;filter:blur(3px)}
-.loginBrandLogo{position:relative;z-index:1;width:235px;max-width:100%;height:auto;max-height:125px;object-fit:contain;filter:drop-shadow(0 8px 16px #18233320);margin-bottom:28px}
+.loginBrandLogo{position:relative;z-index:1;width:310px;max-width:100%;height:auto;max-height:155px;object-fit:contain;filter:drop-shadow(0 8px 16px #18233320);margin-bottom:28px}
 .loginBrandSide span{position:relative;z-index:1;font-size:7px;letter-spacing:.17em;color:#687789;font-weight:800}
 .loginBrandSide b{position:relative;z-index:1;font-size:12px;letter-spacing:.08em;margin-top:6px;color:#1d2a3a}
 .loginFormSide{padding:38px;min-width:0}
 .loginFormSide .logoCircle{margin:0 0 15px}
-@media(max-width:700px){.loginCardBranded{grid-template-columns:1fr}.loginBrandSide{min-height:165px;padding:24px 20px}.loginBrandLogo{width:205px;max-height:95px;margin-bottom:12px}.loginBrandSide span{font-size:6px}.loginBrandSide b{font-size:10px}.loginFormSide{padding:28px 24px}.loginFormSide .logoCircle{margin-bottom:12px}}
+@media(max-width:700px){.loginCardBranded{grid-template-columns:1fr}.loginBrandSide{min-height:165px;padding:24px 20px}.loginBrandLogo{width:245px;max-height:115px;margin-bottom:12px}.loginBrandSide span{font-size:6px}.loginBrandSide b{font-size:10px}.loginFormSide{padding:28px 24px}.loginFormSide .logoCircle{margin-bottom:12px}}
 @media(max-width:420px){.loginClassicBrand{padding:13px}.loginFormSide{padding:25px 20px}.loginCardBranded{border-radius:22px}}
