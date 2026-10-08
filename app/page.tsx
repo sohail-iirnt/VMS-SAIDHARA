@@ -119,7 +119,7 @@ function LottieSplash({onDone}:{onDone:()=>void}){
    <div className="rippleCore"><img src={DEFAULT_LOGIN_LOGO} alt=""/></div>
    <span className="rippleSpark rippleSparkOne"/><span className="rippleSpark rippleSparkTwo"/><span className="rippleSpark rippleSparkThree"/><span className="rippleSpark rippleSparkFour"/>
   </div>
-  <div className="splashCaption"><b>VISITOR AND ASSEST MANAGEMENT SYSTEM</b><span>NDC SAIDHARA</span></div>
+  <div className="splashCaption"><b>VISITOR AND ASSET MANAGEMENT SYSTEM</b><span>NDC SAIDHARA</span></div>
  </main>;
 }
 function Login(p:any){
