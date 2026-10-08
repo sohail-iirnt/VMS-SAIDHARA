@@ -60,6 +60,7 @@ function printPageCss(s:PrintSettings){
  .safetyFooter{font-size:9px!important}
  .thermalOnly{display:${thermal?"block":"none"}}
  .thermalHidden{display:${thermal?"none":"block"}}
+ .thermalRules{display:${thermal?"none":"block"}}\n ${thermal?".safetyBack{display:none!important}.infoGrid,.transferGrid,.transferRoute,.securityInfo{grid-template-columns:1fr!important}.passBrand,.transferPassBrand{padding:4mm!important}.passBody,.transferPassBody{padding:4mm!important}.barcodePanel,.transferBarcode{padding:3mm!important}.nonRoutinePassSheet{padding:4mm!important}.nonRoutinePassGrid{grid-template-columns:1fr!important}.nonRoutinePeople ol{grid-template-columns:1fr!important}.nonRoutinePassTimes{grid-template-columns:1fr!important}.nonRoutinePassFooter{display:none!important}":""}
  `;
 }
 
@@ -216,7 +217,7 @@ function NonRoutinePassView({entry,locations,onClose}:{entry:any;locations:Locat
    *{box-sizing:border-box}
    html,body{margin:0;padding:0;background:#fff!important;color:#172033;-webkit-print-color-adjust:exact;print-color-adjust:exact}
    body{font-family:"Noto Sans Devanagari","Noto Sans",Arial,sans-serif}
-   .printPass{width:100%;max-width:190mm;margin:0 auto}
+   .printPass{width:100%;max-width:none;margin:0 auto}
    .nonRoutinePassSheet{display:block!important;visibility:visible!important;background:#fff;color:#1c283b;width:100%;border:1px solid #d9dee6;border-radius:3px;padding:10mm;box-shadow:none}
    .nonRoutinePassHeader{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #17284b;padding-bottom:5mm}
    .passBrand{font-size:16px;font-weight:900;letter-spacing:.08em;color:#17284b}
