@@ -339,8 +339,9 @@ function PassModal({profile,locations,duty,onClose}:{profile:Profile;locations:L
 }
 
 function PassView({pass,profile,onClose}:{pass:any;profile:Profile;onClose:()=>void}){
- const refSvg=useRef<SVGSVGElement>(null);const [returning,setReturning]=useState(false);const [assetRecord,setAssetRecord]=useState<any>(null);const [printSettings,setPrintSettings]=useState<PrintSettings>(DEFAULT_PRINT_SETTINGS[isAssetPass?"gateAsset":"gateVisitor"]);
+ const refSvg=useRef<SVGSVGElement>(null);const [returning,setReturning]=useState(false);const [assetRecord,setAssetRecord]=useState<any>(null);
  const isAssetPass=pass.passType==="ASSET / MATERIAL";
+ const [printSettings,setPrintSettings]=useState<PrintSettings>(DEFAULT_PRINT_SETTINGS[isAssetPass?"gateAsset":"gateVisitor"]);
  useEffect(()=>{if(refSvg.current&&pass.barcodeValue)JsBarcode(refSvg.current,String(pass.barcodeValue),{format:"CODE128",width:2.15,height:64,displayValue:true,fontSize:12,margin:8,lineColor:"#101828",textMargin:7})},[pass]);
  useEffect(()=>{const kind=isAssetPass?"gateAsset":"gateVisitor";let active=true;getDoc(doc(db,"settings","printSettings")).then(s=>{if(!active)return;const raw=s.exists()?((s.data() as any)[kind]||{}):{};const base=DEFAULT_PRINT_SETTINGS[kind];setPrintSettings({...base,...raw})}).catch(()=>{});return()=>{active=false}},[isAssetPass]);
  useEffect(()=>{let active=true;if(isAssetPass&&pass.assetId){getDoc(doc(db,"assets",pass.assetId)).then(s=>{if(active&&s.exists())setAssetRecord({id:s.id,...s.data()})}).catch(()=>{})}else setAssetRecord(null);return()=>{active=false}},[isAssetPass,pass.assetId]);
