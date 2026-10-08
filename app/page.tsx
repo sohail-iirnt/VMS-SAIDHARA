@@ -6,6 +6,7 @@ import {doc,getDoc,collection,query,where,onSnapshot,addDoc,updateDoc,serverTime
 import {ref,uploadString,getDownloadURL} from "firebase/storage";
 import {LayoutDashboard,Users,PackageCheck,Ticket,BarChart3,Settings,LogOut,Plus,Search,Camera,CheckCircle2,Clock3,ShieldCheck,X,Menu,MapPin,RefreshCw,Printer,ScanLine,RotateCcw,Eye,ArrowRightLeft,Send,Inbox,CheckCheck,History,Activity,ArrowRight,PackageSearch,CalendarDays,CalendarCheck,Ban,UserCheck,Share2,MessageCircle,Mail,Smartphone,Copy,Check,HardHat} from "lucide-react";
 import JsBarcode from "jsbarcode";
+
 import PublicAppointmentSettings from "../components/PublicAppointmentSettings";
 
 type Profile={uid:string;name:string;email:string;role:"admin"|"security";locationId:string;active:boolean};
@@ -101,13 +102,26 @@ function printPageCss(s:PrintSettings){
  `;
 }
 export default function Home(){
- const [profile,setProfile]=useState<Profile|null>(null),[loading,setLoading]=useState(true),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[error,setError]=useState("");
+ const [profile,setProfile]=useState<Profile|null>(null),[loading,setLoading]=useState(true),[splashDone,setSplashDone]=useState(false),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[error,setError]=useState("");
  useEffect(()=>{let active=true;const unsub=onAuthStateChanged(auth,async u=>{if(!active)return;if(!u){setProfile(null);setLoading(false);return}try{const s=await getDoc(doc(db,"users",u.uid));if(!active)return;if(s.exists())setProfile({uid:u.uid,...s.data()} as Profile);else setError("Account profile is not configured. Ask the administrator.");}catch{if(active)setError("Unable to load your profile. Please refresh and try again.");}finally{if(active)setLoading(false)}});return()=>{active=false;unsub()}},[]);
- if(loading)return <div className="splash"><div className="brandMark">V</div><h2>VMS NDC</h2><p>Godrej & Boyce · Visitor & Asset Management</p><div className="splashLine"><span/></div></div>;
+ if(!splashDone)return <LottieSplash onDone={()=>setSplashDone(true)}/>;
+ if(loading)return <div className="splash"><div className="splashFallbackLogo"><img src={DEFAULT_LOGIN_LOGO} alt="Godrej & Boyce NDC Saidhara"/></div><h2>VMS NDC</h2><p>Godrej & Boyce · Visitor & Asset Management</p><div className="splashLine"><span/></div></div>;
  if(!profile)return <Login email={email} password={password} setEmail={setEmail} setPassword={setPassword} error={error} setError={setError}/>;
  return <Portal profile={profile}/>;
 }
 
+function LottieSplash({onDone}:{onDone:()=>void}){
+ useEffect(()=>{const timer=window.setTimeout(onDone,3600);return()=>window.clearTimeout(timer)},[onDone]);
+ return <main className="splash lottieSplash">
+  <div className="rippleStage" aria-hidden="true">
+   <div className="rippleHalo rippleHaloOne"/><div className="rippleHalo rippleHaloTwo"/><div className="rippleHalo rippleHaloThree"/>
+   <div className="rippleRing rippleRingOne"/><div className="rippleRing rippleRingTwo"/><div className="rippleRing rippleRingThree"/>
+   <div className="rippleCore"><img src={DEFAULT_LOGIN_LOGO} alt=""/></div>
+   <span className="rippleSpark rippleSparkOne"/><span className="rippleSpark rippleSparkTwo"/><span className="rippleSpark rippleSparkThree"/><span className="rippleSpark rippleSparkFour"/>
+  </div>
+  <div className="splashCaption"><b>VISITOR AND ASSET MANAGEMENT SYSTEM</b><span>NDC SAIDHARA</span></div>
+ </main>;
+}
 function Login(p:any){
  const [branding,setBranding]=useState<LoginBranding>({logoUrl:DEFAULT_LOGIN_LOGO,width:310});
  useEffect(()=>{
