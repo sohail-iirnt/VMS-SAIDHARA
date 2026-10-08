@@ -111,23 +111,16 @@ export default function Home(){
 }
 
 function LottieSplash({onDone}:{onDone:()=>void}){
- const host=useRef<HTMLDivElement|null>(null);
- useEffect(()=>{
-  let disposed=false;
-  let animation:any=null;
-  const fallback=window.setTimeout(()=>{if(!disposed)onDone()},3400);
-  (async()=>{
-   try{
-    const mod:any=await import("lottie-web");
-    if(disposed)return;
-    const lottie=mod.default||mod;
-    animation=lottie.loadAnimation({container:host.current,renderer:"svg",loop:false,autoplay:true,path:"/vms-splash.json",rendererSettings:{preserveAspectRatio:"xMidYMid meet"}});
-    animation.addEventListener("complete",()=>{if(!disposed)onDone()});
-   }catch{if(!disposed)onDone()}
-  })();
-  return()=>{disposed=true;window.clearTimeout(fallback);if(animation){try{animation.destroy()}catch{}}};
- },[]);
- return <main className="splash lottieSplash"><div className="lottieStage" ref={host}/><div className="splashCaption"><b>VISITOR MANAGEMENT SYSTEM</b><span>SAIDHARA NDC · GODREJ & BOYCE</span></div></main>;
+ useEffect(()=>{const timer=window.setTimeout(onDone,3600);return()=>window.clearTimeout(timer)},[onDone]);
+ return <main className="splash lottieSplash">
+  <div className="rippleStage" aria-hidden="true">
+   <div className="rippleHalo rippleHaloOne"/><div className="rippleHalo rippleHaloTwo"/><div className="rippleHalo rippleHaloThree"/>
+   <div className="rippleRing rippleRingOne"/><div className="rippleRing rippleRingTwo"/><div className="rippleRing rippleRingThree"/>
+   <div className="rippleCore"><img src={DEFAULT_LOGIN_LOGO} alt=""/></div>
+   <span className="rippleSpark rippleSparkOne"/><span className="rippleSpark rippleSparkTwo"/><span className="rippleSpark rippleSparkThree"/><span className="rippleSpark rippleSparkFour"/>
+  </div>
+  <div className="splashCaption"><b>VISITOR AND ASSEST MANAGEMENT SYSTEM</b><span>NDC SAIDHARA</span></div>
+ </main>;
 }
 function Login(p:any){
  const [branding,setBranding]=useState<LoginBranding>({logoUrl:DEFAULT_LOGIN_LOGO,width:310});
