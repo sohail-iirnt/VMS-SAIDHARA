@@ -207,13 +207,14 @@ function NonRoutineModal({profile,locations,duty,onClose}:{profile:Profile;locat
  </form></Modal>;
 }
 function NonRoutinePassView({entry,locations,onClose}:{entry:any;locations:Location[];onClose:()=>void}){
- const print=()=>{
+ const print=async(thermal=false)=>{
   const sheet=document.querySelector(".nonRoutinePassSheet") as HTMLElement|null;
   if(!sheet)return;
+  const baseSettings=await loadPrintSettings("nonRoutine");const settings=thermal?{...baseSettings,format:baseSettings.thermalWidth===58?"THERMAL_58":"THERMAL_80"}:baseSettings;
   const printWindow=window.open("about:blank","_blank","width=1000,height=800");
   if(!printWindow){alert("Please allow pop-ups to print the pass.");return}
   const printStyles=`<style>
-   @page{size:A4 portrait;margin:10mm}
+   ${printPageCss(settings)}
    *{box-sizing:border-box}
    html,body{margin:0;padding:0;background:#fff!important;color:#172033;-webkit-print-color-adjust:exact;print-color-adjust:exact}
    body{font-family:'Noto Sans Devanagari','Noto Sans',Arial,sans-serif}
