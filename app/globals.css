@@ -413,12 +413,25 @@
 
 .passPreview .safetyRule strong,.passPreview .safetyRule span{font-size:13px!important;line-height:1.55!important}.passPreview .safetyRule>b{font-size:13px!important}.passPreview .emergency{font-size:12px!important}.passPreview .emergency b{font-size:14px!important}
 
-.lottieSplash{position:fixed;inset:0;z-index:9999;overflow:hidden;background:radial-gradient(circle at 50% 45%,#172b4a 0%,#0b1424 48%,#050b14 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
-.lottieStage{width:min(76vw,760px);height:min(58vh,430px);display:grid;place-items:center}
-.lottieStage svg{width:100%!important;height:100%!important;display:block}
-.splashCaption{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:-18px;text-align:center;letter-spacing:.12em}
-.splashCaption b{font-size:12px;font-weight:850}
-.splashCaption span{font-size:9px;color:#aab8ce;letter-spacing:.16em}
+.lottieSplash{position:fixed;inset:0;z-index:9999;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#1a3558 0%,#0b172a 48%,#050b14 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+.rippleStage{position:relative;width:min(78vw,520px);height:min(52vh,430px);display:grid;place-items:center;isolation:isolate}
+.rippleStage:before{content:"";position:absolute;width:38%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(77,178,255,.18),rgba(42,111,205,.07) 52%,transparent 72%);filter:blur(12px);animation:rippleBreath 2.8s ease-in-out infinite}
+.rippleHalo,.rippleRing{position:absolute;left:50%;top:50%;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(.35);opacity:0}
+.rippleHalo{width:43%;aspect-ratio:1;background:radial-gradient(circle,rgba(56,151,255,.13) 0%,rgba(56,151,255,.045) 48%,transparent 72%);filter:blur(2px);animation:rippleOut 2.8s ease-out infinite}
+.rippleHaloTwo{animation-delay:.65s}.rippleHaloThree{animation-delay:1.3s}
+.rippleRing{width:46%;aspect-ratio:1;border:1px solid rgba(123,204,255,.7);box-shadow:0 0 18px rgba(51,153,255,.12),inset 0 0 18px rgba(51,153,255,.07);animation:rippleOut 2.8s ease-out infinite}
+.rippleRingTwo{animation-delay:.65s;border-color:rgba(112,187,255,.48)}.rippleRingThree{animation-delay:1.3s;border-color:rgba(112,187,255,.3)}
+.rippleCore{position:relative;z-index:2;width:min(54%,300px);aspect-ratio:1;display:grid;place-items:center;animation:coreFloat 3s ease-in-out infinite}
+.rippleCore img{display:block;width:100%;height:100%;object-fit:contain;background:transparent;border:0;box-shadow:none;filter:drop-shadow(0 8px 22px rgba(0,0,0,.24))}
+.rippleSpark{position:absolute;width:5px;height:5px;border-radius:50%;background:#a5e2ff;box-shadow:0 0 12px 3px rgba(83,177,255,.55);animation:sparkPulse 1.8s ease-in-out infinite}
+.rippleSparkOne{left:27%;top:35%}.rippleSparkTwo{right:25%;top:43%;animation-delay:.4s}.rippleSparkThree{left:34%;bottom:27%;animation-delay:.8s}.rippleSparkFour{right:32%;bottom:32%;animation-delay:1.2s}
+.splashCaption{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:-10px;padding:0 18px;text-align:center;letter-spacing:.1em}
+.splashCaption b{font-size:clamp(11px,1.45vw,15px);font-weight:850;line-height:1.5}
+.splashCaption span{font-size:11px;color:#aabfda;letter-spacing:.24em;font-weight:700}
 .splashFallbackLogo{width:min(310px,72vw);display:grid;place-items:center;margin-bottom:18px}
 .splashFallbackLogo img{display:block;width:100%;height:auto;max-height:160px;object-fit:contain}
-@media(max-width:560px){.lottieStage{width:92vw;height:48vh}.splashCaption{margin-top:-8px}.splashCaption b{font-size:10px}.splashCaption span{font-size:8px}}
+@keyframes rippleOut{0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}15%{opacity:.85}80%{opacity:.25}100%{opacity:0;transform:translate(-50%,-50%) scale(2.15)}}
+@keyframes rippleBreath{0%,100%{opacity:.55;transform:scale(.86)}50%{opacity:1;transform:scale(1.12)}}
+@keyframes coreFloat{0%,100%{transform:translateY(3px) scale(.98)}50%{transform:translateY(-4px) scale(1.02)}}
+@keyframes sparkPulse{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.25)}}
+@media(max-width:560px){.rippleStage{width:96vw;height:45vh}.rippleCore{width:62%}.splashCaption{margin-top:0;gap:6px}.splashCaption b{font-size:10px;letter-spacing:.06em}.splashCaption span{font-size:9px;letter-spacing:.16em}}
