@@ -287,7 +287,7 @@ function NonRoutinePassView({entry,locations,onClose}:{entry:any;locations:Locat
    .nonRoutinePassFooter{display:flex;justify-content:space-between;gap:15px;margin-top:6mm;padding-top:3mm;border-top:1px solid #e2e6ec;font-size:7px;color:#8a94a2}
   </style>`;
   printWindow.document.documentElement.innerHTML=`<head><meta charset="utf-8"><title>Non-Routine Visitor Pass</title>${printStyles}</head><body><main class="printWrap"></main></body>`;
-  const target=printWindow.document.querySelector(".printPass");
+  const target=printWindow.document.querySelector(".printWrap");
   if(!target){printWindow.close();alert("Unable to prepare the print pass.");return}
   target.appendChild(sheet.cloneNode(true));
   printWindow.document.close();
