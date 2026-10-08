@@ -82,7 +82,7 @@ function printPageCss(s:PrintSettings){
  *{box-sizing:border-box}
  html,body{margin:0;padding:0;background:#fff!important;color:#152033;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible}
  body{font-family:${family};font-size:${s.fontSize}px;line-height:1.45}
- .printWrap{width:${Math.max(20,contentW/s.scale)}mm;max-width:none;margin:0 auto;transform:scale(${s.scale});transform-origin:top left;font-family:${family};font-size:${s.fontSize}px;line-height:1.45;overflow:visible}
+ .printWrap{width:${contentW}mm;max-width:${contentW}mm;margin:0 auto;font-family:${family};font-size:${s.fontSize}px;line-height:1.45;overflow:visible}
  .printWrap *{font-family:inherit;max-width:100%}
  .printWrap strong,.printWrap b{font-weight:800}
  .safetyRule strong,.safetyRule span{font-size:13px!important;line-height:1.55!important}.safetyRule>b{font-size:13px!important}
@@ -369,7 +369,7 @@ function PassView({pass,profile,onClose}:{pass:any;profile:Profile;onClose:()=>v
  const refSvg=useRef<SVGSVGElement>(null);const [returning,setReturning]=useState(false);const [assetRecord,setAssetRecord]=useState<any>(null);
  const isAssetPass=pass.passType==="ASSET / MATERIAL";
  const [printSettings,setPrintSettings]=useState<PrintSettings>(DEFAULT_PRINT_SETTINGS[isAssetPass?"gateAsset":"gateVisitor"]);const [selectedPrintFormat,setSelectedPrintFormat]=useState("DEFAULT");
- useEffect(()=>{if(refSvg.current&&pass.barcodeValue)JsBarcode(refSvg.current,String(pass.barcodeValue),{format:"CODE128",...barcodeProfile(selectedPrintFormat==="DEFAULT"?printSettings.format:selectedPrintFormat),displayValue:true,lineColor:"#101828"})},[pass]);
+ useEffect(()=>{if(refSvg.current&&pass.barcodeValue)JsBarcode(refSvg.current,String(pass.barcodeValue),{format:"CODE128",...barcodeProfile(selectedPrintFormat==="DEFAULT"?printSettings.format:selectedPrintFormat),displayValue:true,lineColor:"#101828"})},[pass,selectedPrintFormat,printSettings]);
  useEffect(()=>{const kind=isAssetPass?"gateAsset":"gateVisitor";let active=true;getDoc(doc(db,"settings","printSettings")).then(s=>{if(!active)return;const raw=s.exists()?((s.data() as any)[kind]||{}):{};const base=DEFAULT_PRINT_SETTINGS[kind];setPrintSettings({...base,...raw})}).catch(()=>{});return()=>{active=false}},[isAssetPass]);
  useEffect(()=>{let active=true;if(isAssetPass&&pass.assetId){getDoc(doc(db,"assets",pass.assetId)).then(s=>{if(active&&s.exists())setAssetRecord({id:s.id,...s.data()})}).catch(()=>{})}else setAssetRecord(null);return()=>{active=false}},[isAssetPass,pass.assetId]);
  const issuedBy=pass.issuedBy||assetRecord?.issuedBy||pass.issuedByPerson||pass.createdByName||profile.name||"—";
