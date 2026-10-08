@@ -412,3 +412,13 @@
 @media(max-width:600px){.printSettingFields{grid-template-columns:1fr}.printSettingHead{flex-direction:column}.printSettingFoot{display:grid}}
 
 .passPreview .safetyRule strong,.passPreview .safetyRule span{font-size:13px!important;line-height:1.55!important}.passPreview .safetyRule>b{font-size:13px!important}.passPreview .emergency{font-size:12px!important}.passPreview .emergency b{font-size:14px!important}
+
+.lottieSplash{position:fixed;inset:0;z-index:9999;overflow:hidden;background:radial-gradient(circle at 50% 45%,#172b4a 0%,#0b1424 48%,#050b14 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+.lottieStage{width:min(76vw,760px);height:min(58vh,430px);display:grid;place-items:center}
+.lottieStage svg{width:100%!important;height:100%!important;display:block}
+.splashCaption{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:-18px;text-align:center;letter-spacing:.12em}
+.splashCaption b{font-size:12px;font-weight:850}
+.splashCaption span{font-size:9px;color:#aab8ce;letter-spacing:.16em}
+.splashFallbackLogo{width:min(310px,72vw);display:grid;place-items:center;margin-bottom:18px}
+.splashFallbackLogo img{display:block;width:100%;height:auto;max-height:160px;object-fit:contain}
+@media(max-width:560px){.lottieStage{width:92vw;height:48vh}.splashCaption{margin-top:-8px}.splashCaption b{font-size:10px}.splashCaption span{font-size:8px}}
