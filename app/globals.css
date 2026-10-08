@@ -410,3 +410,5 @@
 .printSettingFoot{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #edf0f4;margin-top:14px;padding-top:10px;font-size:7px;color:#8a95a6}
 @media(max-width:900px){.printSettingsGrid{grid-template-columns:1fr}}
 @media(max-width:600px){.printSettingFields{grid-template-columns:1fr}.printSettingHead{flex-direction:column}.printSettingFoot{display:grid}}
+
+.passPreview .safetyRule strong,.passPreview .safetyRule span{font-size:13px!important;line-height:1.55!important}.passPreview .safetyRule>b{font-size:13px!important}.passPreview .emergency{font-size:12px!important}.passPreview .emergency b{font-size:14px!important}
