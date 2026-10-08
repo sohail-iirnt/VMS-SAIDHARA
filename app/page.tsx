@@ -487,7 +487,7 @@ function Analytics({profile,allowed,locations}:{profile:Profile;allowed:Location
 
 function PrintSettingsPanel(){
  const [settings,setSettings]=useState<Record<PrintKind,PrintSettings>>(DEFAULT_PRINT_SETTINGS),[saving,setSaving]=useState(false);
- useEffect(()=>onSnapshot(doc(db,"settings","printSettings"),s=>{const d=s.exists()?((s.data() as any)||{}):{};setSettings(Object.fromEntries((Object.keys(DEFAULT_PRINT_SETTINGS) as PrintKind[]).map(k=>[k,{...DEFAULT_PRINT_SETTINGS[k],...(d[k]||{})}])) as Record<PrintKind,PrintSettings>)),()=>{}),[]);
+ useEffect(()=>onSnapshot(doc(db,"settings","printSettings"),s=>{const d=s.exists()?((s.data() as any)||{}):{};setSettings(Object.fromEntries((Object.keys(DEFAULT_PRINT_SETTINGS) as PrintKind[]).map(k=>[k,{...DEFAULT_PRINT_SETTINGS[k],...(d[k]||{})}])) as Record<PrintKind,PrintSettings>)},()=>{}),[]);
  const update=(kind:PrintKind,key:string,value:any)=>setSettings(x=>({...x,[kind]:{...x[kind],[key]:value}}));
  const save=async()=>{setSaving(true);try{await setDoc(doc(db,"settings","printSettings"),{...settings,updatedAt:serverTimestamp(),updatedBy:auth.currentUser?.uid||null},{merge:true});alert("Print settings saved. New print jobs will use them.")}catch(e:any){alert(e.message||"Could not save print settings.")}finally{setSaving(false)}};
  const reset=()=>setSettings(DEFAULT_PRINT_SETTINGS);
