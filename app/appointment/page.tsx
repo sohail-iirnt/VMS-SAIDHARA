@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 import {addDoc,collection,Timestamp,doc,getDoc} from "firebase/firestore";
 import AppointmentBookingV2 from "../appointment-v2/page";
+import AppointmentSplash from "../../components/AppointmentSplash";
 import {db} from "../../lib/firebase";
 import {CalendarCheck,Clock3,MapPin,ShieldCheck,CheckCircle2,ArrowLeft} from "lucide-react";
 
@@ -36,19 +37,13 @@ function AppointmentBookingClassic(){
 
 
 function AppointmentDesignLoader(){
- return <main style={{minHeight:"100svh",display:"grid",placeItems:"center",background:"linear-gradient(135deg,#f7f4ec 0%,#eef5f0 100%)",padding:24}}>
-  <div style={{width:"min(420px,100%)",textAlign:"center",padding:"34px 26px",borderRadius:24,background:"rgba(255,255,255,.9)",boxShadow:"0 20px 60px rgba(31,55,43,.10)",border:"1px solid rgba(31,55,43,.08)"}}>
-   <div style={{fontSize:12,fontWeight:800,letterSpacing:".16em",color:"#8a7650",textTransform:"uppercase"}}>Godrej & Boyce</div>
-   <div style={{marginTop:8,fontSize:24,fontWeight:800,color:"#19352a"}}>Saidhara NDC</div>
-   <div style={{marginTop:7,color:"#66756d",fontSize:14}}>Preparing your appointment form…</div>
-   <div style={{height:4,borderRadius:99,background:"#dfe9e2",overflow:"hidden",marginTop:22}}><div style={{height:"100%",width:"42%",borderRadius:99,background:"#2f8f83",animation:"appointmentLoader 1.2s ease-in-out infinite"}}/></div>
-   <style>{`@keyframes appointmentLoader{0%{transform:translateX(-120%)}100%{transform:translateX(280%)}}`}</style>
-  </div>
- </main>;
+ return <AppointmentSplash/>;
 }
 
 export default function AppointmentBooking(){
  const [design,setDesign]=useState<"loading"|"classic"|"visitor-v2">("loading");
+ const [splashDone,setSplashDone]=useState(false);
+ useEffect(()=>{const timer=window.setTimeout(()=>setSplashDone(true),2600);return()=>window.clearTimeout(timer)},[]);
  useEffect(()=>{
   let active=true;
   getDoc(doc(db,"publicSettings","appointment"))
@@ -56,7 +51,7 @@ export default function AppointmentBooking(){
    .catch(()=>{if(active)setDesign("classic")});
   return()=>{active=false};
  },[]);
- if(design==="loading") return <AppointmentDesignLoader/>;
- if(design==="visitor-v2") return <AppointmentBookingV2/>;
+ if(!splashDone || design==="loading") return <AppointmentDesignLoader/>;
+ if(design==="visitor-v2") return <AppointmentBookingV2 showSplash={false}/>;
  return <AppointmentBookingClassic/>;
 }
