@@ -112,14 +112,20 @@ export default function Home(){
 
 function LottieSplash({onDone}:{onDone:()=>void}){
  useEffect(()=>{const timer=window.setTimeout(onDone,3600);return()=>window.clearTimeout(timer)},[onDone]);
- return <main className="splash lottieSplash">
-  <div className="rippleStage" aria-hidden="true">
-   <div className="rippleHalo rippleHaloOne"/><div className="rippleHalo rippleHaloTwo"/><div className="rippleHalo rippleHaloThree"/>
-   <div className="rippleRing rippleRingOne"/><div className="rippleRing rippleRingTwo"/><div className="rippleRing rippleRingThree"/>
-   <div className="rippleCore"><img src={DEFAULT_LOGIN_LOGO} alt=""/></div>
-   <span className="rippleSpark rippleSparkOne"/><span className="rippleSpark rippleSparkTwo"/><span className="rippleSpark rippleSparkThree"/><span className="rippleSpark rippleSparkFour"/>
-  </div>
-  <div className="splashCaption"><b>VISITOR AND ASSET MANAGEMENT SYSTEM</b><span>NDC SAIDHARA</span></div>
+ return <main className="splash lottieSplash" role="status" aria-live="polite" aria-label="Loading Saidhara NDC Visitor and Asset Management System">
+  <div className="mainSplashOrb" aria-hidden="true"/>
+  <section className="mainSplashContent">
+   <div className="rippleStage" aria-hidden="true">
+    <div className="rippleHalo rippleHaloOne"/><div className="rippleHalo rippleHaloTwo"/><div className="rippleHalo rippleHaloThree"/>
+    <div className="rippleRing rippleRingOne"/><div className="rippleRing rippleRingTwo"/><div className="rippleRing rippleRingThree"/>
+    <div className="rippleCore"><img src={DEFAULT_LOGIN_LOGO} alt=""/></div>
+    <span className="rippleSpark rippleSparkOne"/><span className="rippleSpark rippleSparkTwo"/><span className="rippleSpark rippleSparkThree"/><span className="rippleSpark rippleSparkFour"/>
+   </div>
+   <div className="splashCaption"><span className="mainSplashEyebrow">GODREJ &amp; BOYCE</span><b>VISITOR AND ASSET<br className="mainSplashBreak"/> MANAGEMENT SYSTEM</b><span>NDC SAIDHARA</span></div>
+   <div className="mainSplashLoading" aria-hidden="true"><span/></div>
+   <span className="mainSplashLabel">Preparing your secure operations portal</span>
+  </section>
+  <span className="mainSplashFooter">A safer, smoother welcome to Saidhara NDC</span>
  </main>;
 }
 function Login(p:any){
