@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import {
@@ -21,6 +21,7 @@ import {
   X
 } from "lucide-react";
 import styles from "./page.module.css";
+import AppointmentSplash from "../../components/AppointmentSplash";
 
 const LOCATIONS = [
   { id: "ADMIN", name: "Main Admin Office", short: "Admin Office" },
@@ -69,7 +70,13 @@ const initialForm = (): FormState => ({
   photoUrl: ""
 });
 
-export default function AppointmentBookingV2() {
+export default function AppointmentBookingV2({ showSplash = true }: { showSplash?: boolean } = {}) {
+  const [splashDone, setSplashDone] = useState(!showSplash);
+  useEffect(() => {
+    if (!showSplash) return;
+    const timer = window.setTimeout(() => setSplashDone(true), 2600);
+    return () => window.clearTimeout(timer);
+  }, [showSplash]);
   const [form, setForm] = useState<FormState>(initialForm);
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
@@ -249,6 +256,8 @@ export default function AppointmentBookingV2() {
     setDone(null);
     setError("");
   };
+
+  if (!splashDone) return <AppointmentSplash/>;
 
   if (done) {
     return (
