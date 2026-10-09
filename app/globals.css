@@ -614,3 +614,33 @@ header h2,.toolbar h1,.sectionTitle b,.panelHead b,.historyHead b,.modalHead h2{
 @media(max-width:1050px){.themePresetGrid{grid-template-columns:repeat(3,minmax(0,1fr))}.themeColorGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.content{padding:58px 12px 28px}.themeStudio{padding:15px}.themeStudioHead{flex-direction:column}.themePresetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.themeMiniPreview{grid-template-columns:95px 1fr}.themeMiniBody{gap:10px;padding:10px}.themeActions{flex-direction:column-reverse}.themeActions button{width:100%}.themeColorGrid{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){.nav,.functionCard,.themePreset,.primary,.secondary{transition:none!important}}
+
+/* Final coverage for shared legacy surfaces that are reused by Analytics,
+   timeline, appointments and every module page. */
+.hero{background:linear-gradient(118deg,var(--vms-sidebar),color-mix(in srgb,var(--vms-sidebar) 68%,var(--vms-accent)));color:#fffdf6;border:1px solid color-mix(in srgb,var(--vms-accent) 25%,var(--vms-sidebar));box-shadow:0 14px 34px color-mix(in srgb,var(--vms-sidebar) 13%,transparent)}
+.hero h1{color:#fffdf6}.hero p{color:#d0d9d0}.heroBadge{background:#ffffff12;border-color:#ffffff25;color:#f5f2e8}
+.bars{color:var(--vms-ink)}.barRow{color:var(--vms-ink)}.barRow>div{background:color-mix(in srgb,var(--vms-border) 65%,var(--vms-surface))}.barRow i{background:linear-gradient(90deg,var(--vms-accent),color-mix(in srgb,var(--vms-accent) 70%,var(--vms-accent-2)))}
+.assetTimelineHero,.assetTimelineHead,.assetPicker,.assetList,.assetTimelineStats .stat{background-color:var(--vms-surface);border-color:var(--vms-border);color:var(--vms-ink)}
+.assetTimelineHero{background:linear-gradient(115deg,var(--vms-sidebar),color-mix(in srgb,var(--vms-sidebar) 70%,var(--vms-accent)));color:#fffdf6;box-shadow:0 14px 34px color-mix(in srgb,var(--vms-sidebar) 12%,transparent)}
+.assetTimelineHero h1,.assetTimelineHero h2{color:#fffdf6}.assetTimelineHero p,.assetTimelineHero span{color:#d0d9d0}
+.assetTimelineScope,.assetPicker,.assetList{background:var(--vms-surface);border-color:var(--vms-border)}
+.assetPicker input,.assetPicker select{background:var(--vms-surface);border-color:var(--vms-border);color:var(--vms-ink)}
+.assetTimelineHead{border-bottom:1px solid var(--vms-border)}.assetTimelineHead b,.assetList b{color:var(--vms-ink)}
+.timelineEmpty{color:var(--vms-muted)}.timelineEmptyIcon{background:var(--vms-accent-wash);color:var(--vms-accent)}.timelineEmpty b{color:var(--vms-ink)}
+.movementTimeline:before,.timelineLine{background:var(--vms-border)}.movementDot,.movementIcon{background:var(--vms-accent-wash);color:var(--vms-accent);border-color:var(--vms-border)}
+.assetTimelineStats .statIcon{background:var(--vms-accent-wash);color:var(--vms-accent)}
+.printSettingsNotice{background:var(--vms-accent-wash);color:var(--vms-ink);border:1px solid var(--vms-border);border-radius:10px}
+.printSettingCard{background:var(--vms-surface);border-color:var(--vms-border);border-radius:13px}
+.printSettingHead b{color:var(--vms-ink)}.printSettingHead span,.printSettingFoot{color:var(--vms-muted)}
+.printSettingFields select,.printSettingFields input:not([type=range]){background:var(--vms-bg);border-color:var(--vms-border);color:var(--vms-ink)}
+input[type=range]{accent-color:var(--vms-accent)}
+.brandingActions{border-color:var(--vms-border)}
+.publicAppointmentSettings,.appointmentSettingsCard,.appointmentCard,.appointmentListItem{background:var(--vms-surface);border-color:var(--vms-border);color:var(--vms-ink)}
+.appointmentCard h3,.appointmentSettingsCard h3{color:var(--vms-ink)}
+.appointmentCard p,.appointmentSettingsCard p{color:var(--vms-muted)}
+.appointmentCardActions .primary{background:var(--vms-accent);color:#fff}
+.appointmentCardActions .secondary{background:var(--vms-bg);color:var(--vms-ink);border:1px solid var(--vms-border)}
+/* Remove residual blue from older semantic utilities used in secondary screens. */
+.quickBtn,.locationCard,.check,.photoBox,.tablePanel,.panel,.historyHead,.tablePanel th,.tablePanel td{border-color:var(--vms-border)}
+.quickBtn,.locationCard,.check,.photoBox,.tablePanel,.panel{background-color:var(--vms-surface)}
+.sectionTitle span,.panelHead span,.historyHead span,.tablePanel td small,.fieldHint{color:var(--vms-muted)}
