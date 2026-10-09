@@ -413,25 +413,35 @@
 
 .passPreview .safetyRule strong,.passPreview .safetyRule span{font-size:13px!important;line-height:1.55!important}.passPreview .safetyRule>b{font-size:13px!important}.passPreview .emergency{font-size:12px!important}.passPreview .emergency b{font-size:14px!important}
 
-.lottieSplash{position:fixed;inset:0;z-index:9999;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#1a3558 0%,#0b172a 48%,#050b14 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
-.rippleStage{position:relative;width:min(78vw,520px);height:min(52vh,430px);display:grid;place-items:center;isolation:isolate}
-.rippleStage:before{content:"";position:absolute;width:38%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(77,178,255,.18),rgba(42,111,205,.07) 52%,transparent 72%);filter:blur(12px);animation:rippleBreath 2.8s ease-in-out infinite}
-.rippleHalo,.rippleRing{position:absolute;left:50%;top:50%;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(.35);opacity:0}
-.rippleHalo{width:43%;aspect-ratio:1;background:radial-gradient(circle,rgba(56,151,255,.13) 0%,rgba(56,151,255,.045) 48%,transparent 72%);filter:blur(2px);animation:rippleOut 2.8s ease-out infinite}
-.rippleHaloTwo{animation-delay:.65s}.rippleHaloThree{animation-delay:1.3s}
-.rippleRing{width:46%;aspect-ratio:1;border:1px solid rgba(123,204,255,.7);box-shadow:0 0 18px rgba(51,153,255,.12),inset 0 0 18px rgba(51,153,255,.07);animation:rippleOut 2.8s ease-out infinite}
-.rippleRingTwo{animation-delay:.65s;border-color:rgba(112,187,255,.48)}.rippleRingThree{animation-delay:1.3s;border-color:rgba(112,187,255,.3)}
-.rippleCore{position:relative;z-index:2;width:min(54%,300px);aspect-ratio:1;display:grid;place-items:center;animation:coreFloat 3s ease-in-out infinite}
-.rippleCore img{display:block;width:100%;height:100%;object-fit:contain;background:transparent;border:0;box-shadow:none;filter:drop-shadow(0 8px 22px rgba(0,0,0,.24))}
-.rippleSpark{position:absolute;width:5px;height:5px;border-radius:50%;background:#a5e2ff;box-shadow:0 0 12px 3px rgba(83,177,255,.55);animation:sparkPulse 1.8s ease-in-out infinite}
-.rippleSparkOne{left:27%;top:35%}.rippleSparkTwo{right:25%;top:43%;animation-delay:.4s}.rippleSparkThree{left:34%;bottom:27%;animation-delay:.8s}.rippleSparkFour{right:32%;bottom:32%;animation-delay:1.2s}
-.splashCaption{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:-10px;padding:0 18px;text-align:center;letter-spacing:.1em}
-.splashCaption b{font-size:clamp(11px,1.45vw,15px);font-weight:850;line-height:1.5}
-.splashCaption span{font-size:11px;color:#aabfda;letter-spacing:.24em;font-weight:700}
-.splashFallbackLogo{width:min(310px,72vw);display:grid;place-items:center;margin-bottom:18px}
-.splashFallbackLogo img{display:block;width:100%;height:auto;max-height:160px;object-fit:contain}
-@keyframes rippleOut{0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}15%{opacity:.85}80%{opacity:.25}100%{opacity:0;transform:translate(-50%,-50%) scale(2.15)}}
+/* Shared white Godrej splash — main VMS entry */
+.lottieSplash{position:fixed;inset:0;z-index:9999;overflow:hidden;background:#fff;color:#173b32;display:grid;place-items:center;text-align:center;padding:28px 18px 54px}
+.mainSplashOrb{position:absolute;z-index:0;pointer-events:none;width:min(78vw,700px);aspect-ratio:1;border-radius:50%;top:44%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(225,244,236,.68) 0%,rgba(242,249,245,.42) 36%,rgba(255,255,255,0) 70%)}
+.mainSplashContent{position:relative;z-index:1;width:min(620px,100%);display:flex;flex-direction:column;align-items:center;text-align:center}
+.rippleStage{position:relative;width:min(62vw,270px);min-width:190px;aspect-ratio:1;display:grid;place-items:center;isolation:isolate;margin:0 auto 16px}
+.rippleStage:before{content:"";position:absolute;width:45%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(56,151,113,.12),rgba(56,151,113,.035) 55%,transparent 72%);filter:blur(12px);animation:rippleBreath 2.8s ease-in-out infinite}
+.rippleHalo,.rippleRing{position:absolute;left:50%;top:50%;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(.45);opacity:0}
+.rippleHalo{width:82%;aspect-ratio:1;border:1px solid rgba(203,165,89,.35);box-shadow:0 0 32px rgba(56,151,113,.08);animation:rippleSoft 3.8s ease-out infinite}
+.rippleHaloTwo{animation-delay:1.25s}.rippleHaloThree{animation-delay:2.5s}
+.rippleRing{width:70%;aspect-ratio:1;border:1.5px solid rgba(29,128,96,.42);box-shadow:0 0 18px rgba(51,153,113,.08);animation:rippleOut 3.1s cubic-bezier(.18,.66,.34,1) infinite}
+.rippleRingTwo{animation-delay:1.03s;border-color:rgba(29,128,96,.32)}.rippleRingThree{animation-delay:2.06s;border-color:rgba(29,128,96,.23)}
+.rippleCore{position:relative;z-index:2;width:58%;height:58%;display:grid;place-items:center;border-radius:28%;background:rgba(255,255,255,.96);border:1px solid rgba(30,111,87,.12);box-shadow:0 16px 48px rgba(25,92,69,.12),inset 0 0 0 7px rgba(245,250,247,.95);animation:coreFloat 3s ease-in-out infinite}
+.rippleCore img{display:block;width:84%;height:84%;object-fit:contain;background:transparent;border:0;box-shadow:none;filter:none}
+.rippleSpark{position:absolute;width:6px;height:6px;border-radius:50%;background:#c8a45c;box-shadow:0 0 0 4px rgba(200,164,92,.13);animation:sparkPulse 1.8s ease-in-out infinite}
+.rippleSparkOne{left:22%;top:25%}.rippleSparkTwo{right:20%;top:30%;animation-delay:.4s}.rippleSparkThree{left:26%;bottom:23%;animation-delay:.8s}.rippleSparkFour{right:24%;bottom:25%;animation-delay:1.2s}
+.splashCaption{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0;padding:0 8px;text-align:center;letter-spacing:.1em}
+.splashCaption .mainSplashEyebrow{margin-bottom:1px;color:#9b7a37;font-size:10px;line-height:1.4;font-weight:800;letter-spacing:.24em}
+.splashCaption b{font-size:clamp(11px,1.45vw,15px);font-weight:850;line-height:1.5;color:#173b32;letter-spacing:.065em}
+.splashCaption>span:last-child{font-size:clamp(13px,2.4vw,16px);color:#287b60;letter-spacing:.28em;font-weight:800}
+.mainSplashLoading{position:relative;width:min(260px,68%);height:3px;margin:28px auto 11px;overflow:hidden;border-radius:20px;background:#e7f0eb}
+.mainSplashLoading span{position:absolute;inset:0 auto 0 0;width:38%;border-radius:20px;background:linear-gradient(90deg,#c7a35a,#268b68,#c7a35a);animation:loadingSweep 1.55s ease-in-out infinite}
+.mainSplashLabel{color:#8a978f;font-size:11px;letter-spacing:.025em}
+.mainSplashFooter{position:absolute;bottom:18px;left:18px;right:18px;text-align:center;color:#a0aaa4;font-size:10px;letter-spacing:.03em}
+@keyframes rippleOut{0%{transform:translate(-50%,-50%) scale(.45);opacity:0}16%{opacity:.8}100%{transform:translate(-50%,-50%) scale(1.55);opacity:0}}
+@keyframes rippleSoft{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}20%{opacity:.65}100%{transform:translate(-50%,-50%) scale(1.25);opacity:0}}
 @keyframes rippleBreath{0%,100%{opacity:.55;transform:scale(.86)}50%{opacity:1;transform:scale(1.12)}}
-@keyframes coreFloat{0%,100%{transform:translateY(3px) scale(.98)}50%{transform:translateY(-4px) scale(1.02)}}
-@keyframes sparkPulse{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.25)}}
-@media(max-width:560px){.rippleStage{width:96vw;height:45vh}.rippleCore{width:62%}.splashCaption{margin-top:0;gap:6px}.splashCaption b{font-size:10px;letter-spacing:.06em}.splashCaption span{font-size:9px;letter-spacing:.16em}}
+@keyframes coreFloat{0%,100%{transform:translateY(0) scale(.98)}50%{transform:translateY(-4px) scale(1.02)}}
+@keyframes sparkPulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+@keyframes loadingSweep{0%{transform:translateX(-110%)}100%{transform:translateX(370%)}}
+@media(max-width:560px){.lottieSplash{padding:20px 15px 58px}.rippleStage{width:min(66vw,230px);min-width:168px;margin-bottom:13px}.splashCaption{gap:6px}.splashCaption .mainSplashEyebrow{font-size:9px;letter-spacing:.19em}.splashCaption b{font-size:clamp(10px,3.1vw,13px);letter-spacing:.035em}.splashCaption>span:last-child{font-size:9px;letter-spacing:.22em}.mainSplashLoading{margin-top:23px}.mainSplashLabel{font-size:10px}.mainSplashFooter{font-size:9px;bottom:14px}.mainSplashBreak{display:none}}
+@media(min-width:900px){.rippleStage{width:280px;margin-bottom:18px}.mainSplashContent{transform:translateY(-5px)}}
+@media(prefers-reduced-motion:reduce){.rippleStage:before,.rippleRing,.rippleHalo,.rippleSpark,.rippleCore,.mainSplashLoading span{animation:none!important}.rippleRing,.rippleHalo{opacity:.22;transform:translate(-50%,-50%) scale(1)}.mainSplashLoading span{width:100%;transform:none}}
