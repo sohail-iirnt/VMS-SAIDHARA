@@ -481,7 +481,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .nav.active svg{color:var(--vms-accent-2)}
 .nav.logout:hover{background:#8c352d36;color:#ffe0d6}
 .profileMini{border-top-color:#ffffff20}.profileMini b{color:#fffaf0}.profileMini span{color:#bac6bb}
-.avatar{background:linear-gradient(145deg,var(--vms-accent-2),color-mix(in srgb,var(--vms-accent-2) 60%,var(--vms-sidebar));color:#fff}
+.avatar{background:linear-gradient(145deg,var(--vms-accent-2),color-mix(in srgb,var(--vms-accent-2) 60%,var(--vms-sidebar)));color:#fff}
 header{background:color-mix(in srgb,var(--vms-surface) 94%,transparent);border-bottom:1px solid var(--vms-border);box-shadow:0 3px 15px #202d2707;backdrop-filter:blur(16px)}
 header h2,.toolbar h1,.sectionTitle b,.panelHead b,.historyHead b,.modalHead h2{color:var(--vms-ink)}
 .crumb,.eyebrow{color:var(--vms-accent)}
