@@ -655,3 +655,14 @@ input[type=range]{accent-color:var(--vms-accent)}
 .splash .splashCaption>span:last-child{color:#287b60!important}
 .splash .mainSplashLoading{background:#dfe5ef!important}
 .splash .mainSplashLoading span{background:linear-gradient(90deg,#287b60,#9b7a37)!important}
+
+
+/* Production splash reference: clean white canvas, independent of workspace theme settings. */
+.splash{background:#fff!important;color:#173b32!important}
+.splash p{color:#718096!important}
+.splash .brandMark{background:linear-gradient(135deg,#5b8cff,#3f5eea)!important;color:#fff!important;box-shadow:none!important}
+.splash .mainSplashEyebrow{color:#9b7a37!important}
+.splash .splashCaption b{color:#173b32!important}
+.splash .splashCaption>span:last-child{color:#287b60!important}
+.splash .mainSplashLoading{background:#dfe5ef!important}
+.splash .mainSplashLoading span{background:linear-gradient(90deg,#287b60,#9b7a37)!important}
