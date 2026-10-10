@@ -19,13 +19,15 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const rootRef=useRef<HTMLDivElement|null>(null);
  const noticeIdsRef=useRef<Set<string>>(new Set());
  const [open,setOpen]=useState(false);
+ const [feedError,setFeedError]=useState('');
  const [filter,setFilter]=useState<'all'|'unread'>('all');
  const priorTransferStatus=useRef<Record<string,string>>({});
  const overdueSeen=useRef<Set<string>>(new Set());
  const firstSnapshot=useRef<Record<string,boolean>>({});
  const visitorRecords=useRef<Record<string,{location:NoticeLocation;docs:any[]}>>({});
- const locs=useMemo(()=>profile.role==='admin'?locations:locations.filter(x=>x.id===profile.locationId),[profile,locations]);
- const locLabel=(id:string)=>locations.find(x=>x.id===id)?.name||id;
+ const locs=useMemo(()=>profile.role==='admin'?locations:locations.filter(x=>x.id===profile.locationId||x.name===profile.locationId||x.name.trim().toLowerCase()===String(profile.locationId||'').trim().toLowerCase()),[profile,locations]);
+ const locLabel=(id:string)=>locations.find(x=>x.id===id)?.name||locations.find(x=>x.name===id)?.name||id;
+ const onFeedError=(source:string)=>(error:any)=>{console.error('[VMS notifications] '+source,error);setFeedError(error?.code==='permission-denied'?'Notifications are blocked by Firestore permissions for this location login. Ask an administrator to verify this login’s active status and location assignment, then publish the latest Firestore rules.':'Live notifications temporarily could not connect. Check the connection and reload.');};
  const addNotice=(n:Omit<Notice,'id'|'read'>)=>{
   const id=n.type+':'+n.locationId+':'+n.sourceId;
   if(noticeIdsRef.current.has(id))return;
@@ -40,6 +42,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  useEffect(()=>{if(!historyLoaded)return;noticeIdsRef.current=new Set(notices.map(n=>n.id));try{localStorage.setItem(historyKey,JSON.stringify(notices));}catch{}onHistoryChange?.(notices);},[notices,historyLoaded,historyKey,onHistoryChange]);
  useEffect(()=>{
   if(!historyLoaded)return;
+  setFeedError('');
   const unsubscribers:(()=>void)[]=[];
   const timers:number[]=[];
   locs.forEach(loc=>{
@@ -55,7 +58,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
      const date=d.appointmentDate?' for '+d.appointmentDate:'';
      addNotice({type:'appointment',title:'New appointment booked',message:visitor+' has booked an appointment'+date+'. Review the request and destination.',locationId:loc.id,locationName:loc.name,target:'appointments',sourceId:change.doc.id});
     });
-   },()=>{}));
+   },onFeedError('appointments '+loc.id)));
 
    const incomingKey='incoming:'+loc.id;
    firstSnapshot.current[incomingKey]=false;
@@ -70,7 +73,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
       addNotice({type:'incoming',title:'Incoming material scheduled',message:sender+' has sent '+item+' to '+loc.name+qty+'. Open incoming transfers to review it.',locationId:loc.id,locationName:loc.name,target:'transfers',sourceId:change.doc.id});
      }
     });
-   },()=>{}));
+   },onFeedError('incoming transfers '+loc.id)));
 
    const processOverdue=(location:NoticeLocation,docs:any[])=>docs.forEach((d:any)=>{
     const v=d.data();
@@ -93,7 +96,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    unsubscribers.push(onSnapshot(query(collection(db,'visitors'),where('locationId','==',loc.id)),snap=>{
     visitorRecords.current[loc.id]={location:loc,docs:snap.docs};
     processOverdue(loc,snap.docs);
-   },()=>{}));
+   },onFeedError('visitors '+loc.id)));
    timers.push(window.setInterval(()=>processOverdue(loc,visitorRecords.current[loc.id]?.docs||[]),60000));
 
    const sentKey='sent:'+loc.id;
@@ -109,7 +112,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
       addNotice({type:'received',title:'Transfer received by destination',message:destination+' has received '+item+qty+'.',locationId:loc.id,locationName:loc.name,target:'transfers',sourceId:change.doc.id});
      }
     });
-   },()=>{}));
+   },onFeedError('sent transfers '+loc.id)));
   });
   return()=>{unsubscribers.forEach(u=>u());timers.forEach(timer=>window.clearInterval(timer));};
  },[locs,historyLoaded]);
@@ -123,6 +126,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const markAll=()=>setNotices(old=>old.map(n=>({...n,read:true})));
  return <div className="notificationCenter" ref={rootRef}>
   <button className={'notificationBell '+(open?'isOpen':'')} aria-label="Open notifications" title="Notifications" onClick={()=>setOpen(x=>!x)}><Bell size={18}/>{unread>0&&<span className="notificationCount">{unread>99?'99+':unread}</span>}</button>
+  {feedError&&<div className="notificationFeedError" role="status">{feedError}</div>}
   {open&&<section className="notificationPopover" role="dialog" aria-label="Notifications">
    <header className="notificationHead"><div className="notificationHeadIcon"><BellRing size={19}/></div><div className="notificationHeadCopy"><b>Notifications</b><span>{unread?unread+' unread update'+(unread===1?'':'s'):'You’re all caught up'}</span></div><button className="notificationClose" aria-label="Close" onClick={()=>setOpen(false)}><X size={17}/></button></header>
    <div className="notificationToolbar"><div className="notificationFilters"><button className={filter==='all'?'selected':''} onClick={()=>setFilter('all')}>All <span>{notices.length}</span></button><button className={filter==='unread'?'selected':''} onClick={()=>setFilter('unread')}>Unread <span>{unread}</span></button></div><button className="notificationMarkAll" onClick={markAll} disabled={!unread}><CheckCheck size={14}/> Mark all read</button></div>
