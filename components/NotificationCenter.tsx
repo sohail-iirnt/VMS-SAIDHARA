@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Bell, BellRing, CalendarCheck, CheckCheck, Clock3, PackageCheck, ArrowRightLeft, X, ChevronRight, MapPin, Check } from 'lucide-react';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -17,6 +18,9 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const [notices,setNotices]=useState<Notice[]>([]);
  const [historyLoaded,setHistoryLoaded]=useState(false);
  const rootRef=useRef<HTMLDivElement|null>(null);
+ const popoverRef=useRef<HTMLElement|null>(null);
+ const [isMobile,setIsMobile]=useState(false);
+ useEffect(()=>{const media=window.matchMedia('(max-width: 560px)');const update=()=>setIsMobile(media.matches);update();media.addEventListener?.('change',update);return()=>media.removeEventListener?.('change',update);},[]);
  const noticeIdsRef=useRef<Set<string>>(new Set());
  const [open,setOpen]=useState(false);
  const [feedError,setFeedError]=useState('');
@@ -120,19 +124,20 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const unread=notices.filter(n=>!n.read).length;
  useEffect(()=>{onUnreadChange?.(unread)},[unread,onUnreadChange]);
  useEffect(()=>{const markRead=(event:Event)=>{const id=(event as CustomEvent<string>).detail;setNotices(old=>old.map(n=>n.id===id?{...n,read:true}:n));};const markAllRead=()=>setNotices(old=>old.map(n=>({...n,read:true})));window.addEventListener('vms:notification-read',markRead);window.addEventListener('vms:notifications-mark-all-read',markAllRead);return()=>{window.removeEventListener('vms:notification-read',markRead);window.removeEventListener('vms:notifications-mark-all-read',markAllRead);};},[]);
- useEffect(()=>{if(!open)return;const handlePointer=(event:PointerEvent)=>{if(rootRef.current&&!rootRef.current.contains(event.target as Node))setOpen(false);};const handleKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};document.addEventListener('pointerdown',handlePointer);document.addEventListener('keydown',handleKey);return()=>{document.removeEventListener('pointerdown',handlePointer);document.removeEventListener('keydown',handleKey);};},[open]);
+ useEffect(()=>{if(!open)return;const handlePointer=(event:PointerEvent)=>{const target=event.target as Node;if(rootRef.current?.contains(target)||popoverRef.current?.contains(target))return;setOpen(false);};const handleKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};document.addEventListener('pointerdown',handlePointer);document.addEventListener('keydown',handleKey);return()=>{document.removeEventListener('pointerdown',handlePointer);document.removeEventListener('keydown',handleKey);};},[open]);
  const visible=notices.filter(n=>filter==='all'||!n.read);
  const iconFor=(type:Notice['type'])=>type==='appointment'?<CalendarCheck size={18}/>:type==='incoming'?<PackageCheck size={18}/>:type==='overdue'?<Clock3 size={18}/>:<ArrowRightLeft size={18}/>;
  const go=(n:Notice)=>{setNotices(old=>old.map(x=>x.id===n.id?{...x,read:true}:x));setOpen(false);onNavigate(n.target);};
  const markAll=()=>setNotices(old=>old.map(n=>({...n,read:true})));
+ const popover = open ? <section ref={popoverRef} className="notificationPopover" role="dialog" aria-label="Notifications">
+  <header className="notificationHead"><div className="notificationHeadIcon"><BellRing size={19}/></div><div className="notificationHeadCopy"><b>Notifications</b><span>{unread?unread+' unread update'+(unread===1?'':'s'):'You’re all caught up'}</span></div><button className="notificationClose" aria-label="Close" onClick={()=>setOpen(false)}><X size={17}/></button></header>
+  <div className="notificationToolbar"><div className="notificationFilters"><button className={filter==='all'?'selected':''} onClick={()=>setFilter('all')}>All <span>{notices.length}</span></button><button className={filter==='unread'?'selected':''} onClick={()=>setFilter('unread')}>Unread <span>{unread}</span></button></div><button className="notificationMarkAll" onClick={markAll} disabled={!unread}><CheckCheck size={14}/> Mark all read</button></div>
+  <div className="notificationList">{visible.length===0?<div className="notificationEmpty"><span><Bell size={22}/></span><b>{filter==='unread'?'No unread notifications':'You’re all caught up'}</b><p>New appointments, incoming materials, long visits and received transfers will appear here.</p></div>:visible.map(n=><button className={'notificationItem '+(n.read?'read':'')} key={n.id} onClick={()=>go(n)}><span className={'notificationItemIcon '+n.type}>{iconFor(n.type)}</span><span className="notificationItemBody"><b>{n.title}</b><small>{n.message}</small><span className="notificationItemMeta"><MapPin size={12}/>{n.locationName}<i/>Live update</span></span>{!n.read&&<span className="notificationUnreadDot"/>}<ChevronRight className="notificationChevron" size={16}/></button>)}</div>
+  <footer className="notificationFoot"><span><Check size={13}/> Live updates enabled</span><button onClick={()=>{setOpen(false);onNavigate('notifications')}}>Open notification center <ChevronRight size={14}/></button></footer>
+ </section> : null;
  return <div className="notificationCenter" ref={rootRef}>
   <button className={'notificationBell '+(open?'isOpen':'')} aria-label="Open notifications" title="Notifications" onClick={()=>setOpen(x=>!x)}><Bell size={18}/>{unread>0&&<span className="notificationCount">{unread>99?'99+':unread}</span>}</button>
   {feedError&&<div className="notificationFeedError" role="status">{feedError}</div>}
-  {open&&<section className="notificationPopover" role="dialog" aria-label="Notifications">
-   <header className="notificationHead"><div className="notificationHeadIcon"><BellRing size={19}/></div><div className="notificationHeadCopy"><b>Notifications</b><span>{unread?unread+' unread update'+(unread===1?'':'s'):'You’re all caught up'}</span></div><button className="notificationClose" aria-label="Close" onClick={()=>setOpen(false)}><X size={17}/></button></header>
-   <div className="notificationToolbar"><div className="notificationFilters"><button className={filter==='all'?'selected':''} onClick={()=>setFilter('all')}>All <span>{notices.length}</span></button><button className={filter==='unread'?'selected':''} onClick={()=>setFilter('unread')}>Unread <span>{unread}</span></button></div><button className="notificationMarkAll" onClick={markAll} disabled={!unread}><CheckCheck size={14}/> Mark all read</button></div>
-   <div className="notificationList">{visible.length===0?<div className="notificationEmpty"><span><Bell size={22}/></span><b>{filter==='unread'?'No unread notifications':'You’re all caught up'}</b><p>New appointments, incoming materials, long visits and received transfers will appear here.</p></div>:visible.map(n=><button className={'notificationItem '+(n.read?'read':'')} key={n.id} onClick={()=>go(n)}><span className={'notificationItemIcon '+n.type}>{iconFor(n.type)}</span><span className="notificationItemBody"><b>{n.title}</b><small>{n.message}</small><span className="notificationItemMeta"><MapPin size={12}/>{n.locationName}<i/>Live update</span></span>{!n.read&&<span className="notificationUnreadDot"/>}<ChevronRight className="notificationChevron" size={16}/></button>)}</div>
-   <footer className="notificationFoot"><span><Check size={13}/> Live updates enabled</span><button onClick={()=>{setOpen(false);onNavigate('notifications')}}>Open notification center <ChevronRight size={14}/></button></footer>
-  </section>}
+  {isMobile && popover ? createPortal(popover,document.body) : popover}
  </div>;
 }
