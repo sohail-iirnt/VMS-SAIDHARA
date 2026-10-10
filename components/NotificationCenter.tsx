@@ -27,11 +27,13 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const locLabel=(id:string)=>locations.find(x=>x.id===id)?.name||id;
  const addNotice=(n:Omit<Notice,'id'|'read'>)=>{
   const id=n.type+':'+n.locationId+':'+n.sourceId;
+  let added=false;
   setNotices(old=>{
    if(old.some(x=>x.id===id))return old;
-   setOpen(true);
+   added=true;
    return [{...n,id,read:false},...old].slice(0,500);
   });
+  if(added)setOpen(true);
  };
  useEffect(()=>{
   try{const raw=localStorage.getItem(historyKey);if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed))setNotices(parsed.filter(x=>x&&typeof x.id==='string').slice(0,500));}}catch{}
@@ -115,6 +117,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  },[locs,historyLoaded]);
  const unread=notices.filter(n=>!n.read).length;
  useEffect(()=>{onUnreadChange?.(unread)},[unread,onUnreadChange]);
+ useEffect(()=>{const markRead=(event:Event)=>{const id=(event as CustomEvent<string>).detail;setNotices(old=>old.map(n=>n.id===id?{...n,read:true}:n));};const markAllRead=()=>setNotices(old=>old.map(n=>({...n,read:true})));window.addEventListener('vms:notification-read',markRead);window.addEventListener('vms:notifications-mark-all-read',markAllRead);return()=>{window.removeEventListener('vms:notification-read',markRead);window.removeEventListener('vms:notifications-mark-all-read',markAllRead);};},[]);
  useEffect(()=>{if(!open)return;const handlePointer=(event:PointerEvent)=>{if(rootRef.current&&!rootRef.current.contains(event.target as Node))setOpen(false);};const handleKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};document.addEventListener('pointerdown',handlePointer);document.addEventListener('keydown',handleKey);return()=>{document.removeEventListener('pointerdown',handlePointer);document.removeEventListener('keydown',handleKey);};},[open]);
  const visible=notices.filter(n=>filter==='all'||!n.read);
  const iconFor=(type:Notice['type'])=>type==='appointment'?<CalendarCheck size={18}/>:type==='incoming'?<PackageCheck size={18}/>:type==='overdue'?<Clock3 size={18}/>:<ArrowRightLeft size={18}/>;
