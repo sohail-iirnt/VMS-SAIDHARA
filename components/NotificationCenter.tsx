@@ -17,6 +17,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const [notices,setNotices]=useState<Notice[]>([]);
  const [historyLoaded,setHistoryLoaded]=useState(false);
  const rootRef=useRef<HTMLDivElement|null>(null);
+ const noticeIdsRef=useRef<Set<string>>(new Set());
  const [open,setOpen]=useState(false);
  const [filter,setFilter]=useState<'all'|'unread'>('all');
  const priorTransferStatus=useRef<Record<string,string>>({});
@@ -27,19 +28,16 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const locLabel=(id:string)=>locations.find(x=>x.id===id)?.name||id;
  const addNotice=(n:Omit<Notice,'id'|'read'>)=>{
   const id=n.type+':'+n.locationId+':'+n.sourceId;
-  let added=false;
-  setNotices(old=>{
-   if(old.some(x=>x.id===id))return old;
-   added=true;
-   return [{...n,id,read:false},...old].slice(0,500);
-  });
-  if(added)setOpen(true);
+  if(noticeIdsRef.current.has(id))return;
+  noticeIdsRef.current.add(id);
+  setNotices(old=>[{...n,id,read:false},...old].slice(0,500));
+  setOpen(true);
  };
  useEffect(()=>{
-  try{const raw=localStorage.getItem(historyKey);if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed))setNotices(parsed.filter(x=>x&&typeof x.id==='string').slice(0,500));}}catch{}
+  try{const raw=localStorage.getItem(historyKey);if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed)){const saved=parsed.filter(x=>x&&typeof x.id==='string').slice(0,500);noticeIdsRef.current=new Set(saved.map((x:Notice)=>x.id));setNotices(saved);}}}catch{}
   setHistoryLoaded(true);
  },[historyKey]);
- useEffect(()=>{if(!historyLoaded)return;try{localStorage.setItem(historyKey,JSON.stringify(notices));}catch{}onHistoryChange?.(notices);},[notices,historyLoaded,historyKey,onHistoryChange]);
+ useEffect(()=>{if(!historyLoaded)return;noticeIdsRef.current=new Set(notices.map(n=>n.id));try{localStorage.setItem(historyKey,JSON.stringify(notices));}catch{}onHistoryChange?.(notices);},[notices,historyLoaded,historyKey,onHistoryChange]);
  useEffect(()=>{
   if(!historyLoaded)return;
   const unsubscribers:(()=>void)[]=[];
