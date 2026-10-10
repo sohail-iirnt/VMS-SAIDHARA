@@ -269,7 +269,7 @@ function TutorialMode({role}:{role:"admin"|"security"}){
  {stepIndex===topic.steps.length-1&&!started&&<div className="tutorialFinished"><CheckCircle2 size={19}/><span><b>{w.complete}</b><small>{w.finish}</small></span></div>}
  <div className="tutorialControls"><button className="secondary" disabled={stepIndex===0} onClick={()=>setStepIndex(x=>Math.max(0,x-1))}><ChevronLeft size={17}/>{w.previous}</button><div className="tutorialControlCenter"><span>{stepIndex+1} / {topic.steps.length}</span><div><i style={{width:((stepIndex+1)/topic.steps.length*100)+"%"}}/></div></div>{!started&&stepIndex===topic.steps.length-1?<button className="primary" onClick={()=>{setStepIndex(0);setStarted(true)}}><RotateCcw size={16}/>{w.restart}</button>:!started?<button className="primary" onClick={()=>setStarted(true)}><Play size={16}/>{w.start}</button>:<button className="primary" onClick={next}>{stepIndex===topic.steps.length-1?w.complete:w.next}<ChevronRight size={17}/></button>}</div>
  <div className="tutorialSafetyNote"><ShieldCheck size={17}/><span><b>{w.tip}:</b> {safetyText}</span></div>
- </section></div></div>
+ </div></section></div></div>
 }
 
 function DutyDeskBar({profile,locations,duty,onChange}:{profile:Profile;locations:Location[];duty:DutyDesk|null;onChange:(d:DutyDesk|null)=>void}){
