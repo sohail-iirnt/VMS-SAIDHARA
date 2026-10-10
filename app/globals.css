@@ -784,3 +784,37 @@ input[type=range]{accent-color:var(--vms-accent)}
  .notificationFoot{align-items:flex-start;flex-direction:column;gap:8px}
  .notificationFoot button{max-width:100%;text-align:left;justify-content:flex-start}
 }
+
+
+/* Mobile notification viewport sizing for the portalled sheet. */
+@media(max-width:560px){
+ body>.notificationPopover{
+  position:fixed!important;
+  inset:auto 8px max(8px,env(safe-area-inset-bottom)) 8px!important;
+  width:auto!important;
+  height:min(76dvh,680px)!important;
+  max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  min-height:260px;
+  transform:none!important;
+  z-index:2147483000!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  overscroll-behavior:contain;
+  border-radius:22px!important;
+ }
+ body>.notificationPopover .notificationHead,
+ body>.notificationPopover .notificationToolbar,
+ body>.notificationPopover .notificationFoot{flex:0 0 auto;min-width:0}
+ body>.notificationPopover .notificationList{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+ body>.notificationPopover .notificationFoot{padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
+}
+@media(max-width:360px){
+ body>.notificationPopover{inset:auto 5px max(5px,env(safe-area-inset-bottom)) 5px!important;height:min(80dvh,680px)!important;min-height:240px;border-radius:18px!important}
+ body>.notificationPopover .notificationHead{gap:8px;padding:12px!important}
+ body>.notificationPopover .notificationHeadIcon{width:32px;height:32px}
+ body>.notificationPopover .notificationToolbar{gap:5px;padding:8px!important}
+ body>.notificationPopover .notificationFilters button{padding:6px 7px}
+ body>.notificationPopover .notificationMarkAll{font-size:9px}
+ body>.notificationPopover .notificationItem{padding:10px 6px}
+}
