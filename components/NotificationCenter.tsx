@@ -7,13 +7,16 @@ import { db } from '../lib/firebase';
 
 type NoticeProfile = { uid:string; name:string; role:'admin'|'security'; locationId:string };
 type NoticeLocation = { id:string; name:string; active?:boolean };
-type Notice = { id:string; type:'appointment'|'incoming'|'overdue'|'received'; title:string; message:string; locationId:string; locationName:string; target:'appointments'|'transfers'|'visitors'; read:boolean; sourceId:string };
-type Props = { profile:NoticeProfile; locations:NoticeLocation[]; onNavigate:(tab:string)=>void; openRequested?:boolean; onUnreadChange?:(count:number)=>void };
+export type Notice = { id:string; type:'appointment'|'incoming'|'overdue'|'received'; title:string; message:string; locationId:string; locationName:string; target:'appointments'|'transfers'|'visitors'; read:boolean; sourceId:string };
+type Props = { profile:NoticeProfile; locations:NoticeLocation[]; onNavigate:(tab:string)=>void; onUnreadChange?:(count:number)=>void; onHistoryChange?:(items:Notice[])=>void };
 const toMs = (v:any):number => { if(!v)return 0; if(typeof v.toDate==='function')return v.toDate().getTime(); if(typeof v==='number')return v; const n=new Date(v).getTime(); return Number.isFinite(n)?n:0; };
 const receivedStatus = (s:any) => ['RECEIVED','RECEIVED_CLOSED','CLOSED','COMPLETED'].includes(String(s||'').toUpperCase());
 
-export default function NotificationCenter({profile,locations,onNavigate,openRequested=false,onUnreadChange}:Props){
+export default function NotificationCenter({profile,locations,onNavigate,onUnreadChange,onHistoryChange}:Props){
+ const historyKey='vms-notification-history:'+profile.uid+':'+profile.role+':'+profile.locationId;
  const [notices,setNotices]=useState<Notice[]>([]);
+ const [historyLoaded,setHistoryLoaded]=useState(false);
+ const rootRef=useRef<HTMLDivElement|null>(null);
  const [open,setOpen]=useState(false);
  const [filter,setFilter]=useState<'all'|'unread'>('all');
  const priorTransferStatus=useRef<Record<string,string>>({});
@@ -23,11 +26,20 @@ export default function NotificationCenter({profile,locations,onNavigate,openReq
  const locs=useMemo(()=>profile.role==='admin'?locations:locations.filter(x=>x.id===profile.locationId),[profile,locations]);
  const locLabel=(id:string)=>locations.find(x=>x.id===id)?.name||id;
  const addNotice=(n:Omit<Notice,'id'|'read'>)=>{
-  const id=n.type+':'+n.sourceId;
-  setNotices(old=>old.some(x=>x.id===id)?old:[{...n,id,read:false},...old].slice(0,100));
+  const id=n.type+':'+n.locationId+':'+n.sourceId;
+  setNotices(old=>{
+   if(old.some(x=>x.id===id))return old;
+   setOpen(true);
+   return [{...n,id,read:false},...old].slice(0,500);
+  });
  };
- useEffect(()=>{if(openRequested)setOpen(true)},[openRequested]);
  useEffect(()=>{
+  try{const raw=localStorage.getItem(historyKey);if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed))setNotices(parsed.filter(x=>x&&typeof x.id==='string').slice(0,500));}}catch{}
+  setHistoryLoaded(true);
+ },[historyKey]);
+ useEffect(()=>{if(!historyLoaded)return;try{localStorage.setItem(historyKey,JSON.stringify(notices));}catch{}onHistoryChange?.(notices);},[notices,historyLoaded,historyKey,onHistoryChange]);
+ useEffect(()=>{
+  if(!historyLoaded)return;
   const unsubscribers:(()=>void)[]=[];
   const timers:number[]=[];
   locs.forEach(loc=>{
@@ -100,20 +112,21 @@ export default function NotificationCenter({profile,locations,onNavigate,openReq
    },()=>{}));
   });
   return()=>{unsubscribers.forEach(u=>u());timers.forEach(timer=>window.clearInterval(timer));};
- },[locs]);
+ },[locs,historyLoaded]);
  const unread=notices.filter(n=>!n.read).length;
  useEffect(()=>{onUnreadChange?.(unread)},[unread,onUnreadChange]);
+ useEffect(()=>{if(!open)return;const handlePointer=(event:PointerEvent)=>{if(rootRef.current&&!rootRef.current.contains(event.target as Node))setOpen(false);};const handleKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};document.addEventListener('pointerdown',handlePointer);document.addEventListener('keydown',handleKey);return()=>{document.removeEventListener('pointerdown',handlePointer);document.removeEventListener('keydown',handleKey);};},[open]);
  const visible=notices.filter(n=>filter==='all'||!n.read);
  const iconFor=(type:Notice['type'])=>type==='appointment'?<CalendarCheck size={18}/>:type==='incoming'?<PackageCheck size={18}/>:type==='overdue'?<Clock3 size={18}/>:<ArrowRightLeft size={18}/>;
  const go=(n:Notice)=>{setNotices(old=>old.map(x=>x.id===n.id?{...x,read:true}:x));setOpen(false);onNavigate(n.target);};
  const markAll=()=>setNotices(old=>old.map(n=>({...n,read:true})));
- return <div className="notificationCenter">
+ return <div className="notificationCenter" ref={rootRef}>
   <button className={'notificationBell '+(open?'isOpen':'')} aria-label="Open notifications" title="Notifications" onClick={()=>setOpen(x=>!x)}><Bell size={18}/>{unread>0&&<span className="notificationCount">{unread>99?'99+':unread}</span>}</button>
-  {open&&<><button className="notificationDismissLayer" aria-label="Close notifications" onClick={()=>setOpen(false)}/><section className={'notificationPopover '+(openRequested?'notificationPopoverExpanded':'')} role="dialog" aria-label="Notifications">
+  {open&&<section className="notificationPopover" role="dialog" aria-label="Notifications">
    <header className="notificationHead"><div className="notificationHeadIcon"><BellRing size={19}/></div><div className="notificationHeadCopy"><b>Notifications</b><span>{unread?unread+' unread update'+(unread===1?'':'s'):'You’re all caught up'}</span></div><button className="notificationClose" aria-label="Close" onClick={()=>setOpen(false)}><X size={17}/></button></header>
    <div className="notificationToolbar"><div className="notificationFilters"><button className={filter==='all'?'selected':''} onClick={()=>setFilter('all')}>All <span>{notices.length}</span></button><button className={filter==='unread'?'selected':''} onClick={()=>setFilter('unread')}>Unread <span>{unread}</span></button></div><button className="notificationMarkAll" onClick={markAll} disabled={!unread}><CheckCheck size={14}/> Mark all read</button></div>
    <div className="notificationList">{visible.length===0?<div className="notificationEmpty"><span><Bell size={22}/></span><b>{filter==='unread'?'No unread notifications':'You’re all caught up'}</b><p>New appointments, incoming materials, long visits and received transfers will appear here.</p></div>:visible.map(n=><button className={'notificationItem '+(n.read?'read':'')} key={n.id} onClick={()=>go(n)}><span className={'notificationItemIcon '+n.type}>{iconFor(n.type)}</span><span className="notificationItemBody"><b>{n.title}</b><small>{n.message}</small><span className="notificationItemMeta"><MapPin size={12}/>{n.locationName}<i/>Live update</span></span>{!n.read&&<span className="notificationUnreadDot"/>}<ChevronRight className="notificationChevron" size={16}/></button>)}</div>
    <footer className="notificationFoot"><span><Check size={13}/> Live updates enabled</span><button onClick={()=>{setOpen(false);onNavigate('notifications')}}>Open notification center <ChevronRight size={14}/></button></footer>
-  </section></>}
+  </section>}
  </div>;
 }
