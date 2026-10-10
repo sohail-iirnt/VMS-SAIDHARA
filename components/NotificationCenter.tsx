@@ -64,9 +64,9 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    const incomingKey='incoming:'+loc.id;
    firstSnapshot.current[incomingKey]=false;
    unsubscribers.push(onSnapshot(query(collection(db,'internalTransfers'),where('destinationLocationId','==',loc.id)),snap=>{
-    if(!firstSnapshot.current[incomingKey]){firstSnapshot.current[incomingKey]=true;snap.docs.forEach(d=>{priorTransferStatus.current[d.id]=String(d.data().status||'')});return;}
+    if(!firstSnapshot.current[incomingKey]){firstSnapshot.current[incomingKey]=true;snap.docs.forEach(d=>{priorTransferStatus.current[incomingKey+':'+d.id]=String(d.data().status||'')});return;}
     snap.docChanges().forEach(change=>{
-     const d=change.doc.data();const prev=priorTransferStatus.current[change.doc.id];const next=String(d.status||'');priorTransferStatus.current[change.doc.id]=next;
+     const d=change.doc.data();const statusKey=incomingKey+':'+change.doc.id;const prev=priorTransferStatus.current[statusKey];const next=String(d.status||'');priorTransferStatus.current[statusKey]=next;
      if((change.type==='added'||prev!==next)&&['SENT','IN_TRANSIT','SCHEDULED'].includes(next.toUpperCase())){
       const sender=locLabel(d.sourceLocationId||'Unknown location');
       const item=d.itemName||d.description||'material';
@@ -103,9 +103,9 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    const sentKey='sent:'+loc.id;
    firstSnapshot.current[sentKey]=false;
    unsubscribers.push(onSnapshot(query(collection(db,'internalTransfers'),where('sourceLocationId','==',loc.id)),snap=>{
-    if(!firstSnapshot.current[sentKey]){firstSnapshot.current[sentKey]=true;snap.docs.forEach(d=>{priorTransferStatus.current[d.id]=String(d.data().status||'')});return;}
+    if(!firstSnapshot.current[sentKey]){firstSnapshot.current[sentKey]=true;snap.docs.forEach(d=>{priorTransferStatus.current[sentKey+':'+d.id]=String(d.data().status||'')});return;}
     snap.docChanges().forEach(change=>{
-     const d=change.doc.data();const prev=priorTransferStatus.current[change.doc.id];const next=String(d.status||'');priorTransferStatus.current[change.doc.id]=next;
+     const d=change.doc.data();const statusKey=sentKey+':'+change.doc.id;const prev=priorTransferStatus.current[statusKey];const next=String(d.status||'');priorTransferStatus.current[statusKey]=next;
      if(change.type==='modified'&&!receivedStatus(prev)&&receivedStatus(next)){
       const destination=locLabel(d.destinationLocationId||'destination');
       const item=d.itemName||d.description||'the transferred material';
