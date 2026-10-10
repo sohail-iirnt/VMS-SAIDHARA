@@ -3,9 +3,42 @@ service cloud.firestore {
  match /databases/{database}/documents {
   function signedIn(){return request.auth != null;}
   function me(){return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;}
-  function admin(){return signedIn() && me().role == 'admin' && me().active == true;}
-  function security(){return signedIn() && me().role == 'security' && me().active == true;}
-  function sameLocation(resourceData){return admin() || (security() && resourceData.locationId == me().locationId);}
+  function admin(){return signedIn() && me().role == 'admin' && me().active != false;}
+  function security(){return signedIn() && me().role == 'security' && me().active != false;}
+  // Older warehouse user profiles may contain the human-readable location label
+  // (for example "Warehouse I") instead of the canonical location document ID ("I").
+  // Keep access scoped to that one assigned location while supporting both formats.
+  function myLocationMatches(locationId){
+    return locationId == me().locationId
+      || (me().locationId == 'Main Admin Office' && locationId == 'ADMIN')
+      || (me().locationId == 'Warehouse I' && locationId == 'I')
+      || (me().locationId == 'Warehouse J' && locationId == 'J')
+      || (me().locationId == 'Warehouse K' && locationId == 'K')
+      || (me().locationId == 'Warehouse L' && locationId == 'L')
+      || (me().locationId == 'Warehouse O' && locationId == 'O')
+      || (me().locationId == 'Warehouse P' && locationId == 'P')
+      || (me().locationId == 'Warehouse Q' && locationId == 'Q')
+      || (me().locationId == 'Warehouse R' && locationId == 'R')
+      || (me().locationId == 'Warehouse S' && locationId == 'S')
+      || (me().locationId == 'Warehouse T' && locationId == 'T')
+      || (me().locationId in ['H14(MHE)', 'H14 (MHE)', 'H14-MHE'] && locationId == 'H14-MHE');
+  }
+  function myLocationInList(ids){
+    return ids.hasAny([me().locationId])
+      || (me().locationId == 'Main Admin Office' && ids.hasAny(['ADMIN']))
+      || (me().locationId == 'Warehouse I' && ids.hasAny(['I']))
+      || (me().locationId == 'Warehouse J' && ids.hasAny(['J']))
+      || (me().locationId == 'Warehouse K' && ids.hasAny(['K']))
+      || (me().locationId == 'Warehouse L' && ids.hasAny(['L']))
+      || (me().locationId == 'Warehouse O' && ids.hasAny(['O']))
+      || (me().locationId == 'Warehouse P' && ids.hasAny(['P']))
+      || (me().locationId == 'Warehouse Q' && ids.hasAny(['Q']))
+      || (me().locationId == 'Warehouse R' && ids.hasAny(['R']))
+      || (me().locationId == 'Warehouse S' && ids.hasAny(['S']))
+      || (me().locationId == 'Warehouse T' && ids.hasAny(['T']))
+      || (me().locationId in ['H14(MHE)', 'H14 (MHE)', 'H14-MHE'] && ids.hasAny(['H14-MHE']));
+  }
+  function sameLocation(resourceData){return admin() || (security() && myLocationMatches(resourceData.locationId));}
   match /users/{uid} { allow read: if signedIn() && (request.auth.uid==uid || admin()); allow create,update,delete: if admin(); }
   match /locations/{id} { allow read: if signedIn(); allow write: if admin(); }
   match /settings/{id} { allow read: if signedIn(); allow write: if admin(); }
@@ -14,13 +47,13 @@ service cloud.firestore {
     allow write: if admin();
   }
   match /securityPersons/{id} {
-    allow read: if admin() || (security() && resource.data.locationId == me().locationId);
+    allow read: if admin() || (security() && myLocationMatches(resource.data.locationId));
     allow create,update,delete: if admin();
   }
   match /deskSessions/{locationId} {
-    allow read: if admin() || (security() && resource.data.locationId == me().locationId);
-    allow create: if admin() || (security() && request.resource.data.locationId == me().locationId && request.resource.data.startedBy == request.auth.uid);
-    allow update: if admin() || (security() && resource.data.locationId == me().locationId && resource.data.startedBy == request.auth.uid && request.resource.data.locationId == me().locationId && request.resource.data.startedBy == request.auth.uid);
+    allow read: if admin() || (security() && myLocationMatches(resource.data.locationId));
+    allow create: if admin() || (security() && myLocationMatches(request.resource.data.locationId) && request.resource.data.startedBy == request.auth.uid);
+    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && resource.data.startedBy == request.auth.uid && myLocationMatches(request.resource.data.locationId) && request.resource.data.startedBy == request.auth.uid);
     allow delete: if admin();
   }
   match /visitorCounters/{day} { allow read: if admin() || security(); allow create: if admin() || (security() && request.resource.data.nextNumber == 2); allow update: if admin() || (security() && request.resource.data.nextNumber == resource.data.nextNumber + 1); allow delete: if admin(); }
@@ -32,11 +65,11 @@ service cloud.firestore {
     allow create: if request.resource.data.status == 'PENDING'
       && request.resource.data.locationId in ['ADMIN','I','J','K','L','O','P','Q','R','S','T','H14-MHE'];
 
-    allow read: if admin() || (security() && resource.data.locationId == me().locationId);
+    allow read: if admin() || (security() && myLocationMatches(resource.data.locationId));
 
     allow update: if admin() ||
       (security() &&
-       resource.data.locationId == me().locationId &&
+       myLocationMatches(resource.data.locationId) &&
        request.resource.data.locationId == resource.data.locationId &&
        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
          'status','reviewedAt','reviewedBy','reviewedByName','rejectionReason',
@@ -56,12 +89,12 @@ service cloud.firestore {
   match /assets/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
   match /gatePasses/{id} { allow read: if sameLocation(resource.data); allow create: if sameLocation(request.resource.data); allow update: if sameLocation(resource.data) && sameLocation(request.resource.data); allow delete: if admin(); }
   match /internalTransfers/{id} {
-    allow read: if admin() || (security() && (resource.data.sourceLocationId == me().locationId || resource.data.destinationLocationId == me().locationId));
-    allow create: if admin() || (security() && request.resource.data.sourceLocationId == me().locationId);
-    allow update: if admin() || (security() && resource.data.destinationLocationId == me().locationId && request.resource.data.sourceLocationId == resource.data.sourceLocationId && request.resource.data.destinationLocationId == resource.data.destinationLocationId && resource.data.status == 'SENT' && request.resource.data.status == 'RECEIVED_CLOSED');
+    allow read: if admin() || (security() && (myLocationMatches(resource.data.sourceLocationId) || myLocationMatches(resource.data.destinationLocationId)));
+    allow create: if admin() || (security() && myLocationMatches(request.resource.data.sourceLocationId));
+    allow update: if admin() || (security() && myLocationMatches(resource.data.destinationLocationId) && request.resource.data.sourceLocationId == resource.data.sourceLocationId && request.resource.data.destinationLocationId == resource.data.destinationLocationId && resource.data.status == 'SENT' && request.resource.data.status == 'RECEIVED_CLOSED');
     allow delete: if admin();
   }
-  match /assetMovementEvents/{id} { allow read: if admin() || (security() && resource.data.locationIds is list && resource.data.locationIds.hasAny([me().locationId])); allow create: if admin() || (security() && request.resource.data.locationIds is list && request.resource.data.locationIds.hasAny([me().locationId])); allow update,delete: if false; }
+  match /assetMovementEvents/{id} { allow read: if admin() || (security() && resource.data.locationIds is list && myLocationInList(resource.data.locationIds)); allow create: if admin() || (security() && request.resource.data.locationIds is list && myLocationInList(request.resource.data.locationIds)); allow update,delete: if false; }
   match /auditLogs/{id} { allow read: if admin(); allow create: if signedIn(); allow update,delete: if false; }
  }
 }

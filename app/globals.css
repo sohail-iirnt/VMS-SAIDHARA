@@ -681,3 +681,146 @@ input[type=range]{accent-color:var(--vms-accent)}
 .tutorialInstructionCard{display:flex;align-items:flex-start;gap:13px;padding:17px 16px;margin-top:14px;border:1px solid var(--vms-border);border-radius:14px;background:var(--vms-surface)}.tutorialInstructionIcon{width:39px;height:39px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:color-mix(in srgb,var(--vms-accent) 12%,var(--vms-surface));color:var(--vms-accent)}.tutorialInstructionText{flex:1;min-width:0}.tutorialInstructionMeta{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:900;color:var(--vms-accent)}.tutorialInstructionText p{font-size:14px;line-height:1.8;margin:7px 0 0;white-space:normal}.tutorialReplay{width:36px;height:36px;display:grid;place-items:center;flex-shrink:0;border:1px solid var(--vms-border);border-radius:10px;background:var(--vms-bg);color:var(--vms-ink)}.tutorialFinished{display:flex;gap:10px;align-items:center;padding:12px 14px;margin-top:12px;border-radius:12px;background:#e8f6ef;color:#216447}.tutorialFinished span{display:flex;flex-direction:column;gap:3px}.tutorialFinished b{font-size:12px}.tutorialFinished small{font-size:11px;line-height:1.5}.tutorialControls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}.tutorialControls>button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:40px;font-size:11px;font-weight:800}.tutorialControls>button:disabled{opacity:.45;cursor:not-allowed}.tutorialControlCenter{display:flex;flex-direction:column;gap:7px;align-items:center;min-width:70px;color:var(--vms-muted);font-size:10px;font-weight:800}.tutorialControlCenter>div{height:4px;width:76px;background:var(--vms-border);border-radius:5px;overflow:hidden}.tutorialControlCenter i{display:block;height:100%;background:var(--vms-accent);border-radius:5px}.tutorialSafetyNote{display:flex;align-items:flex-start;gap:9px;padding:12px 13px;margin-top:14px;background:var(--vms-bg);border:1px solid var(--vms-border);border-radius:12px;color:var(--vms-muted);font-size:10px;line-height:1.7}.tutorialSafetyNote svg{flex-shrink:0;color:var(--vms-accent);margin-top:1px}.tutorialSafetyNote b{color:var(--vms-ink)}
 @media(max-width:1050px){.tutorialLayout{grid-template-columns:1fr}.tutorialTopics{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}.tutorialSectionLabel{grid-column:1/-1}.tutorialTopic{padding:10px 8px}.tutorialHeroArt{width:140px;transform:scale(.9)}}
 @media(max-width:650px){.tutorialHub{gap:14px}.tutorialHero{padding:23px 19px;border-radius:20px}.tutorialHeroArt{display:none}.tutorialHero h1{font-size:27px}.tutorialHeroMeta{gap:10px}.tutorialLanguageBar{padding:13px;gap:10px}.tutorialLanguageBar>div:first-child{width:100%}.tutorialLanguageOptions{flex:1}.tutorialLanguageOptions button{flex:1;padding:9px 7px}.tutorialAudioToggle{white-space:nowrap}.tutorialTopics{grid-template-columns:1fr;padding:10px}.tutorialTopic{padding:10px}.tutorialWorkspace{padding:13px;border-radius:17px}.tutorialWorkspaceHead{gap:8px}.tutorialWorkspaceHead h2{font-size:19px}.tutorialDuration{padding:7px;font-size:9px}.tutorialMockScreen{grid-template-columns:78px minmax(0,1fr);margin:7px;min-height:250px}.tutorialMockSidebar{padding:9px 5px}.tutorialMockBrand{font-size:8px;gap:4px}.tutorialMockBrand span{width:20px;height:20px}.tutorialMockNav{font-size:8px;padding:8px 4px;gap:4px}.tutorialMockMain{padding:9px 7px}.tutorialMockTop{font-size:6px}.tutorialMockHeading h3{font-size:13px}.tutorialMockInstruction{padding:9px;gap:7px}.tutorialMockInstruction b{font-size:10px}.tutorialMockInstruction span{font-size:8px}.tutorialMockFields{gap:5px}.tutorialMockFields>div{padding:6px}.tutorialMockFields span{font-size:7px}.tutorialMockAction{align-items:flex-start;flex-direction:column}.tutorialMockAction>span{font-size:7px}.tutorialMockAction b{font-size:8px}.tutorialInstructionCard{padding:13px 11px;gap:9px}.tutorialInstructionIcon{width:32px;height:32px}.tutorialInstructionText p{font-size:13px;line-height:1.75}.tutorialReplay{width:31px;height:31px}.tutorialControls{gap:6px}.tutorialControls>button{padding:8px 9px;min-height:38px;font-size:10px}.tutorialControlCenter{min-width:42px}.tutorialControlCenter>div{width:42px}.tutorialStageTop{font-size:8px;padding:10px}.tutorialProgress{margin:18px 0 13px}}
+
+
+/* Refined operations navigation and compact dashboard introduction. */
+.side nav{scrollbar-width:thin;scrollbar-color:#587467 transparent;overscroll-behavior:contain;padding:2px 4px 8px 0;scrollbar-gutter:stable}
+.side nav::-webkit-scrollbar{width:5px}.side nav::-webkit-scrollbar-track{background:transparent;margin:8px 0;border-radius:99px}.side nav::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#49695c,#a18a58);border:1px solid #172b25;border-radius:99px;min-height:34px}.side nav::-webkit-scrollbar-thumb:hover{background:#c0a46a}
+.nav{position:relative;min-height:42px;padding:10px 11px;gap:10px;border:1px solid transparent;transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}.nav:hover{background:#ffffff0b;border-color:#ffffff0d;transform:translateX(1px)}.nav.active{background:linear-gradient(100deg,#ffffff16,#ffffff08);border-color:#ffffff13;color:#fff;box-shadow:inset 3px 0 #c7a96a}.nav.active svg{color:#d8c18c}
+.navCount{font-style:normal;display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;margin-left:auto;padding:0 5px;border-radius:99px;background:#c5a765;color:#1c332a;font-size:9px;font-weight:900;line-height:1}
+.dashboardHero{min-height:0!important;padding:clamp(18px,2.2vw,26px) clamp(20px,2.8vw,32px)!important;border-radius:20px!important;gap:20px;box-shadow:0 13px 32px #173c3215!important}.dashboardHeroCopy{max-width:760px;position:relative;z-index:1}.dashboardHero h1{font-size:clamp(23px,2.7vw,31px)!important;line-height:1.12!important;margin:5px 0 7px!important;letter-spacing:-.045em}.dashboardHero p{font-size:12px!important;line-height:1.55!important;max-width:660px}.dashboardHero .heroActions{margin-top:13px!important;gap:8px}.dashboardHero .heroAction{min-height:35px!important;padding:8px 12px!important;font-size:10px!important;border-radius:10px!important}.dashboardHero .heroEyebrow{font-size:9px!important;letter-spacing:.14em}.dashboardHeroGlow{transform:scale(.78);transform-origin:top right;opacity:.7}
+@media(max-width:650px){.dashboardHero{padding:19px!important;border-radius:17px!important}.dashboardHero h1{font-size:24px!important}.dashboardHero p{font-size:11px!important}.dashboardHero .heroActions{margin-top:11px!important;flex-wrap:wrap}.side nav{scrollbar-width:none}.side nav::-webkit-scrollbar{display:none}}
+
+/* iOS-inspired notification center: translucent glass, rounded rows and responsive sheet. */
+.notificationCenter{position:relative;display:flex;align-items:center}.notificationBell{position:relative;width:39px;height:39px;display:grid;place-items:center;border:1px solid var(--vms-border);border-radius:13px;background:color-mix(in srgb,var(--vms-surface) 86%,transparent);color:var(--vms-ink);box-shadow:0 3px 12px #10251b0a;transition:transform .18s ease,background .18s ease,border-color .18s ease}.notificationBell:hover,.notificationBell.isOpen{background:color-mix(in srgb,var(--vms-accent) 9%,var(--vms-surface));border-color:color-mix(in srgb,var(--vms-accent) 35%,var(--vms-border));transform:translateY(-1px)}.notificationCount{position:absolute;right:-5px;top:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:99px;display:grid;place-items:center;background:#d94d53;color:white;border:2px solid var(--vms-surface);font-size:9px;font-weight:900;line-height:1}
+.notificationDismissLayer{position:fixed;inset:0;z-index:80;background:transparent;border:0;padding:0;cursor:default}.notificationPopover{position:absolute;right:0;top:calc(100% + 12px);z-index:90;width:min(430px,calc(100vw - 28px));max-height:min(690px,calc(100vh - 112px));display:flex;flex-direction:column;overflow:hidden;border:1px solid #ffffffb8;border-radius:25px;background:color-mix(in srgb,var(--vms-surface) 90%,#eef5f1);box-shadow:0 24px 80px #071c1740,0 2px 10px #10251b0b;backdrop-filter:blur(28px) saturate(1.55);-webkit-backdrop-filter:blur(28px) saturate(1.55);animation:notificationIn .2s cubic-bezier(.2,.8,.2,1)}.notificationPopoverExpanded{position:fixed;top:50%;left:50%;right:auto;transform:translate(-50%,-50%);width:min(650px,calc(100vw - 34px));max-height:min(780px,calc(100vh - 42px));animation:notificationSheetIn .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes notificationIn{from{opacity:0;transform:translateY(-6px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes notificationSheetIn{from{opacity:0;transform:translate(-50%,-48%) scale(.985)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.notificationHead{display:flex;align-items:center;gap:12px;padding:20px 20px 16px;background:linear-gradient(145deg,#ffffffb5,#ffffff2b);border-bottom:1px solid color-mix(in srgb,var(--vms-border) 70%,transparent)}.notificationHeadIcon{width:42px;height:42px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#e3f2e9,#c9e2d3);color:#276b51;box-shadow:inset 0 1px #ffffffb8}.notificationHeadCopy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.notificationHeadCopy b{font-size:16px;letter-spacing:-.03em;color:var(--vms-ink)}.notificationHeadCopy span{font-size:11px;color:var(--vms-muted)}.notificationClose{width:32px;height:32px;border:1px solid #dfe7e1;border-radius:50%;background:#ffffff9c;color:#607167;display:grid;place-items:center}
+.notificationToolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid color-mix(in srgb,var(--vms-border) 65%,transparent)}.notificationFilters{display:flex;align-items:center;gap:4px;padding:3px;background:#e8eee9;border-radius:12px}.notificationFilters button{display:flex;align-items:center;gap:6px;padding:7px 10px;border:0;border-radius:9px;background:transparent;color:#69786f;font-size:10px;font-weight:800}.notificationFilters button span{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#d6e0d9;color:#52665a;font-size:9px}.notificationFilters button.selected{background:#fff;color:#214b3b;box-shadow:0 2px 5px #163e3210}.notificationFilters button.selected span{background:#e1efe6;color:#2d7454}.notificationMarkAll{display:flex;align-items:center;gap:5px;border:0;background:transparent;color:var(--vms-accent);font-size:10px;font-weight:800;padding:8px 3px;white-space:nowrap}.notificationMarkAll:disabled{opacity:.4;cursor:default}
+.notificationList{padding:6px 9px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#b7c8bc transparent}.notificationList::-webkit-scrollbar{width:5px}.notificationList::-webkit-scrollbar-thumb{background:#b7c8bc;border-radius:99px}.notificationItem{display:flex;align-items:flex-start;gap:11px;width:100%;position:relative;text-align:left;padding:13px 10px;margin:3px 0;border:1px solid transparent;border-radius:16px;background:transparent;color:var(--vms-ink);transition:background .15s,border-color .15s}.notificationItem:hover{background:#ffffffb8;border-color:#e2eae4}.notificationItem.read{opacity:.74}.notificationItemIcon{width:39px;height:39px;display:grid;place-items:center;flex-shrink:0;border-radius:13px;background:#e4f2e8;color:#317b58}.notificationItemIcon.incoming{background:#e7efff;color:#4d6dc4}.notificationItemIcon.overdue{background:#fff0dc;color:#b76b18}.notificationItemIcon.received{background:#e4f1f0;color:#287c78}.notificationItemBody{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}.notificationItemBody>b{font-size:12px;line-height:1.35;letter-spacing:-.01em}.notificationItemBody>small{font-size:10px;line-height:1.55;color:var(--vms-muted);font-weight:500}.notificationItemMeta{display:flex;align-items:center;gap:5px;color:#87968b;font-size:9px;margin-top:2px}.notificationItemMeta i{width:3px;height:3px;border-radius:50%;background:#a8b5ab;margin:0 2px}.notificationUnreadDot{width:7px;height:7px;flex-shrink:0;border-radius:50%;background:#428f69;margin-top:6px}.notificationChevron{flex-shrink:0;margin-top:11px;color:#a5b1a8}
+.notificationEmpty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:35px 20px 40px}.notificationEmpty>span{width:55px;height:55px;border-radius:19px;display:grid;place-items:center;background:#e8f0ea;color:#5c8a70;margin-bottom:13px}.notificationEmpty>b{font-size:13px;color:var(--vms-ink)}.notificationEmpty p{max-width:250px;color:var(--vms-muted);font-size:10px;line-height:1.65;margin:7px 0 0}.notificationFoot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 17px;border-top:1px solid color-mix(in srgb,var(--vms-border) 70%,transparent);background:#ffffff61}.notificationFoot>span{display:flex;align-items:center;gap:5px;color:#789184;font-size:9px;font-weight:750;white-space:nowrap}.notificationFoot button{display:flex;align-items:center;gap:3px;border:0;background:transparent;color:var(--vms-accent);font-size:10px;font-weight:850}
+.notificationsLanding{max-width:920px;margin:10px auto;padding:clamp(22px,4vw,40px);border:1px solid var(--vms-border);border-radius:25px;background:var(--vms-surface);box-shadow:0 12px 40px #172b3b09}.notificationsLandingIcon{width:54px;height:54px;display:grid;place-items:center;border-radius:18px;background:var(--vms-accent-wash);color:var(--vms-accent);margin-bottom:18px}.notificationsLanding>.eyebrow{font-size:9px}.notificationsLanding h1{font-size:clamp(24px,3vw,32px);letter-spacing:-.04em;margin:7px 0 9px;color:var(--vms-ink)}.notificationsLanding>p{font-size:12px;line-height:1.8;max-width:680px;color:var(--vms-muted)}.notificationsLandingGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:25px 0}.notificationsLandingGrid>div{display:grid;grid-template-columns:28px 1fr;column-gap:9px;row-gap:5px;padding:15px;border:1px solid var(--vms-border);border-radius:15px;background:var(--vms-bg)}.notificationsLandingGrid svg{grid-row:span 2;color:var(--vms-accent)}.notificationsLandingGrid b{font-size:12px;color:var(--vms-ink)}.notificationsLandingGrid span{font-size:10px;line-height:1.6;color:var(--vms-muted)}.notificationsLanding>.primary{font-size:11px}.notificationsLandingHint{font-size:10px!important;margin-top:14px!important}
+@media(max-width:900px){.notificationPopover{position:fixed;top:74px;right:12px;max-height:calc(100vh - 92px);width:min(430px,calc(100vw - 24px))}.notificationPopoverExpanded{top:50%;left:50%;right:auto;max-height:calc(100vh - 26px);width:calc(100vw - 24px)}.notificationHead{padding:17px 17px 14px}}
+@media(max-width:560px){.notificationBell{width:36px;height:36px;border-radius:12px}.notificationPopover{top:auto;bottom:10px;left:8px;right:8px;width:auto;max-height:min(78vh,680px);border-radius:24px}.notificationPopoverExpanded{top:auto;bottom:0;left:0;right:0;transform:none;width:100%;max-height:88vh;border-radius:25px 25px 0 0;animation:notificationMobileSheet .22s ease-out}.notificationHead{padding:16px 16px 13px}.notificationItem{padding:12px 8px;gap:9px}.notificationItemIcon{width:35px;height:35px;border-radius:12px}.notificationItemBody>small{font-size:9px}.notificationFoot{padding:12px 13px}.notificationFoot button{font-size:9px}.notificationsLanding{padding:22px 17px;border-radius:19px}.notificationsLandingGrid{grid-template-columns:1fr;gap:9px;margin:20px 0}}
+@keyframes notificationMobileSheet{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.notificationPopover,.notificationBell,.notificationItem{animation:none!important;transition:none!important}}
+
+/* Keep the glass sheet above its backdrop while leaving the fixed header interactive. */
+.notificationDismissLayer{z-index:19!important}
+
+
+/* Notification history layout and predictable outside-click popup behavior. */
+.notificationDismissLayer{display:none!important}
+.notificationPopover{z-index:120!important;isolation:isolate}
+.notificationCenter{z-index:auto}
+.notificationsLanding{max-width:1120px;width:100%;margin:0 auto;padding:clamp(20px,3vw,34px);overflow:hidden}
+.notificationsLandingTop{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.notificationsLandingTop>div:first-child{min-width:0}
+.notificationsLandingTop .notificationsLandingIcon{margin-bottom:14px}
+.notificationsLandingSummary{display:grid;grid-template-columns:auto auto;align-items:center;column-gap:9px;row-gap:3px;flex-shrink:0;padding:14px 17px;border:1px solid var(--vms-border);border-radius:16px;background:var(--vms-bg);color:var(--vms-muted);font-size:10px}
+.notificationsLandingSummary b{font-size:20px;letter-spacing:-.04em;color:var(--vms-ink);font-variant-numeric:tabular-nums}
+.notificationsLandingSummary i{grid-column:1/-1;height:1px;background:var(--vms-border);margin:5px 0}
+.notificationsLandingToolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:24px;padding:12px 0;border-top:1px solid var(--vms-border);border-bottom:1px solid var(--vms-border)}
+.notificationsHistoryList{display:flex;flex-direction:column;gap:3px;padding:8px 0;min-width:0}
+.notificationsHistoryList .notificationItem{padding:15px 13px;margin:0;border-color:transparent;border-bottom-color:color-mix(in srgb,var(--vms-border) 72%,transparent);border-radius:12px}
+.notificationsHistoryList .notificationItem:last-child{border-bottom-color:transparent}
+.notificationsHistoryList .notificationItemBody>b{font-size:13px}
+.notificationsHistoryList .notificationItemBody>small{font-size:11px;line-height:1.65}
+.notificationsHistoryList .notificationItemMeta{font-size:10px}
+.notificationsLandingBottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid var(--vms-border)}
+.notificationsLandingBottom>span{display:flex;align-items:center;gap:6px;color:var(--vms-muted);font-size:10px}
+.notificationsLandingBottom .primary{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+@media(max-width:680px){
+ .notificationsLandingTop{flex-direction:column;gap:14px}
+ .notificationsLandingSummary{display:flex;align-items:center;gap:7px;padding:10px 12px}
+ .notificationsLandingSummary b{font-size:16px}
+ .notificationsLandingSummary i{width:1px;height:22px;flex:none;margin:0 5px}
+ .notificationsLandingToolbar{align-items:flex-start;flex-direction:column}
+ .notificationsLandingBottom{align-items:flex-start;flex-direction:column}
+ .notificationsLandingBottom .primary{width:100%;justify-content:center}
+ .notificationsHistoryList .notificationItem{padding:12px 7px;gap:8px}
+ .notificationsHistoryList .notificationItemIcon{width:34px;height:34px}
+ .notificationsHistoryList .notificationChevron{width:14px}
+}
+@media(max-width:900px){
+ .notificationPopover{z-index:120!important}
+}
+
+.notificationFeedError{position:fixed;right:20px;bottom:20px;z-index:150;max-width:min(440px,calc(100vw - 32px));padding:13px 16px;border:1px solid #e8b4a9;border-radius:14px;background:#fff6f3;color:#8d3326;box-shadow:0 12px 36px #14231d20;font-size:12px;line-height:1.6}
+
+
+/* Mobile notification sheet: keep alerts fully visible below the sticky app header on phones. */
+@media(max-width:560px){
+ .notificationCenter{position:relative;z-index:121;isolation:isolate}
+ .notificationPopover,
+ .notificationPopoverExpanded{
+  position:fixed!important;
+  top:auto!important;
+  bottom:max(8px,env(safe-area-inset-bottom))!important;
+  left:8px!important;
+  right:8px!important;
+  width:auto!important;
+  max-width:none!important;
+  max-height:min(72dvh,620px)!important;
+  transform:none!important;
+  z-index:9999!important;
+  margin:0!important;
+  overflow:hidden;
+ }
+ .notificationPopover{border-radius:22px!important}
+ .notificationPopoverExpanded{border-radius:22px!important}
+ .notificationHead{flex-shrink:0;padding:14px 15px 12px!important}
+ .notificationToolbar{flex-shrink:0;padding:10px 12px!important}
+ .notificationList{min-height:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+ .notificationFoot{flex-shrink:0;padding:11px 12px calc(11px + env(safe-area-inset-bottom))!important;flex-wrap:wrap}
+ .notificationFoot button{white-space:normal;text-align:right;max-width:58%;justify-content:flex-end}
+ .notificationFeedError{right:10px;left:10px;bottom:max(10px,env(safe-area-inset-bottom));max-width:none;z-index:10000;font-size:11px}
+}
+@media(max-width:380px){
+ .notificationToolbar{align-items:flex-start;flex-wrap:wrap}
+ .notificationMarkAll{font-size:9px}
+ .notificationHead{gap:9px}
+ .notificationHeadIcon{width:36px;height:36px}
+ .notificationHeadCopy b{font-size:15px}
+ .notificationFoot{align-items:flex-start;flex-direction:column;gap:8px}
+ .notificationFoot button{max-width:100%;text-align:left;justify-content:flex-start}
+}
+
+
+/* Mobile notification viewport sizing for the portalled sheet. */
+@media(max-width:560px){
+ body>.notificationPopover{
+  position:fixed!important;
+  inset:auto 8px max(8px,env(safe-area-inset-bottom)) 8px!important;
+  width:auto!important;
+  height:min(76dvh,680px)!important;
+  max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  min-height:260px;
+  transform:none!important;
+  z-index:2147483000!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  overscroll-behavior:contain;
+  border-radius:22px!important;
+ }
+ body>.notificationPopover .notificationHead,
+ body>.notificationPopover .notificationToolbar,
+ body>.notificationPopover .notificationFoot{flex:0 0 auto;min-width:0}
+ body>.notificationPopover .notificationList{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+ body>.notificationPopover .notificationFoot{padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
+}
+@media(max-width:360px){
+ body>.notificationPopover{inset:auto 5px max(5px,env(safe-area-inset-bottom)) 5px!important;height:min(80dvh,680px)!important;min-height:240px;border-radius:18px!important}
+ body>.notificationPopover .notificationHead{gap:8px;padding:12px!important}
+ body>.notificationPopover .notificationHeadIcon{width:32px;height:32px}
+ body>.notificationPopover .notificationToolbar{gap:5px;padding:8px!important}
+ body>.notificationPopover .notificationFilters button{padding:6px 7px}
+ body>.notificationPopover .notificationMarkAll{font-size:9px}
+ body>.notificationPopover .notificationItem{padding:10px 6px}
+}
+
+
+/* Prevent the global sticky-page-header sizing rule from affecting the notification sheet header. */
+@media(max-width:560px){
+ body>.notificationPopover .notificationHead{height:auto!important;min-height:0!important;position:relative!important;top:auto!important;justify-content:flex-start!important}
+}
