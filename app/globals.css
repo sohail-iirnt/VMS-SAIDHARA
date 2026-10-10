@@ -818,3 +818,9 @@ input[type=range]{accent-color:var(--vms-accent)}
  body>.notificationPopover .notificationMarkAll{font-size:9px}
  body>.notificationPopover .notificationItem{padding:10px 6px}
 }
+
+
+/* Prevent the global sticky-page-header sizing rule from affecting the notification sheet header. */
+@media(max-width:560px){
+ body>.notificationPopover .notificationHead{height:auto!important;min-height:0!important;position:relative!important;top:auto!important;justify-content:flex-start!important}
+}
