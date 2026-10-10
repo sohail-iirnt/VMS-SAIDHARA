@@ -4,7 +4,7 @@ service cloud.firestore {
   function signedIn(){return request.auth != null;}
   function me(){return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;}
   function admin(){return signedIn() && me().role == 'admin' && me().active == true;}
-  function security(){return signedIn() && me().role == 'security' && me().active == true;}
+  function security(){return signedIn() && me().role == 'security' && me().active != false;}
   // Older warehouse user profiles may contain the human-readable location label
   // (for example "Warehouse I") instead of the canonical location document ID ("I").
   // Keep access scoped to that one assigned location while supporting both formats.
