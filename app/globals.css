@@ -706,3 +706,41 @@ input[type=range]{accent-color:var(--vms-accent)}
 
 /* Keep the glass sheet above its backdrop while leaving the fixed header interactive. */
 .notificationDismissLayer{z-index:19!important}
+
+
+/* Notification history layout and predictable outside-click popup behavior. */
+.notificationDismissLayer{display:none!important}
+.notificationPopover{z-index:120!important;isolation:isolate}
+.notificationCenter{z-index:auto}
+.notificationsLanding{max-width:1120px;width:100%;margin:0 auto;padding:clamp(20px,3vw,34px);overflow:hidden}
+.notificationsLandingTop{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.notificationsLandingTop>div:first-child{min-width:0}
+.notificationsLandingTop .notificationsLandingIcon{margin-bottom:14px}
+.notificationsLandingSummary{display:grid;grid-template-columns:auto auto;align-items:center;column-gap:9px;row-gap:3px;flex-shrink:0;padding:14px 17px;border:1px solid var(--vms-border);border-radius:16px;background:var(--vms-bg);color:var(--vms-muted);font-size:10px}
+.notificationsLandingSummary b{font-size:20px;letter-spacing:-.04em;color:var(--vms-ink);font-variant-numeric:tabular-nums}
+.notificationsLandingSummary i{grid-column:1/-1;height:1px;background:var(--vms-border);margin:5px 0}
+.notificationsLandingToolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:24px;padding:12px 0;border-top:1px solid var(--vms-border);border-bottom:1px solid var(--vms-border)}
+.notificationsHistoryList{display:flex;flex-direction:column;gap:3px;padding:8px 0;min-width:0}
+.notificationsHistoryList .notificationItem{padding:15px 13px;margin:0;border-color:transparent;border-bottom-color:color-mix(in srgb,var(--vms-border) 72%,transparent);border-radius:12px}
+.notificationsHistoryList .notificationItem:last-child{border-bottom-color:transparent}
+.notificationsHistoryList .notificationItemBody>b{font-size:13px}
+.notificationsHistoryList .notificationItemBody>small{font-size:11px;line-height:1.65}
+.notificationsHistoryList .notificationItemMeta{font-size:10px}
+.notificationsLandingBottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid var(--vms-border)}
+.notificationsLandingBottom>span{display:flex;align-items:center;gap:6px;color:var(--vms-muted);font-size:10px}
+.notificationsLandingBottom .primary{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+@media(max-width:680px){
+ .notificationsLandingTop{flex-direction:column;gap:14px}
+ .notificationsLandingSummary{display:flex;align-items:center;gap:7px;padding:10px 12px}
+ .notificationsLandingSummary b{font-size:16px}
+ .notificationsLandingSummary i{width:1px;height:22px;flex:none;margin:0 5px}
+ .notificationsLandingToolbar{align-items:flex-start;flex-direction:column}
+ .notificationsLandingBottom{align-items:flex-start;flex-direction:column}
+ .notificationsLandingBottom .primary{width:100%;justify-content:center}
+ .notificationsHistoryList .notificationItem{padding:12px 7px;gap:8px}
+ .notificationsHistoryList .notificationItemIcon{width:34px;height:34px}
+ .notificationsHistoryList .notificationChevron{width:14px}
+}
+@media(max-width:900px){
+ .notificationPopover{z-index:120!important}
+}
