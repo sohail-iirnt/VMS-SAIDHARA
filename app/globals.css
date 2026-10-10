@@ -746,3 +746,41 @@ input[type=range]{accent-color:var(--vms-accent)}
 }
 
 .notificationFeedError{position:fixed;right:20px;bottom:20px;z-index:150;max-width:min(440px,calc(100vw - 32px));padding:13px 16px;border:1px solid #e8b4a9;border-radius:14px;background:#fff6f3;color:#8d3326;box-shadow:0 12px 36px #14231d20;font-size:12px;line-height:1.6}
+
+
+/* Mobile notification sheet: keep alerts fully visible below the sticky app header on phones. */
+@media(max-width:560px){
+ .notificationCenter{position:relative;z-index:121;isolation:isolate}
+ .notificationPopover,
+ .notificationPopoverExpanded{
+  position:fixed!important;
+  top:auto!important;
+  bottom:max(8px,env(safe-area-inset-bottom))!important;
+  left:8px!important;
+  right:8px!important;
+  width:auto!important;
+  max-width:none!important;
+  max-height:min(72dvh,620px)!important;
+  transform:none!important;
+  z-index:9999!important;
+  margin:0!important;
+  overflow:hidden;
+ }
+ .notificationPopover{border-radius:22px!important}
+ .notificationPopoverExpanded{border-radius:22px!important}
+ .notificationHead{flex-shrink:0;padding:14px 15px 12px!important}
+ .notificationToolbar{flex-shrink:0;padding:10px 12px!important}
+ .notificationList{min-height:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+ .notificationFoot{flex-shrink:0;padding:11px 12px calc(11px + env(safe-area-inset-bottom))!important;flex-wrap:wrap}
+ .notificationFoot button{white-space:normal;text-align:right;max-width:58%;justify-content:flex-end}
+ .notificationFeedError{right:10px;left:10px;bottom:max(10px,env(safe-area-inset-bottom));max-width:none;z-index:10000;font-size:11px}
+}
+@media(max-width:380px){
+ .notificationToolbar{align-items:flex-start;flex-wrap:wrap}
+ .notificationMarkAll{font-size:9px}
+ .notificationHead{gap:9px}
+ .notificationHeadIcon{width:36px;height:36px}
+ .notificationHeadCopy b{font-size:15px}
+ .notificationFoot{align-items:flex-start;flex-direction:column;gap:8px}
+ .notificationFoot button{max-width:100%;text-align:left;justify-content:flex-start}
+}
