@@ -25,7 +25,8 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const overdueSeen=useRef<Set<string>>(new Set());
  const firstSnapshot=useRef<Record<string,boolean>>({});
  const visitorRecords=useRef<Record<string,{location:NoticeLocation;docs:any[]}>>({});
- const locs=useMemo(()=>profile.role==='admin'?locations:locations.filter(x=>x.id===profile.locationId||x.name===profile.locationId||x.name.trim().toLowerCase()===String(profile.locationId||'').trim().toLowerCase()),[profile,locations]);
+ const normalizeLocation=(value:any)=>String(value||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const locs=useMemo(()=>profile.role==='admin'?locations:locations.filter(x=>x.id===profile.locationId||normalizeLocation(x.id)===normalizeLocation(profile.locationId)||normalizeLocation(x.name)===normalizeLocation(profile.locationId)),[profile,locations]);
  const locLabel=(id:string)=>locations.find(x=>x.id===id)?.name||locations.find(x=>x.name===id)?.name||id;
  const onFeedError=(source:string)=>(error:any)=>{console.error('[VMS notifications] '+source,error);setFeedError(error?.code==='permission-denied'?'Notifications are blocked by Firestore permissions for this location login. Ask an administrator to verify this login’s active status and location assignment, then publish the latest Firestore rules.':'Live notifications temporarily could not connect. Check the connection and reload.');};
  const addNotice=(n:Omit<Notice,'id'|'read'>)=>{
