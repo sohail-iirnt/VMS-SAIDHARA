@@ -46,7 +46,7 @@ service cloud.firestore {
     allow get: if admin() || (security() && (resource == null || myLocationMatches(resource.data.locationId)));
     allow list: if admin() || (security() && myLocationMatches(resource.data.locationId));
     allow create: if admin() || (security() && myLocationMatches(request.resource.data.locationId));
-    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read','readAt','readBy']));
+    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read','readAt','readBy','clearedAt','clearedBy']));
     allow delete: if admin();
   }
   match /locations/{id} { allow read: if signedIn(); allow write: if admin(); }
