@@ -180,7 +180,8 @@ function Page({tab,profile,allowed,locations,duty,refresh,onNavigate,notificatio
 
 function NotificationsLanding({notifications,onNavigate,profile,locations}:{notifications:Notice[];onNavigate:(tab:string)=>void;profile:Profile;locations:Location[]}){
  const [filter,setFilter]=useState<"all"|"unread">("all");
- const [clearScopeLocation,setClearScopeLocation]=useState(profile.role==="admin"?"all":profile.locationId);
+ const defaultClearLocation=profile.role==="admin"?"all":(locations.find(loc=>loc.id===profile.locationId||loc.name===profile.locationId)?.id||profile.locationId);
+ const [clearScopeLocation,setClearScopeLocation]=useState(defaultClearLocation);
  const clearable=profile.role==="admin"&&clearScopeLocation!=="all"?notifications.filter(n=>n.locationId===clearScopeLocation):notifications;
  const unread=notifications.filter(n=>!n.read).length;
  const visible=notifications.filter(n=>filter==="all"||!n.read);
