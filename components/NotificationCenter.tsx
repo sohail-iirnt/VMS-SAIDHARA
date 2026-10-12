@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Bell, BellRing, CalendarCheck, CheckCheck, Clock3, PackageCheck, ArrowRightLeft, X, ChevronRight, MapPin, Check } from 'lucide-react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, query, runTransaction, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 type NoticeProfile = { uid:string; name:string; role:'admin'|'security'; locationId:string };
@@ -14,9 +14,7 @@ const toMs = (v:any):number => { if(!v)return 0; if(typeof v.toDate==='function'
 const receivedStatus = (s:any) => ['RECEIVED','RECEIVED_CLOSED','CLOSED','COMPLETED'].includes(String(s||'').toUpperCase());
 
 export default function NotificationCenter({profile,locations,onNavigate,onUnreadChange,onHistoryChange}:Props){
- const historyKey='vms-notification-history:'+profile.uid+':'+profile.role+':'+profile.locationId;
  const [notices,setNotices]=useState<Notice[]>([]);
- const [historyLoaded,setHistoryLoaded]=useState(false);
  const rootRef=useRef<HTMLDivElement|null>(null);
  const popoverRef=useRef<HTMLElement|null>(null);
  const [isMobile,setIsMobile]=useState(false);
@@ -36,17 +34,39 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const addNotice=(n:Omit<Notice,'id'|'read'>)=>{
   const id=n.type+':'+n.locationId+':'+n.sourceId;
   if(noticeIdsRef.current.has(id))return;
-  noticeIdsRef.current.add(id);
-  setNotices(old=>[{...n,id,read:false},...old].slice(0,500));
-  setOpen(true);
+  const ref=doc(db,'locationNotifications',encodeURIComponent(id));
+  void runTransaction(db,async transaction=>{
+   const existing=await transaction.get(ref);
+   if(existing.exists())return false;
+   transaction.set(ref,{...n,id,read:false,createdAt:serverTimestamp(),createdBy:profile.uid});
+   return true;
+  }).then(created=>{if(created)setOpen(true);}).catch(error=>{onFeedError('saving notification') (error);});
  };
  useEffect(()=>{
-  try{const raw=localStorage.getItem(historyKey);if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed)){const saved=parsed.filter(x=>x&&typeof x.id==='string').slice(0,500);noticeIdsRef.current=new Set(saved.map((x:Notice)=>x.id));setNotices(saved);}}}catch{}
-  setHistoryLoaded(true);
- },[historyKey]);
- useEffect(()=>{if(!historyLoaded)return;noticeIdsRef.current=new Set(notices.map(n=>n.id));try{localStorage.setItem(historyKey,JSON.stringify(notices));}catch{}onHistoryChange?.(notices);},[notices,historyLoaded,historyKey,onHistoryChange]);
+  const applySnapshot=(snap:any,locationId?:string)=>{
+   const rows=snap.docs.map((d:any)=>({ ...d.data(), id:d.data().id||decodeURIComponent(d.id) } as Notice));
+   if(profile.role==='admin'||!locationId){
+    noticeIdsRef.current=new Set(rows.map((n:Notice)=>n.id));
+    setNotices(rows.sort((a: any,b: any)=>toMs(b.createdAt)-toMs(a.createdAt)).slice(0,500));
+    return;
+   }
+   setNotices(old=>{
+    const keep=old.filter(n=>n.locationId!==locationId);
+    const merged=[...keep,...rows];
+    noticeIdsRef.current=new Set(merged.map(n=>n.id));
+    return merged.sort((a:any,b:any)=>toMs(b.createdAt)-toMs(a.createdAt)).slice(0,500);
+   });
+  };
+  const unsubscribers:(()=>void)[]=[];
+  if(profile.role==='admin'){
+   unsubscribers.push(onSnapshot(collection(db,'locationNotifications'),snap=>applySnapshot(snap),onFeedError('shared notification feed')));
+  }else{
+   locs.forEach(loc=>unsubscribers.push(onSnapshot(query(collection(db,'locationNotifications'),where('locationId','==',loc.id)),snap=>applySnapshot(snap,loc.id),onFeedError('shared notification feed '+loc.id))));
+  }
+  return()=>unsubscribers.forEach(unsubscribe=>unsubscribe());
+ },[profile.role,locs]);
+ useEffect(()=>{onHistoryChange?.(notices);},[notices,onHistoryChange]);
  useEffect(()=>{
-  if(!historyLoaded)return;
   setFeedError('');
   const unsubscribers:(()=>void)[]=[];
   const timers:number[]=[];
@@ -120,15 +140,16 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    },onFeedError('sent transfers '+loc.id)));
   });
   return()=>{unsubscribers.forEach(u=>u());timers.forEach(timer=>window.clearInterval(timer));};
- },[locs,historyLoaded]);
+ },[locs]);
  const unread=notices.filter(n=>!n.read).length;
  useEffect(()=>{onUnreadChange?.(unread)},[unread,onUnreadChange]);
- useEffect(()=>{const markRead=(event:Event)=>{const id=(event as CustomEvent<string>).detail;setNotices(old=>old.map(n=>n.id===id?{...n,read:true}:n));};const markAllRead=()=>setNotices(old=>old.map(n=>({...n,read:true})));window.addEventListener('vms:notification-read',markRead);window.addEventListener('vms:notifications-mark-all-read',markAllRead);return()=>{window.removeEventListener('vms:notification-read',markRead);window.removeEventListener('vms:notifications-mark-all-read',markAllRead);};},[]);
+ const markOneRead=(id:string)=>{setNotices(old=>old.map(n=>n.id===id?{...n,read:true}:n));void updateDoc(doc(db,'locationNotifications',encodeURIComponent(id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}).catch(error=>onFeedError('marking notification read')(error));};
+ const markAll=()=>{const unreadRows=notices.filter(n=>!n.read);setNotices(old=>old.map(n=>({...n,read:true})));void Promise.all(unreadRows.map(n=>updateDoc(doc(db,'locationNotifications',encodeURIComponent(n.id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}))).catch(error=>onFeedError('marking all notifications read')(error));};
+ useEffect(()=>{const markRead=(event:Event)=>{const id=(event as CustomEvent<string>).detail;markOneRead(id);};const markAllRead=()=>markAll();window.addEventListener('vms:notification-read',markRead);window.addEventListener('vms:notifications-mark-all-read',markAllRead);return()=>{window.removeEventListener('vms:notification-read',markRead);window.removeEventListener('vms:notifications-mark-all-read',markAllRead);};},[profile.uid,notices]);
  useEffect(()=>{if(!open)return;const handlePointer=(event:PointerEvent)=>{const target=event.target as Node;if(rootRef.current?.contains(target)||popoverRef.current?.contains(target))return;setOpen(false);};const handleKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};document.addEventListener('pointerdown',handlePointer);document.addEventListener('keydown',handleKey);return()=>{document.removeEventListener('pointerdown',handlePointer);document.removeEventListener('keydown',handleKey);};},[open]);
  const visible=notices.filter(n=>filter==='all'||!n.read);
  const iconFor=(type:Notice['type'])=>type==='appointment'?<CalendarCheck size={18}/>:type==='incoming'?<PackageCheck size={18}/>:type==='overdue'?<Clock3 size={18}/>:<ArrowRightLeft size={18}/>;
- const go=(n:Notice)=>{setNotices(old=>old.map(x=>x.id===n.id?{...x,read:true}:x));setOpen(false);onNavigate(n.target);};
- const markAll=()=>setNotices(old=>old.map(n=>({...n,read:true})));
+ const go=(n:Notice)=>{markOneRead(n.id);setOpen(false);onNavigate(n.target);};
  const popover = open ? <section ref={popoverRef} className="notificationPopover" role="dialog" aria-label="Notifications">
   <header className="notificationHead"><div className="notificationHeadIcon"><BellRing size={19}/></div><div className="notificationHeadCopy"><b>Notifications</b><span>{unread?unread+' unread update'+(unread===1?'':'s'):'You’re all caught up'}</span></div><button className="notificationClose" aria-label="Close" onClick={()=>setOpen(false)}><X size={17}/></button></header>
   <div className="notificationToolbar"><div className="notificationFilters"><button className={filter==='all'?'selected':''} onClick={()=>setFilter('all')}>All <span>{notices.length}</span></button><button className={filter==='unread'?'selected':''} onClick={()=>setFilter('unread')}>Unread <span>{unread}</span></button></div><button className="notificationMarkAll" onClick={markAll} disabled={!unread}><CheckCheck size={14}/> Mark all read</button></div>
