@@ -824,3 +824,11 @@ input[type=range]{accent-color:var(--vms-accent)}
 @media(max-width:560px){
  body>.notificationPopover .notificationHead{height:auto!important;min-height:0!important;position:relative!important;top:auto!important;justify-content:flex-start!important}
 }
+
+
+/* Shared notification controls: keep location clearing compact and usable on mobile. */
+.notificationActions{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;min-width:0}
+.notificationClearScope{max-width:132px;min-width:94px;padding:7px 8px;border:1px solid var(--vms-border);border-radius:9px;background:var(--vms-bg);color:var(--vms-ink);font-size:10px;outline-offset:2px}
+.notificationClearAll{color:#a33a32!important}
+.notificationClearAll:disabled{opacity:.42}
+@media(max-width:560px){.notificationActions{gap:5px}.notificationClearScope{max-width:112px;min-width:82px;font-size:9px;padding:6px 5px}.notificationMarkAll{gap:4px;padding:7px 8px!important}}

@@ -40,6 +40,15 @@ service cloud.firestore {
   }
   function sameLocation(resourceData){return admin() || (security() && myLocationMatches(resourceData.locationId));}
   match /users/{uid} { allow read: if signedIn() && (request.auth.uid==uid || admin()); allow create,update,delete: if admin(); }
+  // Shared notifications are stored once per location/source so every login assigned
+  // to that location sees the same feed and read state. Admin accounts share the global feed.
+  match /locationNotifications/{id} {
+    allow get: if admin() || (security() && (resource == null || myLocationMatches(resource.data.locationId)));
+    allow list: if admin() || (security() && myLocationMatches(resource.data.locationId));
+    allow create: if admin() || (security() && myLocationMatches(request.resource.data.locationId));
+    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read','readAt','readBy','clearedAt','clearedBy']));
+    allow delete: if admin();
+  }
   match /locations/{id} { allow read: if signedIn(); allow write: if admin(); }
   match /settings/{id} { allow read: if signedIn(); allow write: if admin(); }
   match /publicSettings/{id} {
@@ -53,7 +62,10 @@ service cloud.firestore {
   match /deskSessions/{locationId} {
     allow read: if admin() || (security() && myLocationMatches(resource.data.locationId));
     allow create: if admin() || (security() && myLocationMatches(request.resource.data.locationId) && request.resource.data.startedBy == request.auth.uid);
-    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && resource.data.startedBy == request.auth.uid && myLocationMatches(request.resource.data.locationId) && request.resource.data.startedBy == request.auth.uid);
+    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && (
+      (resource.data.status != 'ACTIVE' && request.resource.data.status == 'ACTIVE' && request.resource.data.startedBy == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['locationId','securityPersonId','securityPersonName','status','startedAt','startedBy','startedByName','endedAt','endedBy','endedByName']))
+      || (resource.data.status == 'ACTIVE' && request.resource.data.status == 'ENDED' && request.resource.data.startedBy == resource.data.startedBy && request.resource.data.endedBy == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','endedAt','endedBy','endedByName']))
+    ));
     allow delete: if admin();
   }
   match /visitorCounters/{day} { allow read: if admin() || security(); allow create: if admin() || (security() && request.resource.data.nextNumber == 2); allow update: if admin() || (security() && request.resource.data.nextNumber == resource.data.nextNumber + 1); allow delete: if admin(); }
