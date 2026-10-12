@@ -148,7 +148,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const markAll=()=>{const unreadRows=notices.filter(n=>!n.read);setNotices(old=>old.map(n=>({...n,read:true})));void Promise.all(unreadRows.map(n=>updateDoc(doc(db,'locationNotifications',encodeURIComponent(n.id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}))).catch(error=>onFeedError('marking all notifications read')(error));};
  const clearableNotices=profile.role==='admin'&&clearScopeLocation!=='all'?notices.filter(n=>n.locationId===clearScopeLocation):notices;
  const clearNotifications=(requestedScope:string)=>{
-  const targetScope=profile.role==='admin'?requestedScope:profile.locationId;
+  const targetScope=profile.role==='admin'?requestedScope:(locs[0]?.id||profile.locationId);
   const clearing=targetScope==='all'?notices:notices.filter(n=>n.locationId===targetScope);
   if(!clearing.length)return;
   const scope=targetScope==='all'?'all locations':locLabel(targetScope);
