@@ -178,8 +178,10 @@ function Page({tab,profile,allowed,locations,duty,refresh,onNavigate,notificatio
 }
 
 
-function NotificationsLanding({notifications,onNavigate}:{notifications:Notice[];onNavigate:(tab:string)=>void}){
+function NotificationsLanding({notifications,onNavigate,profile,locations}:{notifications:Notice[];onNavigate:(tab:string)=>void;profile:Profile;locations:Location[]}){
  const [filter,setFilter]=useState<"all"|"unread">("all");
+ const [clearScopeLocation,setClearScopeLocation]=useState(profile.role==="admin"?"all":profile.locationId);
+ const clearable=profile.role==="admin"&&clearScopeLocation!=="all"?notifications.filter(n=>n.locationId===clearScopeLocation):notifications;
  const unread=notifications.filter(n=>!n.read).length;
  const visible=notifications.filter(n=>filter==="all"||!n.read);
  const iconFor=(type:Notice["type"])=>type==="appointment"?<CalendarCheck size={18}/>:type==="incoming"?<PackageCheck size={18}/>:type==="overdue"?<Clock3 size={18}/>:<ArrowRightLeft size={18}/>;
