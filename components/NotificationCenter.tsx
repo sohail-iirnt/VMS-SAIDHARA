@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Bell, BellRing, CalendarCheck, CheckCheck, Clock3, PackageCheck, ArrowRightLeft, X, ChevronRight, MapPin, Check } from 'lucide-react';
-import { collection, doc, onSnapshot, query, runTransaction, serverTimestamp, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, onSnapshot, query, runTransaction, serverTimestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 type NoticeProfile = { uid:string; name:string; role:'admin'|'security'; locationId:string };
@@ -48,14 +48,14 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    const rows=snap.docs.map((d:any)=>({ ...d.data(), id:d.data().id||decodeURIComponent(d.id) } as Notice)).filter((n:Notice)=>!n.clearedAt);
    if(profile.role==='admin'||!locationId){
     noticeIdsRef.current=new Set(rows.map((n:Notice)=>n.id));
-    setNotices(rows.sort((a: any,b: any)=>toMs(b.createdAt)-toMs(a.createdAt)).slice(0,500));
+    setNotices(rows.sort((a: any,b: any)=>toMs(b.createdAt)-toMs(a.createdAt)));
     return;
    }
    setNotices(old=>{
     const keep=old.filter(n=>n.locationId!==locationId);
     const merged=[...keep,...rows];
     noticeIdsRef.current=new Set(merged.map(n=>n.id));
-    return merged.sort((a:any,b:any)=>toMs(b.createdAt)-toMs(a.createdAt)).slice(0,500);
+    return merged.sort((a:any,b:any)=>toMs(b.createdAt)-toMs(a.createdAt));
    });
   };
   const unsubscribers:(()=>void)[]=[];
@@ -147,15 +147,23 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const markOneRead=(id:string)=>{setNotices(old=>old.map(n=>n.id===id?{...n,read:true}:n));void updateDoc(doc(db,'locationNotifications',encodeURIComponent(id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}).catch(error=>onFeedError('marking notification read')(error));};
  const markAll=()=>{const unreadRows=notices.filter(n=>!n.read);setNotices(old=>old.map(n=>({...n,read:true})));void Promise.all(unreadRows.map(n=>updateDoc(doc(db,'locationNotifications',encodeURIComponent(n.id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}))).catch(error=>onFeedError('marking all notifications read')(error));};
  const clearableNotices=profile.role==='admin'&&clearScopeLocation!=='all'?notices.filter(n=>n.locationId===clearScopeLocation):notices;
- const clearAllNotifications=()=>{
-  if(!clearableNotices.length)return;
-  const scope=profile.role==='admin'?(clearScopeLocation==='all'?'all locations':locLabel(clearScopeLocation)):(locs[0]?.name||'this location');
-  if(typeof window!=='undefined'&&!window.confirm('Clear all '+clearableNotices.length+' notification'+(clearableNotices.length===1?'':'s')+' from '+scope+' for every login in this scope?'))return;
-  const clearing=clearableNotices;
+ const clearNotifications=(requestedScope:string)=>{
+  const targetScope=profile.role==='admin'?requestedScope:profile.locationId;
+  const clearing=targetScope==='all'?notices:notices.filter(n=>n.locationId===targetScope);
+  if(!clearing.length)return;
+  const scope=targetScope==='all'?'all locations':locLabel(targetScope);
+  if(typeof window!=='undefined'&&!window.confirm('Clear all '+clearing.length+' notification'+(clearing.length===1?'':'s')+' from '+scope+' for every login in this scope?'))return;
   setNotices(old=>old.filter(n=>!clearing.some(c=>c.id===n.id)));
-  void Promise.all(clearing.map(n=>updateDoc(doc(db,'locationNotifications',encodeURIComponent(n.id)),{clearedAt:serverTimestamp(),clearedBy:profile.uid}))).catch(error=>onFeedError('clearing shared notification history')(error));
+  const commits:Promise<void>[]=[];
+  for(let i=0;i<clearing.length;i+=450){
+   const batch=writeBatch(db);
+   clearing.slice(i,i+450).forEach(n=>batch.update(doc(db,'locationNotifications',encodeURIComponent(n.id)),{clearedAt:serverTimestamp(),clearedBy:profile.uid}));
+   commits.push(batch.commit());
+  }
+  void Promise.all(commits).catch(error=>onFeedError('clearing shared notification history')(error));
  };
- useEffect(()=>{const markRead=(event:Event)=>{const id=(event as CustomEvent<string>).detail;markOneRead(id);};const markAllRead=()=>markAll();window.addEventListener('vms:notification-read',markRead);window.addEventListener('vms:notifications-mark-all-read',markAllRead);return()=>{window.removeEventListener('vms:notification-read',markRead);window.removeEventListener('vms:notifications-mark-all-read',markAllRead);};},[profile.uid,notices]);
+ const clearAllNotifications=()=>clearNotifications(clearScopeLocation);
+ useEffect(()=>{const markRead=(event:Event)=>{const id=(event as CustomEvent<string>).detail;markOneRead(id);};const markAllRead=()=>markAll();const clearRequested=(event:Event)=>clearNotifications((event as CustomEvent<string>).detail||'all');window.addEventListener('vms:notification-read',markRead);window.addEventListener('vms:notifications-mark-all-read',markAllRead);window.addEventListener('vms:notifications-clear',clearRequested);return()=>{window.removeEventListener('vms:notification-read',markRead);window.removeEventListener('vms:notifications-mark-all-read',markAllRead);window.removeEventListener('vms:notifications-clear',clearRequested);};},[profile.uid,profile.role,notices,locs,clearScopeLocation]);
  useEffect(()=>{if(!open)return;const handlePointer=(event:PointerEvent)=>{const target=event.target as Node;if(rootRef.current?.contains(target)||popoverRef.current?.contains(target))return;setOpen(false);};const handleKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};document.addEventListener('pointerdown',handlePointer);document.addEventListener('keydown',handleKey);return()=>{document.removeEventListener('pointerdown',handlePointer);document.removeEventListener('keydown',handleKey);};},[open]);
  const visible=notices.filter(n=>filter==='all'||!n.read);
  const iconFor=(type:Notice['type'])=>type==='appointment'?<CalendarCheck size={18}/>:type==='incoming'?<PackageCheck size={18}/>:type==='overdue'?<Clock3 size={18}/>:<ArrowRightLeft size={18}/>;
