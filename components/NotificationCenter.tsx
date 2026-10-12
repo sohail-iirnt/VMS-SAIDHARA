@@ -8,7 +8,7 @@ import { db } from '../lib/firebase';
 
 type NoticeProfile = { uid:string; name:string; role:'admin'|'security'; locationId:string };
 type NoticeLocation = { id:string; name:string; active?:boolean };
-export type Notice = { id:string; type:'appointment'|'incoming'|'overdue'|'received'; title:string; message:string; locationId:string; locationName:string; target:'appointments'|'transfers'|'visitors'; read:boolean; sourceId:string };
+export type Notice = { id:string; type:'appointment'|'incoming'|'overdue'|'received'; title:string; message:string; locationId:string; locationName:string; target:'appointments'|'transfers'|'visitors'; read:boolean; sourceId:string; clearedAt?:any; clearedBy?:string };
 type Props = { profile:NoticeProfile; locations:NoticeLocation[]; onNavigate:(tab:string)=>void; onUnreadChange?:(count:number)=>void; onHistoryChange?:(items:Notice[])=>void };
 const toMs = (v:any):number => { if(!v)return 0; if(typeof v.toDate==='function')return v.toDate().getTime(); if(typeof v==='number')return v; const n=new Date(v).getTime(); return Number.isFinite(n)?n:0; };
 const receivedStatus = (s:any) => ['RECEIVED','RECEIVED_CLOSED','CLOSED','COMPLETED'].includes(String(s||'').toUpperCase());
@@ -44,7 +44,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  };
  useEffect(()=>{
   const applySnapshot=(snap:any,locationId?:string)=>{
-   const rows=snap.docs.map((d:any)=>({ ...d.data(), id:d.data().id||decodeURIComponent(d.id) } as Notice));
+   const rows=snap.docs.map((d:any)=>({ ...d.data(), id:d.data().id||decodeURIComponent(d.id) } as Notice)).filter((n:Notice)=>!n.clearedAt);
    if(profile.role==='admin'||!locationId){
     noticeIdsRef.current=new Set(rows.map((n:Notice)=>n.id));
     setNotices(rows.sort((a: any,b: any)=>toMs(b.createdAt)-toMs(a.createdAt)).slice(0,500));
