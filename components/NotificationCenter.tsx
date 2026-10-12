@@ -23,6 +23,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const [open,setOpen]=useState(false);
  const [feedError,setFeedError]=useState('');
  const [filter,setFilter]=useState<'all'|'unread'>('all');
+ const [clearScopeLocation,setClearScopeLocation]=useState('all');
  const priorTransferStatus=useRef<Record<string,string>>({});
  const overdueSeen=useRef<Set<string>>(new Set());
  const firstSnapshot=useRef<Record<string,boolean>>({});
@@ -145,11 +146,12 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  useEffect(()=>{onUnreadChange?.(unread)},[unread,onUnreadChange]);
  const markOneRead=(id:string)=>{setNotices(old=>old.map(n=>n.id===id?{...n,read:true}:n));void updateDoc(doc(db,'locationNotifications',encodeURIComponent(id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}).catch(error=>onFeedError('marking notification read')(error));};
  const markAll=()=>{const unreadRows=notices.filter(n=>!n.read);setNotices(old=>old.map(n=>({...n,read:true})));void Promise.all(unreadRows.map(n=>updateDoc(doc(db,'locationNotifications',encodeURIComponent(n.id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}))).catch(error=>onFeedError('marking all notifications read')(error));};
+ const clearableNotices=profile.role==='admin'&&clearScopeLocation!=='all'?notices.filter(n=>n.locationId===clearScopeLocation):notices;
  const clearAllNotifications=()=>{
-  if(!notices.length)return;
-  const scope=profile.role==='admin'?'all locations':(locs[0]?.name||'this location');
-  if(typeof window!=='undefined'&&!window.confirm('Clear all notifications from '+scope+' for every login in this scope?'))return;
-  const clearing=notices;
+  if(!clearableNotices.length)return;
+  const scope=profile.role==='admin'?(clearScopeLocation==='all'?'all locations':locLabel(clearScopeLocation)):(locs[0]?.name||'this location');
+  if(typeof window!=='undefined'&&!window.confirm('Clear all '+clearableNotices.length+' notification'+(clearableNotices.length===1?'':'s')+' from '+scope+' for every login in this scope?'))return;
+  const clearing=clearableNotices;
   setNotices(old=>old.filter(n=>!clearing.some(c=>c.id===n.id)));
   void Promise.all(clearing.map(n=>updateDoc(doc(db,'locationNotifications',encodeURIComponent(n.id)),{clearedAt:serverTimestamp(),clearedBy:profile.uid}))).catch(error=>onFeedError('clearing shared notification history')(error));
  };
@@ -160,7 +162,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const go=(n:Notice)=>{markOneRead(n.id);setOpen(false);onNavigate(n.target);};
  const popover = open ? <section ref={popoverRef} className="notificationPopover" role="dialog" aria-label="Notifications">
   <header className="notificationHead"><div className="notificationHeadIcon"><BellRing size={19}/></div><div className="notificationHeadCopy"><b>Notifications</b><span>{unread?unread+' unread update'+(unread===1?'':'s'):'You’re all caught up'}</span></div><button className="notificationClose" aria-label="Close" onClick={()=>setOpen(false)}><X size={17}/></button></header>
-  <div className="notificationToolbar"><div className="notificationFilters"><button className={filter==='all'?'selected':''} onClick={()=>setFilter('all')}>All <span>{notices.length}</span></button><button className={filter==='unread'?'selected':''} onClick={()=>setFilter('unread')}>Unread <span>{unread}</span></button></div><div className="notificationActions"><button className="notificationMarkAll" onClick={markAll} disabled={!unread}><CheckCheck size={14}/> Mark all read</button><button className="notificationMarkAll notificationClearAll" onClick={clearAllNotifications} disabled={!notices.length} title="Clear notifications for every login in this scope"><X size={14}/> Clear history</button></div></div>
+  <div className="notificationToolbar"><div className="notificationFilters"><button className={filter==='all'?'selected':''} onClick={()=>setFilter('all')}>All <span>{notices.length}</span></button><button className={filter==='unread'?'selected':''} onClick={()=>setFilter('unread')}>Unread <span>{unread}</span></button></div><div className="notificationActions">{profile.role==='admin'&&<select className="notificationClearScope" aria-label="Location to clear" value={clearScopeLocation} onChange={e=>setClearScopeLocation(e.target.value)}><option value="all">All locations</option>{locations.map(loc=><option key={loc.id} value={loc.id}>{loc.name}</option>)}</select>}<button className="notificationMarkAll" onClick={markAll} disabled={!unread}><CheckCheck size={14}/> Mark all read</button><button className="notificationMarkAll notificationClearAll" onClick={clearAllNotifications} disabled={!clearableNotices.length} title="Clear notifications for every login in the selected scope"><X size={14}/> Clear history</button></div></div>
   <div className="notificationList">{visible.length===0?<div className="notificationEmpty"><span><Bell size={22}/></span><b>{filter==='unread'?'No unread notifications':'You’re all caught up'}</b><p>New appointments, incoming materials, long visits and received transfers will appear here.</p></div>:visible.map(n=><button className={'notificationItem '+(n.read?'read':'')} key={n.id} onClick={()=>go(n)}><span className={'notificationItemIcon '+n.type}>{iconFor(n.type)}</span><span className="notificationItemBody"><b>{n.title}</b><small>{n.message}</small><span className="notificationItemMeta"><MapPin size={12}/>{n.locationName}<i/>Live update</span></span>{!n.read&&<span className="notificationUnreadDot"/>}<ChevronRight className="notificationChevron" size={16}/></button>)}</div>
   <footer className="notificationFoot"><span><Check size={13}/> Live updates enabled</span><button onClick={()=>{setOpen(false);onNavigate('notifications')}}>Open notification center <ChevronRight size={14}/></button></footer>
  </section> : null;
