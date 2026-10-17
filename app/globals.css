@@ -860,3 +860,87 @@ input[type=range]{accent-color:var(--vms-accent)}
 .settingsSectionBody .printSettingsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .settingsSectionBody .printSettingCard{min-width:0}
 @media(max-width:680px){.settingsSection>summary{padding:13px;gap:10px}.settingsSectionIcon{width:36px;height:36px}.settingsSectionChevron{display:none}.settingsSectionBody{padding:12px}.settingsSectionBody .printSettingsGrid{grid-template-columns:minmax(0,1fr)}}
+
+/* Appointment officials: clean, responsive directory cards */
+.officialAdminPanel{display:grid;gap:17px;min-width:0}
+.officialAdminIntro{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:2px 1px 17px;border-bottom:1px solid var(--vms-border,#dcded2)}
+.officialAdminIntro>div{min-width:0;max-width:760px}
+.officialAdminIntro h3{font-size:19px;line-height:1.25;margin:5px 0 7px;color:var(--vms-ink,#202d27);letter-spacing:-.025em}
+.officialAdminIntro p{font-size:12px;line-height:1.65;color:var(--vms-muted,#68766d);margin:0}
+.officialAddButton{flex:0 0 auto;white-space:nowrap}
+.officialListToolbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.officialSearch{display:flex;align-items:center;gap:9px;min-width:0;width:min(420px,100%);padding:0 12px;height:42px;border:1px solid var(--vms-border,#dcded2);border-radius:11px;background:var(--vms-surface,#fffefa);color:var(--vms-muted,#68766d)}
+.officialSearch:focus-within{border-color:var(--vms-accent,#26745b);box-shadow:0 0 0 3px color-mix(in srgb,var(--vms-accent,#26745b) 12%,transparent)}
+.officialSearch input{border:0;outline:0;background:transparent;color:var(--vms-ink,#202d27);width:100%;min-width:0;font-size:12px}
+.officialSearch input:focus{box-shadow:none}
+.officialCount{flex:0 0 auto;border:1px solid var(--vms-border,#dcded2);border-radius:999px;padding:7px 10px;background:var(--vms-surface-2,#f6f8f5);font-size:11px;font-weight:750;color:var(--vms-muted,#68766d);white-space:nowrap}
+.officialCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;align-items:stretch}
+.officialCard{min-width:0;display:flex;flex-direction:column;gap:17px;padding:17px;border:1px solid var(--vms-border,#dcded2);border-radius:15px;background:var(--vms-surface,#fffefa);transition:border-color .16s ease,box-shadow .16s ease}
+.officialCard:hover{border-color:color-mix(in srgb,var(--vms-accent,#26745b) 40%,var(--vms-border,#dcded2));box-shadow:0 7px 20px rgba(25,48,35,.055)}
+.officialCard.isDisabled{background:var(--vms-surface-2,#f8f9f6)}
+.officialCardMain{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.officialAvatar{width:43px;height:43px;display:grid;place-items:center;flex:0 0 auto;border-radius:13px;background:color-mix(in srgb,var(--vms-accent,#26745b) 12%,var(--vms-surface,#fffefa));color:var(--vms-accent,#26745b);font-size:17px;font-weight:850}
+.officialCard.isDisabled .officialAvatar{filter:grayscale(1);opacity:.68}
+.officialIdentity{min-width:0;flex:1}
+.officialIdentity h4{font-size:14px;line-height:1.35;margin:1px 0 4px;color:var(--vms-ink,#202d27);font-weight:800;overflow-wrap:anywhere}
+.officialIdentity p{font-size:11px;line-height:1.5;margin:0 0 10px;color:var(--vms-muted,#68766d);overflow-wrap:anywhere}
+.officialStatus{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:750;border-radius:999px;padding:5px 8px}
+.officialStatus i{width:6px;height:6px;border-radius:50%;display:inline-block;background:currentColor}
+.officialStatus.active{background:#e8f5eb;color:#267345}
+.officialStatus.disabled{background:#f2e9e7;color:#9a5147}
+.officialCardFooter{margin-top:auto;padding-top:13px;border-top:1px solid var(--vms-border,#dcded2);display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.officialAccessNote{display:flex;align-items:center;gap:6px;min-width:0;color:var(--vms-muted,#68766d);font-size:10px;line-height:1.45}
+.officialAccessNote svg{flex:0 0 auto;color:var(--vms-accent,#26745b)}
+.officialToggleButton{flex:0 0 auto;min-height:34px;min-width:104px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--vms-border,#dcded2);border-radius:9px;padding:7px 10px;font-size:11px;font-weight:800;line-height:1.2;white-space:nowrap;transition:background .15s ease,border-color .15s ease}
+.officialToggleButton.disable{background:var(--vms-surface,#fffefa);color:#a4473c;border-color:#e8c9c4}
+.officialToggleButton.disable:hover{background:#fff0ee;border-color:#dba9a2}
+.officialToggleButton.enable{background:#e8f5eb;color:#246d40;border-color:#c4e4cc}
+.officialToggleButton.enable:hover{background:#d9efdf;border-color:#9fd2ae}
+.officialEmpty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:34px 18px;border:1px dashed var(--vms-border,#dcded2);border-radius:14px;background:var(--vms-surface-2,#f8faf7)}
+.officialEmptyIcon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:var(--vms-surface,#fffefa);color:var(--vms-accent,#26745b);margin-bottom:11px}
+.officialEmpty>b{font-size:13px;color:var(--vms-ink,#202d27)}
+.officialEmpty p{max-width:420px;font-size:11px;line-height:1.6;color:var(--vms-muted,#68766d);margin:6px 0 14px}
+@media(max-width:920px){.officialCards{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.officialAdminIntro{flex-direction:column;align-items:stretch;gap:13px}.officialAddButton{align-self:flex-start}.officialListToolbar{align-items:stretch}.officialSearch{width:100%}.officialCard{padding:14px;gap:14px}.officialCardFooter{align-items:flex-start;flex-direction:column}.officialToggleButton{width:100%}.officialCount{align-self:center}}
+
+/* Searchable security roster and bulk add improvements */
+.dutyOfficerPicker{display:flex;align-items:center;gap:5px;min-width:0;max-width:220px}
+.dutyOfficerPicker input{width:100%;min-width:110px;height:34px;border:1px solid #dce2eb;background:#fff;border-radius:9px;padding:0 10px;font-size:11px;color:#26334a}
+.dutyOfficerPicker input:focus{outline:2px solid #26745b33;border-color:#26745b}
+.dutyOfficerPicker input:disabled{background:#f0f2f4;color:#647084}
+.formGrid textarea{width:100%;min-height:140px;resize:vertical;border:1px solid #dce2eb;border-radius:10px;padding:12px;font:inherit;font-size:13px;line-height:1.6;background:#fff;color:#26334a}
+@media(max-width:760px){
+ .dutyDesk{flex-wrap:wrap;align-items:stretch;width:100%;padding:9px;gap:8px}
+ .dutyStatus{flex:1 1 100%;padding:2px 2px 5px}
+ .dutyDesk>select{max-width:none;flex:1 1 100%;height:40px;font-size:13px}
+ .dutyOfficerPicker{max-width:none;width:100%;flex:1 1 100%}
+ .dutyOfficerPicker input{height:42px;min-width:0;flex:1;font-size:14px}
+ .dutyStart,.dutyLogout{flex:1;min-height:40px;font-size:12px}
+}
+@media(max-width:600px){
+ .formGrid{grid-template-columns:minmax(0,1fr)}
+ .formGrid .field.full,.formGrid .full{grid-column:1}
+ .formGrid textarea{min-height:190px;font-size:14px}
+ .modalActions{display:flex;gap:8px;flex-wrap:wrap}
+ .modalActions button{flex:1;min-height:42px}
+}
+
+
+/* VMS theme-aware dropdowns: no browser-native select popup, mobile or desktop. */
+.vmsSelectRoot{position:relative;display:block;min-width:0;width:100%;color:var(--vms-ink,#202d27);font:inherit}
+.vmsSelectTrigger{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;min-height:40px;padding:9px 12px;border:1px solid var(--vms-border,#dcded2);border-radius:10px;background:var(--vms-surface,#fffefa);color:var(--vms-ink,#202d27);font:inherit;font-size:inherit;text-align:left;cursor:pointer;transition:border-color .16s,box-shadow .16s,background .16s}
+.vmsSelectTrigger:hover{border-color:var(--vms-accent,#26745b)}
+.vmsSelectTrigger:focus-visible{outline:2px solid var(--vms-accent,#26745b);outline-offset:2px}
+.vmsSelectTrigger:disabled{opacity:.58;cursor:not-allowed}
+.vmsSelectValue{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vmsSelectChevron{flex:0 0 auto;color:var(--vms-accent,#26745b);transition:transform .16s}
+.vmsSelectChevron.isOpen{transform:rotate(180deg)}
+.vmsSelectMenu{position:absolute;z-index:1000;top:calc(100% + 6px);left:0;right:0;max-height:min(300px,55vh);overflow-y:auto;padding:5px;border:1px solid var(--vms-border,#dcded2);border-radius:12px;background:var(--vms-surface,#fffefa);box-shadow:0 16px 38px #142b2226;overscroll-behavior:contain}
+.vmsSelectOption{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:40px;padding:9px 10px;border:0;border-radius:8px;background:transparent;color:var(--vms-ink,#202d27);font:inherit;font-size:inherit;text-align:left;cursor:pointer}
+.vmsSelectOption:hover,.vmsSelectOption:focus-visible{outline:none;background:color-mix(in srgb,var(--vms-accent,#26745b) 10%,var(--vms-surface,#fffefa))}
+.vmsSelectOption.isSelected{background:color-mix(in srgb,var(--vms-accent,#26745b) 13%,var(--vms-surface,#fffefa));font-weight:650}
+.vmsSelectOption.isSelected svg{color:var(--vms-accent,#26745b)}
+.vmsSelectOption:disabled{opacity:.45;cursor:not-allowed}
+.vmsSelectRequired{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;bottom:0;left:0}
+.dutyDesk .vmsSelectRoot{min-width:150px;flex:1 1 180px}
+@media(max-width:680px){.dutyDesk .vmsSelectRoot{width:100%;min-width:0;flex:1 1 100%}.vmsSelectTrigger{min-height:44px}.vmsSelectMenu{max-height:45vh}}

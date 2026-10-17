@@ -71,7 +71,7 @@ service cloud.firestore {
     allow write: if admin();
   }
   match /securityPersons/{id} {
-    allow read: if admin() || (security() && (moduleEnabled('visitors') || moduleEnabled('appointments')) && myLocationMatches(resource.data.locationId));
+    allow read: if admin() || (security() && (moduleEnabled('visitors') || moduleEnabled('appointments')) && (resource.data.locationId == 'ALL' || myLocationMatches(resource.data.locationId)));
     allow create,update,delete: if admin();
   }
   match /deskSessions/{locationId} {

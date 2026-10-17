@@ -1,4 +1,5 @@
 "use client";
+import VmsSelect from "../../components/VmsSelect";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { addDoc, collection, Timestamp, onSnapshot } from "firebase/firestore";
@@ -25,6 +26,7 @@ import AppointmentSplash from "../../components/AppointmentSplash";
 
 const LOCATIONS = [
   { id: "ADMIN", name: "Main Admin Office", short: "Admin Office" },
+   { id: "MAIN-GATE", name: "MAIN GATE", short: "MAIN GATE" },
   { id: "I", name: "Warehouse I", short: "Warehouse I" },
   { id: "J", name: "Warehouse J", short: "Warehouse J" },
   { id: "K", name: "Warehouse K", short: "Warehouse K" },
@@ -367,8 +369,8 @@ export default function AppointmentBookingV2({ showSplash = true }: { showSplash
                   <label className={styles.field}><span>Mobile number <b>*</b></span><div className={styles.inputWrap}><Phone size={17} /><input inputMode="tel" autoComplete="tel" value={form.mobile} onChange={(e) => update("mobile", e.target.value)} placeholder="10-digit mobile" required /></div></label>
                   <label className={styles.field}><span>Company / organisation</span><div className={styles.inputWrap}><UsersRound size={17} /><input value={form.company} onChange={(e) => update("company", e.target.value)} placeholder="Company name" /></div></label>
                   <label className={styles.field}><span>Email address</span><div className={styles.inputWrap}><Mail size={17} /><input type="email" autoComplete="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="Optional" /></div></label>
-                  <label className={styles.field}><span>Who are you meeting? <b>*</b></span><div className={styles.inputWrap}><UserRound size={17}/><input value={hostSearch} onChange={(e)=>setHostSearch(e.target.value)} placeholder="Search official by name…" /></div><div className={styles.inputWrap}><UserRound size={17} /><select value={form.hostType === "OTHERS" ? "OTHERS" : form.hostId} onChange={(e) => { const value = e.target.value; if (value === "OTHERS") { update("hostType", "OTHERS"); update("hostId", ""); update("hostName", ""); } else { const host = officials.find((x: any) => (x.uid || x.id) === value); update("hostType", "OFFICIAL"); update("hostId", value); update("hostName", host?.name || ""); } }} required><option value="">Search / select official</option>{officials.filter((x: any) => String(x.name || "").toLowerCase().includes(hostSearch.toLowerCase())).map((x: any) => <option key={x.id} value={x.uid || x.id}>{x.name}</option>)}<option value="OTHERS">Others — type a name</option></select></div>{form.hostType === "OTHERS" && <div className={styles.inputWrap}><UserRound size={17}/><input value={form.hostName} onChange={(e) => update("hostName", e.target.value)} placeholder="Enter person's full name" required /></div>}</label>
-                  <label className={styles.field}><span>Purpose</span><div className={styles.inputWrap}><Sparkles size={17} /><select value={form.purpose} onChange={(e) => update("purpose", e.target.value)}>{PURPOSES.map((purpose) => <option key={purpose}>{purpose}</option>)}</select></div></label>
+                  <label className={styles.field}><span>Who are you meeting? <b>*</b></span><div className={styles.inputWrap}><UserRound size={17}/><input value={hostSearch} onChange={(e)=>setHostSearch(e.target.value)} placeholder="Search official by name…" /></div><div className={styles.inputWrap}><UserRound size={17} /><VmsSelect value={form.hostType === "OTHERS" ? "OTHERS" : form.hostId} onChange={(e) => { const value = e.target.value; if (value === "OTHERS") { update("hostType", "OTHERS"); update("hostId", ""); update("hostName", ""); } else { const host = officials.find((x: any) => (x.uid || x.id) === value); update("hostType", "OFFICIAL"); update("hostId", value); update("hostName", host?.name || ""); } }} required><option value="">Search / select official</option>{officials.filter((x: any) => String(x.name || "").toLowerCase().includes(hostSearch.toLowerCase())).map((x: any) => <option key={x.id} value={x.uid || x.id}>{x.name}</option>)}<option value="OTHERS">Others — type a name</option></VmsSelect></div>{form.hostType === "OTHERS" && <div className={styles.inputWrap}><UserRound size={17}/><input value={form.hostName} onChange={(e) => update("hostName", e.target.value)} placeholder="Enter person's full name" required /></div>}</label>
+                  <label className={styles.field}><span>Purpose</span><div className={styles.inputWrap}><Sparkles size={17} /><VmsSelect value={form.purpose} onChange={(e) => update("purpose", e.target.value)}>{PURPOSES.map((purpose) => <option key={purpose}>{purpose}</option>)}</VmsSelect></div></label>
                 </div>
 
                 <div className={styles.photoCard}>
