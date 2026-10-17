@@ -6,7 +6,7 @@ import { Bell, BellRing, CalendarCheck, CheckCheck, Clock3, PackageCheck, ArrowR
 import { collection, doc, onSnapshot, query, runTransaction, serverTimestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
-type NoticeProfile = { uid:string; name:string; role:'admin'|'security'|'official'; locationId:string };
+type NoticeProfile = { uid:string; name:string; role:'admin'|'security'|'official'; locationId:string; accessTabs?:string[] };
 type NoticeLocation = { id:string; name:string; active?:boolean };
 export type Notice = { id:string; type:'appointment'|'incoming'|'overdue'|'received'; title:string; message:string; locationId:string; locationName:string; target:'appointments'|'transfers'|'visitors'; read:boolean; sourceId:string; recipientUid?:string; clearedAt?:any; clearedBy?:string };
 type Props = { profile:NoticeProfile; locations:NoticeLocation[]; onNavigate:(tab:string)=>void; onUnreadChange?:(count:number)=>void; onHistoryChange?:(items:Notice[])=>void };
@@ -32,6 +32,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const normalizeLocation=(value:any)=>String(value||'').toLowerCase().replace(/[^a-z0-9]/g,'');
  const locs=useMemo(()=>profile.role==='admin'?locations:profile.role==='official'?[]:locations.filter(x=>x.id===profile.locationId||normalizeLocation(x.id)===normalizeLocation(profile.locationId)||normalizeLocation(x.name)===normalizeLocation(profile.locationId)),[profile,locations]);
  const locLabel=(id:string)=>locations.find(x=>x.id===id)?.name||locations.find(x=>x.name===id)?.name||id;
+ const canUse=(moduleName:string)=>profile.role==='admin'||profile.role==='official'||!Array.isArray(profile.accessTabs)||profile.accessTabs.includes(moduleName);
  const onFeedError=(source:string)=>(error:any)=>{console.error('[VMS notifications] '+source,error);setFeedError(error?.code==='permission-denied'?'Notifications are blocked by Firestore permissions for this location login. Ask an administrator to verify this login’s active status and location assignment, then publish the latest Firestore rules.':'Live notifications temporarily could not connect. Check the connection and reload.');};
  const addNotice=(n:Omit<Notice,'id'|'read'>)=>{
   const id=n.recipientUid?'user:'+n.recipientUid+':'+n.type+':'+n.sourceId:n.type+':'+n.locationId+':'+n.sourceId;
@@ -83,6 +84,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    return()=>unsubscribers.forEach(u=>u());
   }
   locs.forEach(loc=>{
+   if(canUse('appointments')){
    const appointmentKey='appointments:'+loc.id;
    firstSnapshot.current[appointmentKey]=false;
    unsubscribers.push(onSnapshot(query(collection(db,'visitorAppointments'),where('locationId','==',loc.id)),snap=>{
@@ -110,6 +112,8 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
     });
    },onFeedError('appointments '+loc.id)));
 
+   }
+   if(canUse('transfers')){
    const incomingKey='incoming:'+loc.id;
    firstSnapshot.current[incomingKey]=false;
    unsubscribers.push(onSnapshot(query(collection(db,'internalTransfers'),where('destinationLocationId','==',loc.id)),snap=>{
@@ -125,6 +129,8 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
     });
    },onFeedError('incoming transfers '+loc.id)));
 
+   }
+   if(canUse('visitors')){
    const processOverdue=(location:NoticeLocation,docs:any[])=>docs.forEach((d:any)=>{
     const v=d.data();
     if(v.checkOutAt||v.checkedOutAt||String(v.status||'').toUpperCase()==='CHECKED_OUT')return;
@@ -149,6 +155,8 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    },onFeedError('visitors '+loc.id)));
    timers.push(window.setInterval(()=>processOverdue(loc,visitorRecords.current[loc.id]?.docs||[]),60000));
 
+   }
+   if(canUse('transfers')){
    const sentKey='sent:'+loc.id;
    firstSnapshot.current[sentKey]=false;
    unsubscribers.push(onSnapshot(query(collection(db,'internalTransfers'),where('sourceLocationId','==',loc.id)),snap=>{
@@ -163,6 +171,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
      }
     });
    },onFeedError('sent transfers '+loc.id)));
+   }
   });
   return()=>{unsubscribers.forEach(u=>u());timers.forEach(timer=>window.clearInterval(timer));};
  },[locs]);
