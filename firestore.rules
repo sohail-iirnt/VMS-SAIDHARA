@@ -51,7 +51,7 @@ service cloud.firestore {
     allow delete: if admin();
   }
   match /userNotifications/{id} {
-    allow get: if official() && resource.data.recipientUid == request.auth.uid;
+    allow get: if official() && (resource == null || resource.data.recipientUid == request.auth.uid);
     allow list: if official() && resource.data.recipientUid == request.auth.uid;
     allow create: if official() && request.resource.data.recipientUid == request.auth.uid;
     allow update: if official() && resource.data.recipientUid == request.auth.uid && request.resource.data.recipientUid == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read','readAt','readBy','clearedAt','clearedBy']);
