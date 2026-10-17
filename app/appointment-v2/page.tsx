@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { addDoc, collection, Timestamp, onSnapshot } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import {
   ArrowRight,
@@ -51,6 +51,8 @@ type FormState = {
   mobile: string;
   email: string;
   hostName: string;
+  hostId: string;
+  hostType: string;
   purpose: string;
   remarks: string;
   photoUrl: string;
@@ -65,6 +67,8 @@ const initialForm = (): FormState => ({
   mobile: "",
   email: "",
   hostName: "",
+  hostId: "",
+  hostType: "OFFICIAL",
   purpose: "Meeting",
   remarks: "",
   photoUrl: ""
@@ -78,6 +82,8 @@ export default function AppointmentBookingV2({ showSplash = true }: { showSplash
     return () => window.clearTimeout(timer);
   }, [showSplash]);
   const [form, setForm] = useState<FormState>(initialForm);
+  const [officials, setOfficials] = useState<any[]>([]);
+  useEffect(() => onSnapshot(collection(db, "appointmentOfficials"), (snap) => setOfficials(snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((x: any) => x.active !== false)), () => setOfficials([])), []);
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState<{ appointmentNo: string; locationName: string; date: string; time: string; visitorName: string } | null>(null);
@@ -217,6 +223,10 @@ export default function AppointmentBookingV2({ showSplash = true }: { showSplash
         throw new Error("Please complete all required visitor details.");
       }
 
+      if (form.hostType === "OTHERS" && !form.hostName.trim()) throw new Error("Please enter the name of the person you want to meet.");
+      if (form.hostType !== "OTHERS" && !form.hostId) throw new Error("Please select whom you want to meet.");
+      const selectedHost = officials.find((x: any) => x.id === form.hostId || x.uid === form.hostId);
+      const hostName = form.hostType === "OTHERS" ? form.hostName.trim() : (selectedHost?.name || form.hostName.trim());
       const appointmentNo = refNo();
       await addDoc(collection(db, "visitorAppointments"), {
         appointmentNo,
@@ -228,7 +238,10 @@ export default function AppointmentBookingV2({ showSplash = true }: { showSplash
         company: form.company.trim(),
         mobile: form.mobile.trim(),
         email: form.email.trim(),
-        hostName: form.hostName.trim(),
+        hostName,
+        hostId: form.hostType === "OTHERS" ? "" : (selectedHost?.uid || selectedHost?.id || form.hostId),
+        hostType: form.hostType,
+        approvalMode: form.hostType === "OTHERS" ? "LOCATION" : "OFFICIAL",
         purpose: form.purpose,
         remarks: form.remarks.trim(),
         photoUrl: form.photoUrl || "",
@@ -342,7 +355,7 @@ export default function AppointmentBookingV2({ showSplash = true }: { showSplash
                   <label className={styles.field}><span>Appointment date <b>*</b></span><div className={styles.inputWrap}><CalendarDays size={17} /><input type="date" min={today()} value={form.appointmentDate} onChange={(e) => update("appointmentDate", e.target.value)} required /></div></label>
                   <label className={styles.field}><span>Preferred time <b>*</b></span><div className={styles.inputWrap}><Clock3 size={17} /><input type="time" value={form.appointmentTime} onChange={(e) => update("appointmentTime", e.target.value)} required /></div></label>
                 </div>
-                <div className={styles.tip}><Clock3 size={16} /><span>Your request will be reviewed by the security team at your selected location.</span></div>
+                <div className={styles.tip}><Clock3 size={16} /><span>Your request will be reviewed by the selected official or the security team at your selected location.</span></div>
               </div>
             ) : (
               <div className={styles.stepBody}>
@@ -353,7 +366,7 @@ export default function AppointmentBookingV2({ showSplash = true }: { showSplash
                   <label className={styles.field}><span>Mobile number <b>*</b></span><div className={styles.inputWrap}><Phone size={17} /><input inputMode="tel" autoComplete="tel" value={form.mobile} onChange={(e) => update("mobile", e.target.value)} placeholder="10-digit mobile" required /></div></label>
                   <label className={styles.field}><span>Company / organisation</span><div className={styles.inputWrap}><UsersRound size={17} /><input value={form.company} onChange={(e) => update("company", e.target.value)} placeholder="Company name" /></div></label>
                   <label className={styles.field}><span>Email address</span><div className={styles.inputWrap}><Mail size={17} /><input type="email" autoComplete="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="Optional" /></div></label>
-                  <label className={styles.field}><span>Who are you meeting? <b>*</b></span><div className={styles.inputWrap}><UserRound size={17} /><input value={form.hostName} onChange={(e) => update("hostName", e.target.value)} placeholder="Name of host or employee" required /></div></label>
+                  <label className={styles.field}><span>Who are you meeting? <b>*</b></span><div className={styles.inputWrap}><UserRound size={17} /><select value={form.hostType === "OTHERS" ? "OTHERS" : form.hostId} onChange={(e) => { const value = e.target.value; if (value === "OTHERS") { update("hostType", "OTHERS"); update("hostId", ""); update("hostName", ""); } else { const host = officials.find((x: any) => (x.uid || x.id) === value); update("hostType", "OFFICIAL"); update("hostId", value); update("hostName", host?.name || ""); } }} required><option value="">Search / select official</option>{officials.map((x: any) => <option key={x.id} value={x.uid || x.id}>{x.name}</option>)}<option value="OTHERS">Others — type a name</option></select></div>{form.hostType === "OTHERS" && <div className={styles.inputWrap}><UserRound size={17}/><input value={form.hostName} onChange={(e) => update("hostName", e.target.value)} placeholder="Enter person's full name" required /></div>}</label>
                   <label className={styles.field}><span>Purpose</span><div className={styles.inputWrap}><Sparkles size={17} /><select value={form.purpose} onChange={(e) => update("purpose", e.target.value)}>{PURPOSES.map((purpose) => <option key={purpose}>{purpose}</option>)}</select></div></label>
                 </div>
 
