@@ -1,0 +1,7 @@
+.accessPermissionCard{border:1px solid var(--vms-border,#dcded2);background:var(--vms-surface,#fffefa);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 8px 24px #142b2210}
+.accessPermissionCard .sectionTitle{margin-bottom:12px}
+.accessPermissionGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 14px;padding-top:12px;border-top:1px solid var(--vms-border,#dcded2)}
+.accessPermissionGrid .check{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0}
+.accessPermissionGrid input[type=checkbox]{accent-color:var(--vms-accent,#26745b);width:16px;height:16px;flex:0 0 auto}
+@media(max-width:900px){.accessPermissionGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.accessPermissionCard .sectionTitle{align-items:flex-start;gap:12px;flex-wrap:wrap}}
+@media(max-width:560px){.accessPermissionGrid{grid-template-columns:1fr}.accessPermissionCard{padding:13px}.accessPermissionCard .rowActions{flex-wrap:wrap}}

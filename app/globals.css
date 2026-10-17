@@ -832,3 +832,31 @@ input[type=range]{accent-color:var(--vms-accent)}
 .notificationClearAll{color:#a33a32!important}
 .notificationClearAll:disabled{opacity:.42}
 @media(max-width:560px){.notificationActions{gap:5px}.notificationClearScope{max-width:112px;min-width:82px;font-size:9px;padding:6px 5px}.notificationMarkAll{gap:4px;padding:7px 8px!important}}
+
+/* Compact, sectioned admin settings */
+.settingsAccordion{display:grid;gap:12px;margin:18px 0 28px}
+.settingsSection{border:1px solid var(--vms-border,#d8ded7);border-radius:16px;background:var(--vms-surface,#fff);overflow:hidden;box-shadow:0 5px 20px rgba(22,38,29,.045)}
+.settingsSection>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:17px 19px;min-height:76px;transition:background .18s ease}
+.settingsSection>summary::-webkit-details-marker{display:none}
+.settingsSection>summary:hover{background:var(--vms-surface-2,#f6f8f5)}
+.settingsSection>summary>span:nth-child(2){display:grid;gap:4px;flex:1;min-width:0}
+.settingsSection>summary b{font-size:14px;color:var(--vms-ink,#24352b);font-weight:750}
+.settingsSection>summary small{font-size:12px;line-height:1.5;color:var(--vms-muted,#68766d);font-weight:450}
+.settingsSectionIcon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto;color:var(--vms-accent,#26745b);background:color-mix(in srgb,var(--vms-accent,#26745b) 10%,transparent)}
+.settingsSectionChevron{font-size:11px;font-weight:700;color:var(--vms-accent,#26745b);border:1px solid var(--vms-border,#d8ded7);border-radius:999px;padding:7px 11px;white-space:nowrap}
+.settingsSection>summary:after{content:"+";font-size:21px;line-height:1;color:var(--vms-muted,#68766d);margin-left:2px}
+.settingsSection[open]>summary:after{content:"−"}
+.settingsSection[open]>summary{border-bottom:1px solid var(--vms-border,#d8ded7);background:var(--vms-surface-2,#f6f8f5)}
+.settingsSectionBody{padding:18px;min-width:0}
+.settingsSectionBody>.panel,.settingsSectionBody>.themeStudio,.settingsSectionBody>.printSettingsAdmin{margin:0;box-shadow:none}
+.settingsSectionBody>.sectionTitle:first-child{margin-top:0}
+.accessModulesDropdown{border-top:1px solid var(--vms-border,#d8ded7);margin-top:12px;padding-top:10px}
+.accessModulesDropdown>summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--vms-accent,#26745b);padding:7px 2px}
+.accessModulesDropdown>summary::-webkit-details-marker{display:none}
+.accessModulesDropdown>summary:after{content:"▾";margin-left:auto;font-size:15px}
+.accessModulesDropdown[open]>summary:after{content:"▴"}
+.accessCount{border-radius:999px;background:var(--vms-surface-2,#f3f6f2);border:1px solid var(--vms-border,#d8ded7);padding:4px 9px;color:var(--vms-ink,#24352b);font-size:11px}
+.accessModulesDropdown .accessPermissionGrid{margin-top:8px;padding:13px;border:1px solid var(--vms-border,#d8ded7);border-radius:12px;background:var(--vms-surface-2,#f8faf7)}
+.settingsSectionBody .printSettingsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.settingsSectionBody .printSettingCard{min-width:0}
+@media(max-width:680px){.settingsSection>summary{padding:13px;gap:10px}.settingsSectionIcon{width:36px;height:36px}.settingsSectionChevron{display:none}.settingsSectionBody{padding:12px}.settingsSectionBody .printSettingsGrid{grid-template-columns:minmax(0,1fr)}}
