@@ -5,6 +5,7 @@ service cloud.firestore {
   function me(){return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;}
   function admin(){return signedIn() && me().role == 'admin' && me().active != false;}
   function security(){return signedIn() && me().role == 'security' && me().active != false;}
+  function official(){return signedIn() && me().role == 'official' && me().active != false;}
   // Older warehouse user profiles may contain the human-readable location label
   // (for example "Warehouse I") instead of the canonical location document ID ("I").
   // Keep access scoped to that one assigned location while supporting both formats.
@@ -49,6 +50,17 @@ service cloud.firestore {
     allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read','readAt','readBy','clearedAt','clearedBy']));
     allow delete: if admin();
   }
+  match /userNotifications/{id} {
+    allow get: if official() && resource.data.recipientUid == request.auth.uid;
+    allow list: if official() && resource.data.recipientUid == request.auth.uid;
+    allow create: if official() && request.resource.data.recipientUid == request.auth.uid;
+    allow update: if official() && resource.data.recipientUid == request.auth.uid && request.resource.data.recipientUid == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read','readAt','readBy','clearedAt','clearedBy']);
+    allow delete: if false;
+  }
+  match /appointmentOfficials/{id} {
+    allow read: if true;
+    allow create,update,delete: if admin();
+  }
   match /locations/{id} { allow read: if signedIn(); allow write: if admin(); }
   match /settings/{id} { allow read: if signedIn(); allow write: if admin(); }
   match /publicSettings/{id} {
@@ -71,23 +83,33 @@ service cloud.firestore {
   match /visitorCounters/{day} { allow read: if admin() || security(); allow create: if admin() || (security() && request.resource.data.nextNumber == 2); allow update: if admin() || (security() && request.resource.data.nextNumber == resource.data.nextNumber + 1); allow delete: if admin(); }
   match /nonRoutineVisitorCounters/{day} { allow read: if admin() || security(); allow create: if admin() || (security() && request.resource.data.nextNumber == 2); allow update: if admin() || (security() && request.resource.data.nextNumber == resource.data.nextNumber + 1); allow delete: if admin(); }
   match /visitorAppointments/{id} {
-    // Public appointment intake. The booking page is intentionally login-free.
-    // Keep this write rule simple: all fields are validated by the booking UI,
-    // while all reads/updates remain restricted to Admin or the appointment location's security desk.
+    // Public booking is login-free. Decisions are restricted to the named official,
+    // the destination security desk after delegation / Others routing, or an admin.
     allow create: if request.resource.data.status == 'PENDING'
       && request.resource.data.locationId in ['ADMIN','I','J','K','L','O','P','Q','R','S','T','H14-MHE'];
 
-    allow read: if admin() || (security() && myLocationMatches(resource.data.locationId));
+    allow read: if admin()
+      || (security() && myLocationMatches(resource.data.locationId))
+      || (official() && resource.data.hostId == request.auth.uid);
 
-    allow update: if admin() ||
-      (security() &&
-       myLocationMatches(resource.data.locationId) &&
-       request.resource.data.locationId == resource.data.locationId &&
-       request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-         'status','reviewedAt','reviewedBy','reviewedByName','rejectionReason',
-         'noShowAt','visitorId','checkedInAt','checkedInBy','checkedInByName',
-         'checkedOutAt','checkedOutBy','checkedOutByName','updatedAt'
-       ]));
+    allow update: if admin()
+      || (security()
+        && myLocationMatches(resource.data.locationId)
+        && request.resource.data.locationId == resource.data.locationId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status','reviewedAt','reviewedBy','reviewedByName','reviewedByRole','rejectionReason',
+          'approvalMode','passedToSecurityAt','passedToSecurityBy','passedToSecurityByName',
+          'noShowAt','visitorId','checkedInAt','checkedInBy','checkedInByName',
+          'checkedOutAt','checkedOutBy','checkedOutByName','updatedAt'
+        ]))
+      || (official()
+        && resource.data.hostId == request.auth.uid
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.locationId == resource.data.locationId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status','reviewedAt','reviewedBy','reviewedByName','reviewedByRole','rejectionReason',
+          'approvalMode','passedToSecurityAt','passedToSecurityBy','passedToSecurityByName','updatedAt'
+        ]));
 
     allow delete: if admin();
   }
