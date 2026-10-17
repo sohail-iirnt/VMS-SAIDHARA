@@ -997,3 +997,74 @@ input[type=range]{accent-color:var(--vms-accent)}
  .dutyDesk.dutyActive:not(.dutyCollapsed)>.dutyStatus{grid-column:1/-1}
  .dutyDesk.dutyActive:not(.dutyCollapsed)>.dutyCollapseToggle{grid-column:1/-1;grid-row:auto;width:100%}
 }
+
+
+/* Duty desk v3: resilient officer search and a header-safe responsive control card. */
+.dutyDeskRedesign{position:relative;display:flex;align-items:center;gap:10px;min-width:0;max-width:min(760px,100%);padding:8px 10px;border:1px solid var(--vms-border,#dcded2);border-radius:15px;background:var(--vms-surface,#fffefa);box-shadow:0 4px 15px rgba(24,43,32,.045);color:var(--vms-ink,#202d27);overflow:visible}
+.dutyDeskRedesign .dutyStatus{display:flex;align-items:center;gap:9px;min-width:135px;max-width:190px;padding:2px 5px}
+.dutyDeskRedesign .dutyStatus>div{display:grid;gap:3px;min-width:0}
+.dutyDeskRedesign .dutyStatus small{font-size:8px;letter-spacing:.1em;font-weight:800;color:var(--vms-muted,#6c7b70)}
+.dutyDeskRedesign .dutyStatus b{font-size:11px;line-height:1.25;color:var(--vms-ink,#202d27);overflow-wrap:anywhere}
+.dutyDeskRedesign .dutyLocationLabel{font-size:9px;color:var(--vms-muted,#6c7b70);line-height:1.2}
+.dutyDeskRedesign .dutyControlFields{display:flex;align-items:flex-end;gap:8px;min-width:0;flex:1}
+.dutyDeskRedesign .dutyField{display:grid;gap:5px;min-width:0;flex:1 1 145px;font-size:9px;font-weight:750;color:var(--vms-muted,#6c7b70)}
+.dutyDeskRedesign .dutyField>span{padding-left:2px}
+.dutyDeskRedesign .dutyOfficerField{flex:1 1 180px}
+.dutyDeskRedesign .dutyOfficerPickerNew{display:flex;align-items:center;gap:6px;max-width:none;width:100%;min-width:0}
+.dutyDeskRedesign .dutyOfficerSearch{position:relative;flex:1 1 auto;width:100%;min-width:0}
+.dutyDeskRedesign .dutyOfficerSearch>input{display:block;width:100%;min-width:0;height:39px;padding:0 11px;border:1px solid var(--vms-border,#dcded2);border-radius:10px;background:var(--vms-bg,#f4f2eb);color:var(--vms-ink,#202d27);font-size:11px;outline:none;box-sizing:border-box}
+.dutyDeskRedesign .dutyOfficerSearch>input:focus{border-color:var(--vms-accent,#26745b);box-shadow:0 0 0 3px color-mix(in srgb,var(--vms-accent,#26745b) 13%,transparent)}
+.dutyDeskRedesign .dutyOfficerSearch>input:disabled{opacity:.8;background:var(--vms-surface-2,#f6f8f5)}
+.dutyDeskRedesign .dutyOfficerOptions{position:absolute;z-index:2147483000;top:calc(100% + 6px);left:0;right:0;max-height:min(330px,55vh);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:5px;border:1px solid var(--vms-border,#dcded2);border-radius:12px;background:var(--vms-surface,#fffefa);color:var(--vms-ink,#202d27);box-shadow:0 18px 44px rgba(20,43,34,.2)}
+.dutyDeskRedesign .dutyOfficerOptions>button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:42px;padding:10px;border:0;border-radius:8px;background:transparent;color:var(--vms-ink,#202d27);font-size:12px;text-align:left;cursor:pointer;touch-action:manipulation}
+.dutyDeskRedesign .dutyOfficerOptions>button:hover,.dutyDeskRedesign .dutyOfficerOptions>button:focus-visible{outline:none;background:color-mix(in srgb,var(--vms-accent,#26745b) 11%,var(--vms-surface,#fffefa))}
+.dutyDeskRedesign .dutyOfficerOptions>button span{min-width:0;overflow-wrap:anywhere}
+.dutyDeskRedesign .dutyOfficerOptions>button small{flex:0 0 auto;max-width:44%;font-size:9px;opacity:.72;text-align:right;white-space:normal}
+.dutyDeskRedesign .dutyOfficerEmpty{padding:13px 11px;font-size:11px;line-height:1.5;color:var(--vms-muted,#6c7b70)}
+.dutyDeskRedesign .dutyOfficerError{color:#a33a32}
+.dutyDeskRedesign .dutyStart,.dutyDeskRedesign .dutyLogout{flex:0 0 auto;min-height:39px;margin:0;padding:9px 12px;border-radius:10px;font-size:10px;font-weight:800;white-space:nowrap}
+.dutyDeskRedesign .dutyCollapseToggle{display:none}
+.dutyDeskRedesign .dutyControlFields>.vmsSelectRoot{min-width:145px;flex:1 1 145px}
+.dutyDeskRedesign .dutyControlFields .vmsSelectTrigger{min-height:39px;font-size:11px}
+@media(max-width:1120px){
+ .dutyDeskRedesign{flex-wrap:wrap;max-width:100%;gap:8px}
+ .dutyDeskRedesign .dutyStatus{flex:1 1 135px;max-width:none}
+ .dutyDeskRedesign .dutyControlFields{flex:1 1 100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:end;gap:9px}
+ .dutyDeskRedesign .dutyControlFields>.dutyField{min-width:0}
+ .dutyDeskRedesign .dutyOfficerField{grid-column:1/-1}
+ .dutyDeskRedesign .dutyControlFields>.dutyStart,.dutyDeskRedesign .dutyControlFields>.dutyLogout{grid-column:1/-1;width:100%}
+}
+@media(max-width:760px){
+ .main>header{height:auto!important;min-height:0!important;display:flex!important;flex-direction:column;align-items:stretch!important;justify-content:flex-start!important;gap:12px;padding:13px 14px!important;overflow:visible!important}
+ .main>header .headLeft{width:100%;min-width:0;align-items:center}
+ .main>header .headLeft>div{min-width:0}
+ .main>header .headLeft h2{font-size:16px;line-height:1.25;overflow-wrap:anywhere}
+ .main>header .headerRight{display:flex;align-items:center;justify-content:flex-end;gap:8px;width:100%;max-width:none;min-width:0;flex-wrap:wrap;overflow:visible}
+ .main>header .headerRight>.dutyDeskRedesign{order:3;flex:1 0 100%;width:100%;max-width:none;min-width:0;margin:0}
+ .main>header .headerRight>.dutyDeskRedesign.dutyActive{z-index:45}
+ .dutyDeskRedesign{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:9px;padding:10px;border-radius:15px}
+ .dutyDeskRedesign .dutyStatus{grid-column:1;min-width:0;max-width:none;padding:0}
+ .dutyDeskRedesign .dutyStatus b{font-size:12px}
+ .dutyDeskRedesign .dutyStatus small{font-size:8px}
+ .dutyDeskRedesign .dutyCollapseToggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 11px;border:1px solid var(--vms-border,#dcded2);border-radius:11px;background:var(--vms-bg,#f4f2eb);color:var(--vms-ink,#202d27);font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+ .dutyDeskRedesign .dutyToggleIcon{transform:rotate(90deg);transition:transform .18s ease}
+ .dutyDeskRedesign .dutyToggleIcon.expanded{transform:rotate(-90deg)}
+ .dutyDeskRedesign.dutyCollapsed .dutyControlFields{display:none!important}
+ .dutyDeskRedesign:not(.dutyCollapsed) .dutyStatus{grid-column:1/-1}
+ .dutyDeskRedesign:not(.dutyCollapsed) .dutyCollapseToggle{grid-column:1/-1;width:100%}
+ .dutyDeskRedesign .dutyControlFields{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;width:100%;min-width:0;margin-top:2px}
+ .dutyDeskRedesign .dutyControlFields>.dutyField,.dutyDeskRedesign .dutyControlFields>.vmsSelectRoot,.dutyDeskRedesign .dutyControlFields>.dutyStart,.dutyDeskRedesign .dutyControlFields>.dutyLogout{grid-column:1;width:100%;min-width:0;max-width:100%}
+ .dutyDeskRedesign .dutyField{gap:6px;font-size:10px}
+ .dutyDeskRedesign .dutyOfficerSearch>input{height:46px;min-height:46px;font-size:14px;padding:0 12px}
+ .dutyDeskRedesign .dutyOfficerOptions{max-height:min(45dvh,340px)}
+ .dutyDeskRedesign .dutyOfficerOptions>button{min-height:46px;font-size:14px;padding:11px}
+ .dutyDeskRedesign .dutyOfficerOptions>button small{font-size:10px}
+ .dutyDeskRedesign .dutyStart,.dutyDeskRedesign .dutyLogout{min-height:46px;font-size:13px}
+ .dutyDeskRedesign .dutyChangeOfficer{min-height:40px!important}
+}
+@media(max-width:380px){
+ .main>header{padding:10px!important}
+ .dutyDeskRedesign{padding:9px;gap:8px}
+ .dutyDeskRedesign .dutyCollapseToggle{padding:7px 8px;font-size:10px}
+ .dutyDeskRedesign .dutyStatus b{font-size:11px}
+}
