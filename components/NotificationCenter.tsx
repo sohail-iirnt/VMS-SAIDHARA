@@ -6,9 +6,9 @@ import { Bell, BellRing, CalendarCheck, CheckCheck, Clock3, PackageCheck, ArrowR
 import { collection, doc, onSnapshot, query, runTransaction, serverTimestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
-type NoticeProfile = { uid:string; name:string; role:'admin'|'security'; locationId:string };
+type NoticeProfile = { uid:string; name:string; role:'admin'|'security'|'official'; locationId:string };
 type NoticeLocation = { id:string; name:string; active?:boolean };
-export type Notice = { id:string; type:'appointment'|'incoming'|'overdue'|'received'; title:string; message:string; locationId:string; locationName:string; target:'appointments'|'transfers'|'visitors'; read:boolean; sourceId:string; clearedAt?:any; clearedBy?:string };
+export type Notice = { id:string; type:'appointment'|'incoming'|'overdue'|'received'; title:string; message:string; locationId:string; locationName:string; target:'appointments'|'transfers'|'visitors'; read:boolean; sourceId:string; recipientUid?:string; clearedAt?:any; clearedBy?:string };
 type Props = { profile:NoticeProfile; locations:NoticeLocation[]; onNavigate:(tab:string)=>void; onUnreadChange?:(count:number)=>void; onHistoryChange?:(items:Notice[])=>void };
 const toMs = (v:any):number => { if(!v)return 0; if(typeof v.toDate==='function')return v.toDate().getTime(); if(typeof v==='number')return v; const n=new Date(v).getTime(); return Number.isFinite(n)?n:0; };
 const receivedStatus = (s:any) => ['RECEIVED','RECEIVED_CLOSED','CLOSED','COMPLETED'].includes(String(s||'').toUpperCase());
@@ -29,13 +29,13 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const firstSnapshot=useRef<Record<string,boolean>>({});
  const visitorRecords=useRef<Record<string,{location:NoticeLocation;docs:any[]}>>({});
  const normalizeLocation=(value:any)=>String(value||'').toLowerCase().replace(/[^a-z0-9]/g,'');
- const locs=useMemo(()=>profile.role==='admin'?locations:locations.filter(x=>x.id===profile.locationId||normalizeLocation(x.id)===normalizeLocation(profile.locationId)||normalizeLocation(x.name)===normalizeLocation(profile.locationId)),[profile,locations]);
+ const locs=useMemo(()=>profile.role==='admin'?locations:profile.role==='official'?[]:locations.filter(x=>x.id===profile.locationId||normalizeLocation(x.id)===normalizeLocation(profile.locationId)||normalizeLocation(x.name)===normalizeLocation(profile.locationId)),[profile,locations]);
  const locLabel=(id:string)=>locations.find(x=>x.id===id)?.name||locations.find(x=>x.name===id)?.name||id;
  const onFeedError=(source:string)=>(error:any)=>{console.error('[VMS notifications] '+source,error);setFeedError(error?.code==='permission-denied'?'Notifications are blocked by Firestore permissions for this location login. Ask an administrator to verify this login’s active status and location assignment, then publish the latest Firestore rules.':'Live notifications temporarily could not connect. Check the connection and reload.');};
  const addNotice=(n:Omit<Notice,'id'|'read'>)=>{
-  const id=n.type+':'+n.locationId+':'+n.sourceId;
+  const id=n.recipientUid?'user:'+n.recipientUid+':'+n.type+':'+n.sourceId:n.type+':'+n.locationId+':'+n.sourceId;
   if(noticeIdsRef.current.has(id))return;
-  const ref=doc(db,'locationNotifications',encodeURIComponent(id));
+  const ref=doc(db,n.recipientUid?'userNotifications':'locationNotifications',encodeURIComponent(id));
   void runTransaction(db,async transaction=>{
    const existing=await transaction.get(ref);
    if(existing.exists())return false;
@@ -61,6 +61,8 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
   const unsubscribers:(()=>void)[]=[];
   if(profile.role==='admin'){
    unsubscribers.push(onSnapshot(collection(db,'locationNotifications'),snap=>applySnapshot(snap),onFeedError('shared notification feed')));
+  }else if(profile.role==='official'){
+   unsubscribers.push(onSnapshot(query(collection(db,'userNotifications'),where('recipientUid','==',profile.uid)),snap=>applySnapshot(snap),onFeedError('official notification feed')));
   }else{
    locs.forEach(loc=>unsubscribers.push(onSnapshot(query(collection(db,'locationNotifications'),where('locationId','==',loc.id)),snap=>applySnapshot(snap,loc.id),onFeedError('shared notification feed '+loc.id))));
   }
@@ -71,6 +73,14 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
   setFeedError('');
   const unsubscribers:(()=>void)[]=[];
   const timers:number[]=[];
+  if(profile.role==='official'){
+   const key='official-appointments:'+profile.uid;firstSnapshot.current[key]=false;
+   unsubscribers.push(onSnapshot(query(collection(db,'visitorAppointments'),where('hostId','==',profile.uid)),snap=>{
+    if(!firstSnapshot.current[key]){firstSnapshot.current[key]=true;return;}
+    snap.docChanges().forEach(change=>{if(change.type!=='added')return;const d=change.doc.data();const loc=locations.find(x=>x.id===d.locationId);addNotice({type:'appointment',title:'Appointment request for you',message:(d.visitorName||'A visitor')+' requested a visit on '+(d.appointmentDate||'the scheduled date')+'. Approve, reject or pass it to location security.',locationId:d.locationId||'UNKNOWN',locationName:loc?.name||d.locationName||d.locationId||'Location',target:'appointments',sourceId:change.doc.id,recipientUid:profile.uid});});
+   },onFeedError('official appointments')));
+   return()=>unsubscribers.forEach(u=>u());
+  }
   locs.forEach(loc=>{
    const appointmentKey='appointments:'+loc.id;
    firstSnapshot.current[appointmentKey]=false;
@@ -144,20 +154,20 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  },[locs]);
  const unread=notices.filter(n=>!n.read).length;
  useEffect(()=>{onUnreadChange?.(unread)},[unread,onUnreadChange]);
- const markOneRead=(id:string)=>{setNotices(old=>old.map(n=>n.id===id?{...n,read:true}:n));void updateDoc(doc(db,'locationNotifications',encodeURIComponent(id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}).catch(error=>onFeedError('marking notification read')(error));};
- const markAll=()=>{const unreadRows=notices.filter(n=>!n.read);setNotices(old=>old.map(n=>({...n,read:true})));void Promise.all(unreadRows.map(n=>updateDoc(doc(db,'locationNotifications',encodeURIComponent(n.id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}))).catch(error=>onFeedError('marking all notifications read')(error));};
+ const markOneRead=(id:string)=>{const notice=notices.find(n=>n.id===id);setNotices(old=>old.map(n=>n.id===id?{...n,read:true}:n));if(!notice)return;void updateDoc(doc(db,notice.recipientUid?'userNotifications':'locationNotifications',encodeURIComponent(id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}).catch(error=>onFeedError('marking notification read')(error));};
+ const markAll=()=>{const unreadRows=notices.filter(n=>!n.read);setNotices(old=>old.map(n=>({...n,read:true})));void Promise.all(unreadRows.map(n=>updateDoc(doc(db,n.recipientUid?'userNotifications':'locationNotifications',encodeURIComponent(n.id)),{read:true,readAt:serverTimestamp(),readBy:profile.uid}))).catch(error=>onFeedError('marking all notifications read')(error));};
  const clearableNotices=profile.role==='admin'&&clearScopeLocation!=='all'?notices.filter(n=>n.locationId===clearScopeLocation):notices;
  const clearNotifications=(requestedScope:string)=>{
-  const targetScope=profile.role==='admin'?requestedScope:(locs[0]?.id||profile.locationId);
-  const clearing=targetScope==='all'?notices:notices.filter(n=>n.locationId===targetScope);
+  const targetScope=profile.role==='admin'?requestedScope:profile.role==='official'?'official':(locs[0]?.id||profile.locationId);
+  const clearing=targetScope==='all'||targetScope==='official'?notices:notices.filter(n=>n.locationId===targetScope);
   if(!clearing.length)return;
-  const scope=targetScope==='all'?'all locations':locLabel(targetScope);
+  const scope=targetScope==='all'?'all locations':targetScope==='official'?'your appointment notifications':locLabel(targetScope);
   if(typeof window!=='undefined'&&!window.confirm('Clear all '+clearing.length+' notification'+(clearing.length===1?'':'s')+' from '+scope+' for every login in this scope?'))return;
   setNotices(old=>old.filter(n=>!clearing.some(c=>c.id===n.id)));
   const commits:Promise<void>[]=[];
   for(let i=0;i<clearing.length;i+=450){
    const batch=writeBatch(db);
-   clearing.slice(i,i+450).forEach(n=>batch.update(doc(db,'locationNotifications',encodeURIComponent(n.id)),{clearedAt:serverTimestamp(),clearedBy:profile.uid}));
+   clearing.slice(i,i+450).forEach(n=>batch.update(doc(db,n.recipientUid?'userNotifications':'locationNotifications',encodeURIComponent(n.id)),{clearedAt:serverTimestamp(),clearedBy:profile.uid}));
    commits.push(batch.commit());
   }
   void Promise.all(commits).catch(error=>onFeedError('clearing shared notification history')(error));
