@@ -301,6 +301,22 @@ function TutorialMode({role}:{role:"admin"|"security"}){
  </div></section></div></div>
 }
 
+
+function VmsDropdown({value,options,onChange,placeholder,disabled=false,searchable=true}:{value:string;options:{value:string;label:string}[];onChange:(value:string)=>void;placeholder:string;disabled?:boolean;searchable?:boolean}){
+ const [open,setOpen]=useState(false),[search,setSearch]=useState("");
+ const root=useRef<HTMLDivElement|null>(null);
+ useEffect(()=>{if(!open)return;const outside=(e:MouseEvent)=>{if(root.current&&!root.current.contains(e.target as Node)){setOpen(false);setSearch("")}};const escape=(e:KeyboardEvent)=>{if(e.key==="Escape"){setOpen(false);setSearch("")}};document.addEventListener("mousedown",outside);document.addEventListener("keydown",escape);return()=>{document.removeEventListener("mousedown",outside);document.removeEventListener("keydown",escape)}},[open]);
+ const selected=options.find(o=>o.value===value);
+ const visible=options.filter(o=>o.label.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()));
+ return <div className={"vmsDropdown"+(open?" isOpen":"")} ref={root}>
+  <button type="button" className="vmsDropdownTrigger" aria-haspopup="listbox" aria-expanded={open} disabled={disabled} onClick={()=>{setOpen(v=>!v);setSearch("")}}><span className={"vmsDropdownValue"+(!selected?" isPlaceholder":"")}>{selected?.label||placeholder}</span><span className="vmsDropdownChevron" aria-hidden="true">⌄</span></button>
+  {open&&<div className="vmsDropdownMenu">
+   {searchable&&options.length>5&&<div className="vmsDropdownSearch"><Search size={15}/><input autoFocus value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search options…" aria-label="Search dropdown options"/></div>}
+   <div className="vmsDropdownOptions" role="listbox" aria-label={placeholder}>{visible.map(o=><button type="button" role="option" aria-selected={o.value===value} className={"vmsDropdownOption"+(o.value===value?" selected":"")} key={o.value} onClick={()=>{onChange(o.value);setOpen(false);setSearch("")}}><span>{o.label}</span>{o.value===value&&<span className="vmsDropdownCheck">✓</span>}</button>)}{!visible.length&&<div className="vmsDropdownEmpty">No matching options</div>}</div>
+  </div>}
+ </div>;
+}
+
 function DutyDeskBar({profile,locations,duty,onChange}:{profile:Profile;locations:Location[];duty:DutyDesk|null;onChange:(d:DutyDesk|null)=>void}){
  const [people,setPeople]=useState<any[]>([]),[locationId,setLocationId]=useState(profile.role==="admin"?(duty?.locationId||"ADMIN"):profile.locationId),[personId,setPersonId]=useState(""),[busy,setBusy]=useState(false);
  useEffect(()=>{if(!locationId)return;return onSnapshot(query(collection(db,"securityPersons"),where("locationId","==",locationId)),snap=>setPeople(snap.docs.map(d=>({id:d.id,...d.data()})).filter((p:any)=>p.active!==false)))},[locationId]);
@@ -309,7 +325,7 @@ function DutyDeskBar({profile,locations,duty,onChange}:{profile:Profile;location
  const selected=people.find(x=>x.id===personId);
  const start=async()=>{if(!locationId)return alert("Select a location.");if(!selected)return alert("Select the security person on duty.");setBusy(true);try{const ref=doc(db,"deskSessions",locationId);const existing=await getDoc(ref);if(existing.exists()&&existing.data().status==="ACTIVE")throw new Error(existing.data().securityPersonName+" is already on duty at "+locName(locationId,locations)+".");const data={locationId,securityPersonId:selected.id,securityPersonName:selected.name,status:"ACTIVE",startedAt:serverTimestamp(),startedBy:profile.uid,startedByName:profile.name};await setDoc(ref,data);onChange({id:ref.id,...data} as DutyDesk)}catch(e:any){alert(e.message)}finally{setBusy(false)}};
  const end=async()=>{const currentDuty=duty;if(!currentDuty)return alert("No active desk duty is selected.");setBusy(true);try{await updateDoc(doc(db,"deskSessions",currentDuty.locationId),{status:"ENDED",endedAt:serverTimestamp(),endedBy:profile.uid,endedByName:profile.name});onChange(null)}catch(e:any){alert(e.message)}finally{setBusy(false)}};
- return <div className="dutyDesk"><div className="dutyStatus"><span className={duty?"dutyDot active":"dutyDot"}/><div><small>ON-DUTY SECURITY</small><b>{duty?.securityPersonName||"No desk selected"}</b></div></div>{profile.role==="admin"&&<select value={locationId} onChange={e=>{setLocationId(e.target.value);setPersonId("")}}>{locations.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select>}<select value={personId} disabled={busy||!!duty} onChange={e=>setPersonId(e.target.value)}><option value="">Select desk officer</option>{people.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>{duty?<button className="dutyLogout" onClick={end} disabled={busy}>End duty</button>:<button className="dutyStart" onClick={start} disabled={busy||!personId}>{busy?"…":"Start duty"}</button>}</div>;
+  return <div className="dutyDesk"><div className="dutyStatus"><span className={duty?"dutyDot active":"dutyDot"}/><div><small>ON-DUTY SECURITY</small><b>{duty?.securityPersonName||"No desk selected"}</b></div></div>{profile.role==="admin"&&<VmsDropdown value={locationId} options={locations.map(x=>({value:x.id,label:x.name}))} placeholder="Select office / desk" onChange={v=>{setLocationId(v);setPersonId("")}} searchable/>}<VmsDropdown value={personId} options={people.map(p=>({value:p.id,label:p.name}))} placeholder="Select desk officer" disabled={busy||!!duty} onChange={setPersonId} searchable/>{duty?<button className="dutyLogout" onClick={end} disabled={busy}>End duty</button>:<button className="dutyStart" onClick={start} disabled={busy||!personId}>{busy?"…":"Start duty"}</button>}</div>;
 }
 
 function Stat({label,value,icon}:any){return <div className="stat"><div className="statIcon">{icon}</div><div><span>{label}</span><strong>{value}</strong></div></div>}
