@@ -717,11 +717,20 @@ function ThemeSettings(){
 
 
 function OfficialAdminPanel(){
- const [rows,setRows]=useState<any[]>([]),[accounts,setAccounts]=useState<any[]>([]),[open,setOpen]=useState(false);
+ const [rows,setRows]=useState<any[]>([]),[accounts,setAccounts]=useState<any[]>([]),[open,setOpen]=useState(false),[search,setSearch]=useState("");
  useEffect(()=>onSnapshot(collection(db,"appointmentOfficials"),s=>setRows(s.docs.map(d=>({id:d.id,...d.data()}))),e=>console.error("Officials feed",e)),[]);
  useEffect(()=>onSnapshot(query(collection(db,"users"),where("role","==","official")),s=>setAccounts(s.docs.map(d=>({id:d.id,...d.data()}))),e=>console.error("Official account feed",e)),[]);
  const toggle=async(r:any)=>{try{const active=r.active===false;await updateDoc(doc(db,"appointmentOfficials",r.id),{active,updatedAt:serverTimestamp()});await updateDoc(doc(db,"users",r.id),{active,updatedAt:serverTimestamp()})}catch(e:any){alert(e.message)}};
- return <section className="panel"><div className="sectionTitle"><div><b>Appointment officials</b><span>Officials appear automatically in both public appointment booking forms. Each official can approve only appointments assigned to them.</span></div><button className="primary" onClick={()=>setOpen(true)}><Plus size={15}/> Add official</button></div><div className="tableScroll"><table><thead><tr><th>Official</th><th>Email / login</th><th>Status</th><th>Action</th></tr></thead><tbody>{rows.map(r=><tr key={r.id}><td><b>{r.name}</b></td><td>{accounts.find((a:any)=>a.id===r.id)?.email||"—"}</td><td>{r.active===false?"Disabled":"Active"}</td><td><button className="secondary tiny" onClick={()=>toggle(r)}>{r.active===false?"Enable":"Disable"}</button></td></tr>)}</tbody></table>{!rows.length&&<Empty text="No appointment officials added yet."/>}</div>{open&&<OfficialModal onClose={()=>setOpen(false)}/>}</section>;
+ const filtered=rows.filter(r=>String(r.name||"").toLowerCase().includes(search.toLowerCase())||String(accounts.find((a:any)=>a.id===r.id)?.email||"").toLowerCase().includes(search.toLowerCase()));
+ return <section className="officialAdminPanel">
+  <div className="officialAdminIntro"><div><span className="eyebrow">APPOINTMENT DIRECTORY</span><h3>Appointment officials</h3><p>Manage each official’s login and appointment access. Officials appear automatically in both public booking forms and only see appointments assigned to them.</p></div><button className="primary officialAddButton" onClick={()=>setOpen(true)}><Plus size={15}/> Add official</button></div>
+  <div className="officialListToolbar"><label className="officialSearch"><Search size={16}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search officials by name or email"/></label><span className="officialCount">{rows.length} {rows.length===1?"official":"officials"}</span></div>
+  {filtered.length>0?<div className="officialCards">{filtered.map(r=>{const account=accounts.find((a:any)=>a.id===r.id),disabled=r.active===false;return <article className={"officialCard"+(disabled?" isDisabled":"")} key={r.id}>
+   <div className="officialCardMain"><div className="officialAvatar" aria-hidden="true">{String(r.name||"?").trim().charAt(0).toUpperCase()}</div><div className="officialIdentity"><h4>{r.name||"Unnamed official"}</h4><p>{account?.email||"Login email unavailable"}</p><span className={"officialStatus "+(disabled?"disabled":"active")}><i/>{disabled?"Login disabled":"Active official"}</span></div></div>
+   <div className="officialCardFooter"><span className="officialAccessNote"><ShieldCheck size={14}/> Appointments & notifications only</span><button type="button" className={"officialToggleButton "+(disabled?"enable":"disable")} onClick={()=>toggle(r)}>{disabled?"Enable login":"Disable login"}</button></div>
+  </article>})}</div>:<div className="officialEmpty"><div className="officialEmptyIcon"><Users size={22}/></div><b>{rows.length?"No officials match your search":"No appointment officials yet"}</b><p>{rows.length?"Try another name or email.":"Add an official to give them a private appointment inbox and individual approval authority."}</p>{!rows.length&&<button className="primary" onClick={()=>setOpen(true)}><Plus size={15}/> Add first official</button>}</div>}
+  {open&&<OfficialModal onClose={()=>setOpen(false)}/>}
+ </section>;
 }
 function OfficialModal({onClose}:{onClose:()=>void}){
  const [f,setF]=useState({name:"",email:"",password:""}),[saving,setSaving]=useState(false),u=(k:string,v:string)=>setF(x=>({...x,[k]:v}));
