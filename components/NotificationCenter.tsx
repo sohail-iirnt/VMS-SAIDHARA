@@ -25,6 +25,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
  const [filter,setFilter]=useState<'all'|'unread'>('all');
  const [clearScopeLocation,setClearScopeLocation]=useState('all');
  const priorTransferStatus=useRef<Record<string,string>>({});
+ const priorAppointmentState=useRef<Record<string,string>>({});
  const overdueSeen=useRef<Set<string>>(new Set());
  const firstSnapshot=useRef<Record<string,boolean>>({});
  const visitorRecords=useRef<Record<string,{location:NoticeLocation;docs:any[]}>>({});
@@ -85,14 +86,27 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    const appointmentKey='appointments:'+loc.id;
    firstSnapshot.current[appointmentKey]=false;
    unsubscribers.push(onSnapshot(query(collection(db,'visitorAppointments'),where('locationId','==',loc.id)),snap=>{
-    if(!firstSnapshot.current[appointmentKey]){firstSnapshot.current[appointmentKey]=true;return;}
+    if(!firstSnapshot.current[appointmentKey]){
+     firstSnapshot.current[appointmentKey]=true;
+     snap.docs.forEach(d=>{const v=d.data();priorAppointmentState.current[appointmentKey+':'+d.id]=String(v.status||'PENDING')+'|'+String(v.approvalMode||'OFFICIAL');});
+     return;
+    }
     snap.docChanges().forEach(change=>{
-     if(change.type!=='added')return;
-     const d=change.doc.data();
-     if(['REJECTED','CANCELLED','CANCELED'].includes(String(d.status||'').toUpperCase()))return;
-     const visitor=d.visitorName||d.name||'A visitor';
-     const date=d.appointmentDate?' for '+d.appointmentDate:'';
-     addNotice({type:'appointment',title:'New appointment booked',message:visitor+' has booked an appointment'+date+'. Review the request and destination.',locationId:loc.id,locationName:loc.name,target:'appointments',sourceId:change.doc.id});
+     const d=change.doc.data(),stateKey=appointmentKey+':'+change.doc.id;
+     const previous=priorAppointmentState.current[stateKey]||'',nextStatus=String(d.status||'PENDING'),nextMode=String(d.approvalMode||'OFFICIAL');
+     priorAppointmentState.current[stateKey]=nextStatus+'|'+nextMode;
+     const visitor=d.visitorName||d.name||'A visitor',date=d.appointmentDate?' for '+d.appointmentDate:'';
+     if(change.type==='added'){
+      if(!['REJECTED','CANCELLED','CANCELED'].includes(nextStatus.toUpperCase()))addNotice({type:'appointment',title:'New appointment booked',message:visitor+' has booked an appointment'+date+'. Review the request and destination.',locationId:loc.id,locationName:loc.name,target:'appointments',sourceId:change.doc.id});
+      return;
+     }
+     if(change.type!=='modified'||previous===nextStatus+'|'+nextMode)return;
+     const previousMode=previous.split('|')[1]||'OFFICIAL',previousStatus=previous.split('|')[0]||'PENDING';
+     if(nextMode==='LOCATION'&&previousMode!=='LOCATION'){
+      addNotice({type:'appointment',title:'Appointment passed to security',message:(d.passedToSecurityByName||'The host official')+' passed '+visitor+' for approval at '+loc.name+'.',locationId:loc.id,locationName:loc.name,target:'appointments',sourceId:change.doc.id+':delegated'});
+     }else if((nextStatus==='APPROVED'||nextStatus==='REJECTED')&&previousStatus!==nextStatus){
+      addNotice({type:'appointment',title:'Appointment '+nextStatus.toLowerCase(),message:visitor+' was '+nextStatus.toLowerCase()+' by '+(d.reviewedByName||'an authorized reviewer')+'.',locationId:loc.id,locationName:loc.name,target:'appointments',sourceId:change.doc.id+':decision:'+nextStatus});
+     }
     });
    },onFeedError('appointments '+loc.id)));
 
