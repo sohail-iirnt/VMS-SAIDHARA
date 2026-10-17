@@ -99,7 +99,7 @@ export default function NotificationCenter({profile,locations,onNavigate,onUnrea
    const incomingKey='incoming:'+loc.id;
    firstSnapshot.current[incomingKey]=false;
    unsubscribers.push(onSnapshot(query(collection(db,'internalTransfers'),where('destinationLocationId','==',loc.id)),snap=>{
-    if(!firstSnapshot.current[incomingKey]){firstSnapshot.current[incomingKey]=true;snap.docs.forEach(d=>{priorTransferStatus.current[incomingKey+':'+d.id]=String(d.data().status||'')});return;}
+    if(!firstSnapshot.current[incomingKey]){firstSnapshot.current[incomingKey]=true;snap.docs.forEach(d=>{const data=d.data(),status=String(data.status||'').toUpperCase();priorTransferStatus.current[incomingKey+':'+d.id]=status;if(['SENT','IN_TRANSIT','SCHEDULED'].includes(status)){const sender=locLabel(data.sourceLocationId||'Unknown location'),item=data.itemName||data.description||'material',qty=data.quantity?' · Qty '+data.quantity:'';addNotice({type:'incoming',title:'Incoming material scheduled',message:sender+' has sent '+item+' to '+loc.name+qty+'. Open incoming transfers to review it.',locationId:loc.id,locationName:loc.name,target:'transfers',sourceId:d.id});}});return;}
     snap.docChanges().forEach(change=>{
      const d=change.doc.data();const statusKey=incomingKey+':'+change.doc.id;const prev=priorTransferStatus.current[statusKey];const next=String(d.status||'');priorTransferStatus.current[statusKey]=next;
      if((change.type==='added'||prev!==next)&&['SENT','IN_TRANSIT','SCHEDULED'].includes(next.toUpperCase())){
