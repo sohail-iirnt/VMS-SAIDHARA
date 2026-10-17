@@ -956,3 +956,25 @@ input[type=range]{accent-color:var(--vms-accent)}
 .dutyOfficerEmpty{padding:14px 11px;font-size:12px;opacity:.7}
 .dutyOfficerPicker{max-width:300px}
 @media(max-width:760px){.dutyOfficerSearch{width:100%;flex-basis:100%}.dutyOfficerOptions{max-height:40vh}.dutyOfficerOptions>button{min-height:44px;font-size:14px}}
+
+
+/* Phone duty bar: stack controls to prevent officer selection and End Duty from colliding. */
+@media(max-width:760px){
+ .headerRight{flex-wrap:wrap;align-items:stretch;min-width:0;max-width:100%}
+ .headerRight .dutyDesk{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:9px;width:100%;max-width:100%;min-width:0;flex:1 1 100%;overflow:visible;padding:10px}
+ .dutyDesk .dutyStatus{grid-column:1;min-width:0;width:100%;padding:2px 2px 5px}
+ .dutyDesk .dutyStatus b{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ .dutyDesk>.vmsSelectRoot,.dutyDesk>.dutyOfficerPicker,.dutyDesk>.dutyStart,.dutyDesk>.dutyLogout{grid-column:1;width:100%;min-width:0;max-width:100%}
+ .dutyDesk .dutyOfficerPicker{display:flex;align-items:stretch;gap:7px;min-width:0;max-width:100%;width:100%;flex-wrap:wrap}
+ .dutyDesk .dutyOfficerSearch{position:relative;flex:1 1 100%;width:100%;min-width:0}
+ .dutyDesk .dutyOfficerSearch>input{box-sizing:border-box;width:100%;height:44px;min-height:44px;padding:0 12px;border:1px solid var(--vms-border,#dcded2);border-radius:10px;background:var(--vms-surface,#fffefa);color:var(--vms-ink,#202d27);font-size:14px;touch-action:manipulation}
+ .dutyDesk .dutyOfficerOptions{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:2147483000;max-height:min(45dvh,340px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;border-color:var(--vms-border,#dcded2);background:var(--vms-surface,#fffefa);color:var(--vms-ink,#202d27)}
+ .dutyDesk .dutyOfficerOptions>button{min-height:46px;touch-action:manipulation}
+ .dutyDesk .dutyOfficerPicker>.secondary{flex:1 1 100%;min-height:40px}
+ .dutyDesk .dutyStart,.dutyDesk .dutyLogout{box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-height:44px;margin:0;font-size:13px;white-space:normal}
+}
+@media(max-width:380px){
+ .headerRight .dutyDesk{padding:8px;gap:8px}
+ .dutyDesk .dutyStatus small{font-size:8px}
+ .dutyDesk .dutyStatus b{font-size:12px}
+}
