@@ -123,7 +123,12 @@ service cloud.firestore {
     allow update: if admin() || (security() && moduleEnabled('nonRoutineVisitors') && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId));
     allow delete: if admin();
   }
-  match /visitors/{id} { allow read: if admin() || (security() && (moduleEnabled('visitors') || moduleEnabled('appointments')) && myLocationMatches(resource.data.locationId)); allow create: if admin() || (security() && (moduleEnabled('visitors') || moduleEnabled('appointments')) && myLocationMatches(request.resource.data.locationId)); allow update: if admin() || (security() && (moduleEnabled('visitors') || moduleEnabled('appointments')) && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId)); allow delete: if admin(); }
+  match /visitors/{id} {
+    allow read: if admin() || (security() && myLocationMatches(resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && resource.data.appointmentId is string)));
+    allow create: if admin() || (security() && myLocationMatches(request.resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && request.resource.data.appointmentId is string)));
+    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && resource.data.appointmentId is string && request.resource.data.appointmentId == resource.data.appointmentId)));
+    allow delete: if admin();
+  }
   match /assets/{id} { allow read: if admin() || (security() && moduleEnabled('assets') && myLocationMatches(resource.data.locationId)); allow create: if admin() || (security() && moduleEnabled('assets') && myLocationMatches(request.resource.data.locationId)); allow update: if admin() || (security() && moduleEnabled('assets') && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId)); allow delete: if admin(); }
   match /gatePasses/{id} { allow read: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && myLocationMatches(resource.data.locationId)); allow create: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && myLocationMatches(request.resource.data.locationId)); allow update: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId)); allow delete: if admin(); }
   match /internalTransfers/{id} {
