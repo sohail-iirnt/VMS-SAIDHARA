@@ -1164,3 +1164,34 @@ input[type=range]{accent-color:var(--vms-accent)}
  }
  .splashFallbackMark{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:var(--vms-accent,#286044);color:#fff;margin:0 auto 18px}
 }
+
+/* Mobile officer picker: keep search and options within the visible viewport, below browser chrome. */
+@media(max-width:760px){
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed){
+   top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+   bottom:calc(env(safe-area-inset-bottom,0px) + 12px)!important;
+   max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px)!important;
+   overflow-x:hidden!important;overflow-y:auto!important;
+   overscroll-behavior:contain!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyControlFields{
+   max-height:none!important;overflow:visible!important;min-height:0!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign .dutyOfficerField,
+ .main>header .headerRight>.dutyDeskRedesign .dutyOfficerPicker,
+ .main>header .headerRight>.dutyDeskRedesign .dutyOfficerPickerNew,
+ .main>header .headerRight>.dutyDeskRedesign .dutyOfficerSearch{position:relative!important;min-width:0!important;width:100%!important;overflow:visible!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerOptions{
+   position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+   width:100%!important;max-width:100%!important;max-height:min(32dvh,260px)!important;
+   overflow-y:auto!important;overscroll-behavior:contain!important;z-index:2!important;
+   margin:8px 0 0!important;box-sizing:border-box!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign .dutyOfficerOptions [role="option"],
+ .main>header .headerRight>.dutyDeskRedesign .dutyOfficerOptions button{min-height:44px}
+}
+@media(max-height:650px) and (max-width:760px){
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed){padding:11px!important;gap:8px!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyControlFields{gap:8px!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerOptions{max-height:22dvh!important}
+}
