@@ -1119,3 +1119,48 @@ input[type=range]{accent-color:var(--vms-accent)}
  .sideBackdrop{display:block;position:fixed;inset:0;z-index:1000;border:0;background:rgba(12,22,18,.46);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);padding:0}
  .side.open{z-index:1001!important}
 }
+
+/* Final mobile duty UX: keep it anchored to the dashboard header, compact until requested. */
+@media(max-width:760px){
+ .main>header .headerRight>.dutyDeskRedesign.dutySetupCollapsed,
+ .main>header .headerRight>.dutyDeskRedesign.dutyActive.dutyCollapsed{
+   position:relative!important;inset:auto!important;transform:none!important;z-index:4!important;
+   display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;
+   width:min(100%,360px)!important;max-width:calc(100vw - 32px)!important;min-width:0!important;
+   flex:0 1 auto!important;order:3!important;margin:10px 0 0 auto!important;
+   padding:10px 12px!important;border-radius:18px!important;gap:10px!important;
+   box-shadow:0 8px 22px rgba(20,48,34,.10)!important;background:var(--vms-surface,#fff)!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign.dutySetupCollapsed .dutyStatus,
+ .main>header .headerRight>.dutyDeskRedesign.dutyActive.dutyCollapsed .dutyStatus{grid-column:1!important;min-width:0!important;display:flex!important;align-items:center!important}
+ .main>header .headerRight>.dutyDeskRedesign.dutySetupCollapsed .dutyStatus b,
+ .main>header .headerRight>.dutyDeskRedesign.dutyActive.dutyCollapsed .dutyStatus b{font-size:12px!important;line-height:1.25!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:145px!important}
+ .main>header .headerRight>.dutyDeskRedesign.dutySetupCollapsed .dutyStatus small,
+ .main>header .headerRight>.dutyDeskRedesign.dutyActive.dutyCollapsed .dutyStatus small{font-size:8px!important;letter-spacing:.08em!important}
+ .main>header .headerRight>.dutyDeskRedesign.dutySetupCollapsed .dutyControlFields,
+ .main>header .headerRight>.dutyDeskRedesign.dutyActive.dutyCollapsed .dutyControlFields{display:none!important}
+ .main>header .headerRight>.dutyDeskRedesign.dutySetupCollapsed .dutyCollapseToggle,
+ .main>header .headerRight>.dutyDeskRedesign.dutyActive.dutyCollapsed .dutyCollapseToggle{grid-column:2!important;min-height:40px!important;width:auto!important;white-space:nowrap!important;padding:8px 11px!important;font-size:11px!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed){
+   position:fixed!important;left:12px!important;right:12px!important;top:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 12px)!important;
+   width:auto!important;max-width:560px!important;max-height:min(78dvh,680px)!important;overflow:visible!important;
+   margin:0 auto!important;z-index:10050!important;display:grid!important;
+   grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:12px!important;
+   padding:16px!important;border-radius:24px!important;border:1px solid var(--vms-border,#d8e2d9)!important;
+   background:var(--vms-surface,#fff)!important;box-shadow:0 24px 70px rgba(12,25,19,.28)!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyStatus{grid-column:1!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyCollapseToggle{grid-column:2!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyControlFields{
+   grid-column:1/-1!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:14px!important;width:100%!important;min-width:0!important;
+   max-height:calc(78dvh - 110px)!important;overflow-y:auto!important;padding-bottom:env(safe-area-inset-bottom,0px)!important
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyField,
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerPicker{width:100%!important;min-width:0!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerSearch input{width:100%!important;min-height:52px!important;font-size:16px!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerOptions{
+   position:relative!important;inset:auto!important;max-height:34dvh!important;width:100%!important;margin-top:6px!important;
+   border-radius:14px!important;box-shadow:none!important
+ }
+ .splashFallbackMark{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:var(--vms-accent,#286044);color:#fff;margin:0 auto 18px}
+}
