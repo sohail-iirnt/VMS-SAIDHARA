@@ -1345,3 +1345,27 @@ input[type=range]{accent-color:var(--vms-accent)}
    align-items:center!important;justify-content:center!important;touch-action:manipulation!important;
  }
 }
+
+/* Requested adjustment only: expanded duty panel stays in normal document flow; page/header can scroll. */
+@media(max-width:760px){
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed){
+   position:relative!important;inset:auto!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+   width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+   margin:10px 0!important;padding:14px!important;border-radius:20px!important;box-sizing:border-box!important;
+   overflow:visible!important;z-index:2!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyCollapseToggle{
+   position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+   align-self:flex-end!important;flex:0 0 auto!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyControlFields{
+   flex:0 0 auto!important;min-height:0!important;height:auto!important;max-height:none!important;
+   overflow:visible!important;overscroll-behavior:auto!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyActionFooter{
+   position:relative!important;bottom:auto!important;flex:0 0 auto!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerOptions{
+   max-height:40dvh!important;overflow-y:auto!important;
+ }
+}
