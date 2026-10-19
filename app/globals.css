@@ -1195,3 +1195,47 @@ input[type=range]{accent-color:var(--vms-accent)}
  .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyControlFields{gap:8px!important}
  .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerOptions{max-height:22dvh!important}
 }
+
+/* Mobile duty picker v2: dropdown flows downward from the search field; action stays reachable. */
+@media(max-width:760px){
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed){
+   display:flex!important;flex-direction:column!important;align-items:stretch!important;
+   top:calc(env(safe-area-inset-top,0px) + 8px)!important;
+   bottom:calc(env(safe-area-inset-bottom,0px) + 8px)!important;
+   max-height:none!important;height:auto!important;overflow:hidden!important;
+   padding:14px!important;gap:10px!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyStatus,
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyCollapseToggle{flex:0 0 auto!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyControlFields{
+   display:flex!important;flex-direction:column!important;align-items:stretch!important;
+   flex:1 1 auto!important;min-height:0!important;max-height:none!important;
+   overflow-y:auto!important;overflow-x:hidden!important;gap:12px!important;
+   padding:0 0 max(8px,env(safe-area-inset-bottom,0px))!important;
+   overscroll-behavior:contain!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyField,
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerPickerNew{flex:0 0 auto!important;width:100%!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerSearch{width:100%!important;flex:0 0 auto!important}
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerSearch input{
+   width:100%!important;min-height:52px!important;box-sizing:border-box!important;font-size:16px!important
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerOptions{
+   display:block!important;position:relative!important;inset:auto!important;order:2!important;
+   width:100%!important;max-height:min(38dvh,300px)!important;overflow-y:auto!important;
+   margin:8px 0 0!important;z-index:20!important;flex:0 1 auto!important;
+   border-radius:16px!important;box-sizing:border-box!important;overscroll-behavior:contain!important;
+   background:var(--vms-surface,#fff)!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyStart,
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyLogout{
+   flex:0 0 auto!important;position:sticky!important;bottom:0!important;z-index:21!important;
+   width:100%!important;min-height:54px!important;border-radius:15px!important;
+   margin-top:8px!important;touch-action:manipulation!important;font-size:16px!important;
+   box-shadow:0 -8px 18px rgba(18,40,27,.08)!important;
+ }
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyStart:disabled{opacity:.5!important}
+}
+@media(max-height:700px) and (max-width:760px){
+ .main>header .headerRight>.dutyDeskRedesign:not(.dutyCollapsed):not(.dutySetupCollapsed) .dutyOfficerOptions{max-height:26dvh!important}
+}
