@@ -116,8 +116,7 @@ function printPageCss(s:PrintSettings){
 export default function Home(){
  const [profile,setProfile]=useState<Profile|null>(null),[loading,setLoading]=useState(true),[splashDone,setSplashDone]=useState(false),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[error,setError]=useState("");
  useEffect(()=>{let active=true;let profileUnsub:()=>void=()=>{};const unsub=onAuthStateChanged(auth,u=>{profileUnsub();if(!active)return;if(!u){setProfile(null);setLoading(false);return;}setLoading(true);profileUnsub=onSnapshot(doc(db,"users",u.uid),snap=>{if(!active)return;if(snap.exists()&&snap.data().active!==false)setProfile({uid:u.uid,...snap.data()} as Profile);else{setProfile(null);setError("This account is disabled or not configured. Contact the administrator.");void import("firebase/auth").then(x=>x.signOut(auth));}setLoading(false)},()=>{if(active){setProfile(null);setError("Unable to load your profile. Please refresh and try again.");setLoading(false)}})});return()=>{active=false;profileUnsub();unsub()}},[]);
- if(!splashDone)return <LottieSplash onDone={()=>setSplashDone(true)}/>;
- if(loading)return <div className="splash"><div className="splashFallbackMark" aria-hidden="true"><ShieldCheck size={34}/></div><h2>VMS NDC</h2><p>Godrej & Boyce · Visitor & Asset Management</p><div className="splashLine"><span/></div></div>;
+ if(loading)return <LottieSplash onDone={()=>setSplashDone(true)}/>;
  if(!profile)return <Login email={email} password={password} setEmail={setEmail} setPassword={setPassword} error={error} setError={setError}/>;
  return <Portal profile={profile}/>;
 }
