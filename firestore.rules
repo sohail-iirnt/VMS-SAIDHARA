@@ -15,16 +15,16 @@ service cloud.firestore {
   function myLocationMatches(locationId){
     return locationId == me().locationId
       || (me().locationId == 'Main Admin Office' && locationId == 'ADMIN')
-      || (me().locationId == 'Warehouse I' && locationId == 'I')
-      || (me().locationId == 'Warehouse J' && locationId == 'J')
-      || (me().locationId == 'Warehouse K' && locationId == 'K')
-      || (me().locationId == 'Warehouse L' && locationId == 'L')
-      || (me().locationId == 'Warehouse O' && locationId == 'O')
-      || (me().locationId == 'Warehouse P' && locationId == 'P')
-      || (me().locationId == 'Warehouse Q' && locationId == 'Q')
-      || (me().locationId == 'Warehouse R' && locationId == 'R')
-      || (me().locationId == 'Warehouse S' && locationId == 'S')
-      || (me().locationId == 'Warehouse T' && locationId == 'T')
+      || (me().locationId in ['Warehouse I','I'] && locationId in ['Warehouse I','I'])
+      || (me().locationId in ['Warehouse J','J'] && locationId in ['Warehouse J','J'])
+      || (me().locationId in ['Warehouse K','K'] && locationId in ['Warehouse K','K'])
+      || (me().locationId in ['Warehouse L','L'] && locationId in ['Warehouse L','L'])
+      || (me().locationId in ['Warehouse O','O'] && locationId in ['Warehouse O','O'])
+      || (me().locationId in ['Warehouse P','P'] && locationId in ['Warehouse P','P'])
+      || (me().locationId in ['Warehouse Q','Q'] && locationId in ['Warehouse Q','Q'])
+      || (me().locationId in ['Warehouse R','R'] && locationId in ['Warehouse R','R'])
+      || (me().locationId in ['Warehouse S','S'] && locationId in ['Warehouse S','S'])
+      || (me().locationId in ['Warehouse T','T'] && locationId in ['Warehouse T','T'])
       || (me().locationId in ['H14(MHE)', 'H14 (MHE)', 'H14-MHE'] && locationId == 'H14-MHE');
   }
   function myLocationInList(ids){
