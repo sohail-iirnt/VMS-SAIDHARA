@@ -43,6 +43,8 @@ service cloud.firestore {
       || (me().locationId in ['H14(MHE)', 'H14 (MHE)', 'H14-MHE'] && ids.hasAny(['H14-MHE']));
   }
   function sameLocation(resourceData){return admin() || (security() && myLocationMatches(resourceData.locationId));}
+  function validDutyLocation(locationId){return locationId in ['ADMIN','MAIN-GATE','I','J','K','L','O','P','Q','R','S','T','H14-MHE'];}
+  function onDutyAt(locationId){return security() && validDutyLocation(locationId) && get(/databases/$(database)/documents/deskSessions/$(locationId)).data.status == 'ACTIVE' && get(/databases/$(database)/documents/deskSessions/$(locationId)).data.startedBy == request.auth.uid && get(/databases/$(database)/documents/deskSessions/$(locationId)).data.locationId == locationId;}
   match /users/{uid} { allow read: if signedIn() && (request.auth.uid==uid || admin()); allow create,update,delete: if admin(); }
   // Shared notifications are stored once per location/source so every login assigned
   // to that location sees the same feed and read state. Admin accounts share the global feed.
@@ -73,21 +75,17 @@ service cloud.firestore {
   match /securityPersons/{id} {
     // The duty roster is a shared operational dependency, not a gated tab.
     // Security logins can read their location's officers and the shared ALL roster.
-    allow read: if admin() || (security() && (
-      resource.data.locationId == 'ALL' || myLocationMatches(resource.data.locationId)
-    ));
+    allow read: if admin() || (security() && (resource.data.locationId == 'ALL' || validDutyLocation(resource.data.locationId)));
     allow create,update,delete: if admin();
   }
   match /deskSessions/{locationId} {
     // Allow getDoc() to check a not-yet-created session before first Start Duty.
-    allow get: if admin() || (security() && (
-      resource == null || myLocationMatches(resource.data.locationId)
-    ));
-    allow list: if admin() || (security() && myLocationMatches(resource.data.locationId));
-    allow create: if admin() || (security() && myLocationMatches(request.resource.data.locationId) && request.resource.data.startedBy == request.auth.uid);
-    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && (
-      (resource.data.status != 'ACTIVE' && request.resource.data.status == 'ACTIVE' && request.resource.data.startedBy == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['locationId','securityPersonId','securityPersonName','status','startedAt','startedBy','startedByName','endedAt','endedBy','endedByName']))
-      || (resource.data.status == 'ACTIVE' && request.resource.data.status == 'ENDED' && request.resource.data.startedBy == resource.data.startedBy && request.resource.data.endedBy == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','endedAt','endedBy','endedByName']))
+    allow get: if admin() || (security() && (resource == null || validDutyLocation(resource.data.locationId) || validDutyLocation(locationId)));
+    allow list: if admin();
+    allow create: if admin() || (security() && validDutyLocation(request.resource.data.locationId) && request.resource.data.startedBy == request.auth.uid && request.resource.data.locationId == locationId);
+    allow update: if admin() || (security() && validDutyLocation(locationId) && request.resource.data.locationId == locationId && (
+      (resource.data.status != 'ACTIVE' && request.resource.data.status == 'ACTIVE' && request.resource.data.startedBy == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['locationId','securityPersonId','securityPersonName','status','startedAt','startedBy','startedByName','endedAt','endedBy','endedByName','accountLocationId']))
+      || (resource.data.status == 'ACTIVE' && resource.data.startedBy == request.auth.uid && request.resource.data.status == 'ENDED' && request.resource.data.startedBy == resource.data.startedBy && request.resource.data.endedBy == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','endedAt','endedBy','endedByName']))
     ));
     allow delete: if admin();
   }
@@ -126,23 +124,23 @@ service cloud.firestore {
     allow delete: if admin();
   }
   match /nonRoutineVisitors/{id} {
-    allow read: if admin() || (security() && moduleEnabled('nonRoutineVisitors') && myLocationMatches(resource.data.locationId));
-    allow create: if admin() || (security() && moduleEnabled('nonRoutineVisitors') && myLocationMatches(request.resource.data.locationId));
-    allow update: if admin() || (security() && moduleEnabled('nonRoutineVisitors') && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId));
+    allow read: if admin() || (security() && moduleEnabled('nonRoutineVisitors') && onDutyAt(resource.data.locationId));
+    allow create: if admin() || (security() && moduleEnabled('nonRoutineVisitors') && onDutyAt(request.resource.data.locationId));
+    allow update: if admin() || (security() && moduleEnabled('nonRoutineVisitors') && onDutyAt(resource.data.locationId) && onDutyAt(request.resource.data.locationId));
     allow delete: if admin();
   }
   match /visitors/{id} {
-    allow read: if admin() || (security() && myLocationMatches(resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && resource.data.appointmentId is string)));
-    allow create: if admin() || (security() && myLocationMatches(request.resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && request.resource.data.appointmentId is string)));
-    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && resource.data.appointmentId is string && request.resource.data.appointmentId == resource.data.appointmentId)));
+    allow read: if admin() || (security() && onDutyAt(resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && resource.data.appointmentId is string)));
+    allow create: if admin() || (security() && onDutyAt(request.resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && request.resource.data.appointmentId is string)));
+    allow update: if admin() || (security() && onDutyAt(resource.data.locationId) && onDutyAt(request.resource.data.locationId) && (moduleEnabled('visitors') || (moduleEnabled('appointments') && resource.data.appointmentId is string && request.resource.data.appointmentId == resource.data.appointmentId)));
     allow delete: if admin();
   }
-  match /assets/{id} { allow read: if admin() || (security() && moduleEnabled('assets') && myLocationMatches(resource.data.locationId)); allow create: if admin() || (security() && moduleEnabled('assets') && myLocationMatches(request.resource.data.locationId)); allow update: if admin() || (security() && moduleEnabled('assets') && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId)); allow delete: if admin(); }
-  match /gatePasses/{id} { allow read: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && myLocationMatches(resource.data.locationId)); allow create: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && myLocationMatches(request.resource.data.locationId)); allow update: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId)); allow delete: if admin(); }
+  match /assets/{id} { allow read: if admin() || (security() && moduleEnabled('assets') && onDutyAt(resource.data.locationId)); allow create: if admin() || (security() && moduleEnabled('assets') && onDutyAt(request.resource.data.locationId)); allow update: if admin() || (security() && moduleEnabled('assets') && onDutyAt(resource.data.locationId) && onDutyAt(request.resource.data.locationId)); allow delete: if admin(); }
+  match /gatePasses/{id} { allow read: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && onDutyAt(resource.data.locationId)); allow create: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && onDutyAt(request.resource.data.locationId)); allow update: if admin() || (security() && (moduleEnabled('gatepasses') || moduleEnabled('assets')) && onDutyAt(resource.data.locationId) && onDutyAt(request.resource.data.locationId)); allow delete: if admin(); }
   match /internalTransfers/{id} {
-    allow read: if admin() || (security() && moduleEnabled('transfers') && (myLocationMatches(resource.data.sourceLocationId) || myLocationMatches(resource.data.destinationLocationId)));
-    allow create: if admin() || (security() && moduleEnabled('transfers') && myLocationMatches(request.resource.data.sourceLocationId));
-    allow update: if admin() || (security() && moduleEnabled('transfers') && myLocationMatches(resource.data.destinationLocationId) && request.resource.data.sourceLocationId == resource.data.sourceLocationId && request.resource.data.destinationLocationId == resource.data.destinationLocationId && resource.data.status == 'SENT' && request.resource.data.status == 'RECEIVED_CLOSED');
+    allow read: if admin() || (security() && moduleEnabled('transfers') && (onDutyAt(resource.data.sourceLocationId) || onDutyAt(resource.data.destinationLocationId)));
+    allow create: if admin() || (security() && moduleEnabled('transfers') && onDutyAt(request.resource.data.sourceLocationId));
+    allow update: if admin() || (security() && moduleEnabled('transfers') && onDutyAt(resource.data.destinationLocationId) && request.resource.data.sourceLocationId == resource.data.sourceLocationId && request.resource.data.destinationLocationId == resource.data.destinationLocationId && resource.data.status == 'SENT' && request.resource.data.status == 'RECEIVED_CLOSED');
     allow delete: if admin();
   }
   match /assetMovementEvents/{id} { allow read: if admin() || (security() && moduleEnabled('assetTimeline') && resource.data.locationIds is list && myLocationInList(resource.data.locationIds)); allow create: if admin() || (security() && (moduleEnabled('assets') || moduleEnabled('transfers') || moduleEnabled('gatepasses')) && request.resource.data.locationIds is list && myLocationInList(request.resource.data.locationIds)); allow update,delete: if false; }
