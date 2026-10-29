@@ -74,7 +74,12 @@ service cloud.firestore {
     // The duty roster is a shared operational dependency, not a gated tab.
     // Security logins can read their location's officers and the shared ALL roster.
     allow read: if admin() || (security() && (
-      resource.data.locationId == 'ALL' || myLocationMatches(resource.data.locationId)
+      resource.data.locationId == 'ALL'
+      || myLocationMatches(resource.data.locationId)
+      // Explicit compatibility for the Warehouse I duty roster. Some older user
+      // profiles and roster records use the display label instead of the ID.
+      || (me().locationId in ['I', 'Warehouse I']
+          && resource.data.locationId in ['I', 'Warehouse I'])
     ));
     allow create,update,delete: if admin();
   }
