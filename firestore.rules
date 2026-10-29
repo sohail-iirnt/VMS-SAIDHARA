@@ -49,10 +49,10 @@ service cloud.firestore {
   // Shared notifications are stored once per location/source so every login assigned
   // to that location sees the same feed and read state. Admin accounts share the global feed.
   match /locationNotifications/{id} {
-    allow get: if admin() || (security() && moduleEnabled('notifications') && (resource == null || myLocationMatches(resource.data.locationId)));
-    allow list: if admin() || (security() && moduleEnabled('notifications') && myLocationMatches(resource.data.locationId));
-    allow create: if admin() || (security() && moduleEnabled('notifications') && myLocationMatches(request.resource.data.locationId));
-    allow update: if admin() || (security() && moduleEnabled('notifications') && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read','readAt','readBy','clearedAt','clearedBy']));
+    allow get: if admin() || (security() && moduleEnabled('notifications') && (resource == null || myLocationMatches(resource.data.locationId) || onDutyAt(resource.data.locationId)));
+    allow list: if admin() || (security() && moduleEnabled('notifications') && (myLocationMatches(resource.data.locationId) || onDutyAt(resource.data.locationId)));
+    allow create: if admin() || (security() && moduleEnabled('notifications') && (myLocationMatches(request.resource.data.locationId) || onDutyAt(request.resource.data.locationId)));
+    allow update: if admin() || (security() && moduleEnabled('notifications') && (myLocationMatches(resource.data.locationId) || onDutyAt(resource.data.locationId)) && (myLocationMatches(request.resource.data.locationId) || onDutyAt(request.resource.data.locationId)) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read','readAt','readBy','clearedAt','clearedBy']));
     allow delete: if admin();
   }
   match /userNotifications/{id} {
