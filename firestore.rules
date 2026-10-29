@@ -79,13 +79,15 @@ service cloud.firestore {
     allow create,update,delete: if admin();
   }
   match /deskSessions/{locationId} {
-    // Allow getDoc() to check a not-yet-created session before first Start Duty.
+    // The document ID is the canonical location key. Use it as the authorization
+    // anchor so a legacy/stale locationId field inside deskSessions/I cannot lock
+    // the Warehouse I desk out of its own duty session.
     allow get: if admin() || (security() && (
-      resource == null || myLocationMatches(resource.data.locationId)
+      resource == null || myLocationMatches(locationId) || myLocationMatches(resource.data.locationId)
     ));
     allow list: if admin() || (security() && myLocationMatches(resource.data.locationId));
-    allow create: if admin() || (security() && myLocationMatches(request.resource.data.locationId) && request.resource.data.startedBy == request.auth.uid);
-    allow update: if admin() || (security() && myLocationMatches(resource.data.locationId) && myLocationMatches(request.resource.data.locationId) && (
+    allow create: if admin() || (security() && myLocationMatches(locationId) && request.resource.data.locationId == locationId && request.resource.data.startedBy == request.auth.uid);
+    allow update: if admin() || (security() && myLocationMatches(locationId) && request.resource.data.locationId == locationId && (
       (resource.data.status != 'ACTIVE' && request.resource.data.status == 'ACTIVE' && request.resource.data.startedBy == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['locationId','securityPersonId','securityPersonName','status','startedAt','startedBy','startedByName','endedAt','endedBy','endedByName']))
       || (resource.data.status == 'ACTIVE' && request.resource.data.status == 'ENDED' && request.resource.data.startedBy == resource.data.startedBy && request.resource.data.endedBy == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','endedAt','endedBy','endedByName']))
     ));
