@@ -98,13 +98,13 @@ service cloud.firestore {
       && request.resource.data.locationId in ['ADMIN','MAIN-GATE','I','J','K','L','O','P','Q','R','S','T','H14-MHE'];
 
     allow read: if admin()
-      || (security() && moduleEnabled('appointments') && myLocationMatches(resource.data.locationId))
+      || (security() && moduleEnabled('appointments') && onDutyAt(resource.data.locationId))
       || (official() && resource.data.hostId == request.auth.uid);
 
     allow update: if admin()
       || (security()
         && moduleEnabled('appointments')
-        && myLocationMatches(resource.data.locationId)
+        && onDutyAt(resource.data.locationId)
         && request.resource.data.locationId == resource.data.locationId
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'status','reviewedAt','reviewedBy','reviewedByName','reviewedByRole','rejectionReason',
